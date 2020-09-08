@@ -2,6 +2,16 @@
 use strict;
 use warnings;
 
+#-------------------------------------------------------------------------------
+#   @file   File.example.pl                                                     
+#                                                                               
+#   @par    Classification:  UNCLASSIFIED, OPEN SOURCE                          
+#                                                                               
+#   @brief  Demonstrate how to use the Cpp::File code.                          
+#                                                                               
+#   @version    2020-09-08  DHF     Added header comment block.                 
+#-------------------------------------------------------------------------------
+
 use lib($ENV{"HOME"} . "/bin/perl");
 use Cpp::File();
 

@@ -1,9 +1,17 @@
 #!/usr/bin/perl -w
 
 #-------------------------------------------------------------------------------
-#   Brief:  Process a crash-stack.txt file                                      
+#   File:   crash                                                               
 #                                                                               
 #   Classification: UNCLASSIFIED, OPEN SOURCE                                   
+#                                                                               
+#   Brief:  Process a crash-stack.txt file                                      
+#                                                                               
+#           The common/dev_debug.cpp code will create a crash-stack.txt file    
+#           that effectively has the callback information if the image was      
+#           and routines were compiled and linked with debug information.       
+#                                                                               
+#           This script will display that file in a human readable format.      
 #                                                                               
 #   2020-05-04  DHF     Made open source.                                       
 #-------------------------------------------------------------------------------

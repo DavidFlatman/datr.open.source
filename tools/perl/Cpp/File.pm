@@ -6,6 +6,8 @@ use warnings;
 #                                                                               
 #@file  File.pm                                                                 
 #                                                                               
+#@par   Classification:  UNCLASSIFIED, OPEN SOURCE                              
+#                                                                               
 #@brief Parse a C++ code file.                                                  
 #                                                                               
 #@version   2019-01-30  DHF     File creation.                                  

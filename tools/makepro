@@ -1,6 +1,23 @@
 #!/usr/bin/perl -w
 
 #-------------------------------------------------------------------------------
+# @file makepro                                                                 
+#                                                                               
+# @par  Classification:  UNCLASSIFIED, OPEN SOURCE                              
+#                                                                               
+# @brief    Given a main application (-m) and a directory full of code, makepro 
+#           creates a Qt project file that can be processed with qmake-qt4 or   
+#           qmake-qt5.                                                          
+#                                                                               
+# @todo     Currently this program needs to be executed for each main routine   
+#           in the directory structure.  It should be configured more along the 
+#           lines of "depends" in order to have a single execution create the   
+#           project file for all of the mains -- and for a link library.        
+#                                                                               
+#           Doing so should reduce the amount of time required by makepro and   
+#           reduce the amount of time required to build the projects.           
+#                                                                               
+#                                                                               
 #   -dpath          Search the path for SOURCES and HEADER; pass to compiler.   
 #   -Dmacro=42      Pass qualifier to compiler.                                 
 #   -fflag          Add the given flag to the CXXFLAGS                          

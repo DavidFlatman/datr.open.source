@@ -6,6 +6,8 @@ use warnings;
 #                                                                               
 #@file  FileInternal.pm                                                         
 #                                                                               
+#@par   Classification:  UNCLASIFIED, OPEN SOURCE                               
+#                                                                               
 #@brief Parse a single C++ code file; don't rifle through include files.        
 #                                                                               
 #@version   2019-01-30  DHF     File creation.                                  
