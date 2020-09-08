@@ -35,6 +35,7 @@
 obj/
 bin/
 moc/
+.auto_runtest
 
 # stray editor files
 *.swp

@@ -37,6 +37,7 @@
 #       them.                                                                   
 #                                                                               
 #  History:                                                                     
+#       2020-09-08      DHF         Updated to reflect open source class names. 
 #       2020-05-04      DHF         Open sourced.                               
 #       2019-01-10      DHF         Added in name of the user in the initial    
 #                                   version history.                            
@@ -411,7 +412,7 @@ sub print_test_class_h
     print HFILE &comment(0, "/");
     print HFILE &comment(0, $dashes);
 
-    print HFILE "class ${test} : public dev::Test {\n";
+    print HFILE "class ${test} : public dev::test::work::Test {\n";
     print HFILE "    public:\n";
     print HFILE "        ${test}();\n";
     print HFILE "        ${test}(const ${test}& that);\n";
@@ -426,7 +427,7 @@ sub print_test_class_h
 
     print HFILE "\n    private:\n\n";
 
-    print HFILE "}; //  class ${test} : public dev::Test //\n\n";
+    print HFILE "}; //  class ${test} : public dev::test::work::Test //\n\n";
 
     print HFILE "} // namespace test \n";
     print HFILE $close_namespace;
@@ -464,7 +465,8 @@ sub print_test_class_cpp
     print CFILE &comment(0, $dashes);
     print CFILE &comment(0, "/ \@brief Default constructor");
     print CFILE &comment(0, $dashes);
-    print CFILE "${test}::${test}() : Test(\"${namespace_prefix}${class}\")\n";
+    print CFILE "${test}::${test}()\n"
+    print CFILE"    : dev::test::work::Test(\"${namespace_prefix}${class}\")\n";
     print CFILE "{\n";
     print CFILE &comment(4, "  This space intentionally left mostly blank.");
     print CFILE "}\n\n";

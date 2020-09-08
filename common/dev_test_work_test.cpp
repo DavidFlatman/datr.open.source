@@ -12,6 +12,8 @@
 ///                                                                             
 ///@author  David H. Flatman    DHF     davidflatman@email.com                  
 ///                                                                             
+///@version 2020-09-08  DHF     Removed dependency on ftime.                    
+///                                                                             
 ///@version 2020-05-04  DHF     Open sourced                                    
 ///                                                                             
 ///@version 2018-03-06  DHF     Added handling not implemented.                 
@@ -65,6 +67,8 @@
 #include "lib_compiler_info.h"
 #include "lib_string.h"
 
+#include <chrono>
+#include <ctime>
 #include <stdio.h>      // sprintf  
 #include <string.h>     // strncpy   
 
@@ -204,6 +208,7 @@ void Test::run(
     m_Verbosity = verbosity;
     m_OutputFunction = fun;
     m_OutputIndentation = indentLevel;
+    m_StartMilliseconds = 0;
     
     output(vHeader, "starting class " + m_ClassName);
     outputIndent();
@@ -439,36 +444,6 @@ void Test::notImplemented(
 
 }
 
-///-----------------------------------------------------------------------------
-///@par  Method:  recordElapsed                                                 
-///                                                                             
-///@par  Purpose:                                                               
-///                                                                             
-///-----------------------------------------------------------------------------
-void Test::recordElapsed(const char* test, const timeb& startTime) 
-{
-    timeb stopTime;
-    ftime(&stopTime);
-
-    int milliseconds = stopTime.millitm - startTime.millitm;
-    if (milliseconds < 0) {
-        milliseconds += 1000;
-        --stopTime.time;
-    }
-    time_t seconds = stopTime.time - startTime.time;
-
-    char buffer[2048];
-    sprintf(
-        buffer
-      , "elapsed time %5ld.%03d for condition "
-      , seconds
-      , milliseconds
-    );
-
-    std::string outputLine(buffer);
-    outputLine += test;
-    output(vTimeStamp, outputLine);
-} /// void Test::recordElapsed(const char* test, const timeb& startTime) ///
 
 //------------------------------------------------------------------------------
 ///@brief   Increment the number of passed tests by the given amount.           
@@ -499,10 +474,15 @@ void Test::notImplementedAdd(int count)
 ///@par  Purpose:                                                               
 ///                                                                             
 ///-----------------------------------------------------------------------------
-void Test::output(verbosity_t level, const std::string& message)  {
+void Test::output(verbosity_t level, const std::string& message)  
+{
     if (level & m_Verbosity && m_OutputFunction != NULL) {
-        char buffer[256];
+        char buffer[25];
         if (m_Verbosity & vTimeStamp) {
+//------------------------------------------------------------------------------
+//  ftime has been deprecated.  Need to replace with std::chrono...             
+//------------------------------------------------------------------------------
+#if 0
             timeb current;
             ftime(&current);
             tm time;
@@ -522,12 +502,17 @@ void Test::output(verbosity_t level, const std::string& message)  {
               , time.tm_sec
               , current.millitm
             );
+#else
+            strncpy(buffer, "", sizeof(buffer));
+#endif
         } else {
             strncpy(buffer, "", sizeof(buffer));
         }
         m_OutputFunction(m_OutputIndentation + buffer + message);
+
     } // if (level & m_Verbosity) 
-} 
+} // void Test::output(verbosity_t level, const std::string& message)  
+
 
 //------------------------------------------------------------------------------
 ///@brief   Increment the indentation level (for tests calling tests).          

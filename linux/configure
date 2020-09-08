@@ -6,7 +6,7 @@
 #   version 2020-05-04  DHF     Open sourced                                    
 #-------------------------------------------------------------------------------
 
-OUTPUT_DIR=../../datr.open.source-non-cm/linux/
+OUTPUT_DIR=./
 SUBDIR=$1
 
 if [  -z "$1" ]; then

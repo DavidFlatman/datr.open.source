@@ -14,10 +14,10 @@
 #include "lib_ds_shared_ptr.h"
 
 #include <atomic>
-#include <boost/shared_ptr.hpp>
 #include <iostream>
 #include <sstream>
 #include <stdexcept>
+#include <stdint.h>
 #include <string>
 #include <sys/timeb.h>
 #include <time.h>
@@ -78,6 +78,8 @@ namespace work  {
 ///             } // namespace work                                             
 ///             } // namespace lib                                              
 ///         @endcode                                                            
+///                                                                             
+///@version 2020-09-08  DHF     Added m_StartTime and #include <chrono>         
 ///                                                                             
 ///@version 2020-09-01  DHF     Removed PROXY macros, and *_ACTUAL macros.      
 ///                                                                             
@@ -149,7 +151,8 @@ namespace work  {
 ///                             That Could Possibly Work", SD Conference        
 ///                             April 12, 2001.                                 
 //------------------------------------------------------------------------------
-class Test {
+class Test 
+{
     public:
         typedef void (*OutputFunction)(const std::string& message);
         typedef unsigned int verbosity_t;
@@ -211,11 +214,6 @@ class Test {
         );
 
     protected:
-        void recordElapsed(
-            const char* test
-          , const timeb& startTime
-        );
-
         virtual void runTest() = 0;
         virtual void runTest1();
         virtual void runTest2();
@@ -236,6 +234,8 @@ class Test {
 
         dev::test::work::Test* m_TestClass;
 
+        
+
     private:
         std::string             m_ClassName;
         std::atomic<uint32_t>   m_Failed;
@@ -243,6 +243,9 @@ class Test {
         std::atomic<uint32_t>   m_NotImplemented;
         verbosity_t             m_Verbosity;
         bool                    m_AlreadyExecuted;
+
+        uint64_t                m_StartMilliseconds;
+
 
 }; // class Test //                                                             
 

@@ -1,1 +1,0 @@
-$1 --summary --not-impl --failed --slow --files ../../datr.open.source-non-cm/linux/obj/lib_ieee_ts754_work_float.o
