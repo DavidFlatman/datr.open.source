@@ -1,0 +1,31 @@
+#!/bin/bash
+
+#-------------------------------------------------------------------------------
+#   Classification:  UNCLASSIFIED, OPEN SOURCE                                  
+#                                                                               
+#   version 2020-05-04  DHF     Open sourced                                    
+#-------------------------------------------------------------------------------
+
+OUTPUT_DIR=../../datr.open.source-non-cm/linux/
+SUBDIR=$1
+
+if [  -z "$1" ]; then
+    SUBDIR="common"
+fi
+
+
+../tools/depends                                                        \
+    --terse                                                             \
+    -sboost                                                             \
+    -D_REENTRANT                                                        \
+    -d../${SUBDIR}                                                      \
+    -dsrc                                                               \
+    -std=c++0x                                                          \
+    --temp-dir=${OUTPUT_DIR}                                            \
+    -lpthread                                                           \
+    -lso/usr/lib64/libboost_thread.so                                   \
+    -lso/usr/lib64/libboost_regex.so                                    \
+    -lrt
+exit
+#    -I${BOOST}include/boost-1_69                                        \
+

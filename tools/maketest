@@ -1,0 +1,920 @@
+#!/usr/bin/perl -w
+#-------------------------------------------------------------------------------
+#  Classification:  UNCLASSIFIED, OPEN SOURCE                                   
+#-------------------------------------------------------------------------------
+#                                                                               
+#  Namespace:  dev                                                              
+#                                                                               
+#  Program:  maketest                                                           
+#                                                                               
+#  Purpose:                                                                     
+#       The maketest.pl program creates skeleton test files based on the        
+#       contents of the given .h files.                                         
+#                                                                               
+#  Parameters: ..                                                               
+#       -f          Force overwriting of existing files.  By default, if the    
+#                   files to be written already exist, the program will         
+#                   terminate.                                                  
+#                                                                               
+#       ARGV[n]     The name of the .h file to generate the test files for.     
+#                   Assuming that the input file has the format BASE.h, the     
+#                   output file will be named BASEtest.h and BASEtest.cpp.      
+#                                                                               
+#  Note:                                                                        
+#       We are *not* writing a full blown compiler parser here.  If you have    
+#       goofy code, expected goofy results.  No attempt is made to understand   
+#       nor translate macro definitions.  No attempt is made to open and        
+#       parse include files.                                                    
+#                                                                               
+#       The approach taken to identify methods of a class is the token before   
+#       an open paranethesis.  It is pretty easy to fool this (big deal, edit   
+#       the skeleton code created and add the methods that maketest missed and  
+#       delete the false positives).                                            
+#                                                                               
+#       If your code like:                                                      
+#           MY_MAGIC_MACRO(function_name)(int i, int j, int k);                 
+#       then maketest will miss your methods -- boo hoo, you have to hand enter 
+#       them.                                                                   
+#                                                                               
+#  History:                                                                     
+#       2020-05-04      DHF         Open sourced.                               
+#       2019-01-10      DHF         Added in name of the user in the initial    
+#                                   version history.                            
+#       2018-03-06      DHF         Changed FAIL to undeveloped tests to        
+#                                   TEST_NOT_IMPLEMENTED                        
+#       2017-01-18      MNT         Added FAIL to undeveloped tests.            
+#       2014-02-25      DHF         Automatically include lib_config_filepaths.h
+#       2010-09-21      DHF         Added handling of %operators.               
+#                                   Included definition of a class object at    
+#                                   the beginning of each test method           
+#                                   (at JPW's suggestion).                      
+#       2010-09-15      DHF         Modified to use C++ tokenizing input.       
+#                                   Handle multiple class definitions in one    
+#                                   header file.                                
+#                                   Properly handle forward class definitions.  
+#       2010-03-20      DHF         Changed "tools" to "dev"                    
+#       2006-10-23      DHF         Modified to output something closer to      
+#                                   range's style.                              
+#       2005-12-05      DHF         File creation.                              
+#-------------------------------------------------------------------------------
+    #  The $in_*_comment variables are used in multiple places, but especially  
+    #  the input_*token routines.                                               
+    #                                                                           
+    #  The @input and $input_sub variables are used the the input_ routines.    
+    #  They should probably not be accessed outside of those routines.          
+    #---------------------------------------------------------------------------
+    local $in_block_comment = 0;
+    local $in_line_comment = 0;
+    local $input_sub = 0;
+    local @input;
+    local $who = sprintf "%-12s", $ENV{"USER"};
+
+    local $overwrite_existing_files = 0;
+
+    local $dashes = "---------------------------------------------------------";
+    $dashes .= $dashes . $dashes . $dashes;
+
+    local @today = localtime();
+    local $today = sprintf "%04d-%02d-%02d"
+        , ($today[5]+1900)
+        , $today[4]+1
+        , $today[3];
+
+    local %operators = (
+        "->",   "Dereference"
+      , ">>",   "ShiftRight"
+      , "<<",   "ShiftLeft"
+      , "&&",   "LogicalAnd"
+      , "||",   "LogicalOr"
+
+      , "==",   "Equal"
+      , "<",    "LessThan"
+      , ">",    "GreaterThan"
+      , "<=",   "LessThanOrEqual"
+      , ">=",   "GreaterThanOrEqual"
+      , "!=",   "NotEqual"
+
+      , "=",    "Assignment"
+
+      , "+",    "Add"
+      , "-",    "Minus"
+      , "*",    "Multiply"
+      , "/",    "Divide"
+      , '%',    "Mod"
+
+      , "+=",   "AssignmentAdd"
+      , "-=",   "AssignmentMinus"
+      , "*=",   "AssignmentMultiply"
+      , "/=",   "AssignmentDivide"
+      , "%=",   "AssignmentMod"
+      , "&=",   "AssignemntBitwiseAnd"
+      , "|=",   "AssignemntBitwiseOr"
+      , "~=",   "AssignemntBitwiseNot"
+      , "]=",   "AssignemntBrackets"
+
+      , "--",   "Decrement"
+      , "++",   "Increment"
+
+      , "&",    "BitwiseAnd"
+      , "|",    "BitwiseOr"
+      , "~",    "BitwiseNot"
+      , "]",    "Brackets"
+
+    );
+
+    foreach my $a (@ARGV) {
+        if ($a eq "-f") {
+            $overwrite_existing_files = 1;
+        } else {
+            &process_file($a);
+        }
+    }
+
+#-------------------------------------------------------------------------------
+# @brief    Given the name of a C++ header file, open the file and create test  
+#           files skeletons for testing the contained class.                    
+#-------------------------------------------------------------------------------
+sub process_file
+{
+    my ($filename) = @_;
+
+    #---------------------------------------------------------------------------
+    #  The namespace* variables are "managed" (populated and depopulated) by    
+    #  the process_namespace routine.                                           
+    #                                                                           
+    #  They are used by the print_test_class_* routines.                        
+    #---------------------------------------------------------------------------
+    local @namespaces;
+    local $namespace_prefix = "";
+
+    if ($filename =~ m/(.*)\.hp*$/) {
+        my $base = $1;
+        my $file_h = $base . "test.h";
+        my $file_c = $base . "test.cpp";
+
+        #-----------------------------------------------------------------------
+        #   Ensure that the output files don't already exist (or we've been     
+        #   told to stomp on them.                                              
+        #-----------------------------------------------------------------------
+        my $error = "";
+
+        if ($overwrite_existing_files == 0 and open(FILE, $file_h)) {
+            close(FILE);
+            $error .= $file_h . " already exists\n";
+        }
+        if ($overwrite_existing_files == 0 and open(FILE, $file_c)) {
+            close(FILE);
+            $error .= $file_c . " already exists\n";
+        }
+
+        if ($error) {
+            die $error;
+        }
+
+
+        &input_file_add($filename);
+
+
+        #-----------------------------------------------------------------------
+        #   Open the output files and write the "one shot" information to the   
+        #   files -- the header information that only appears once versus for   
+        #   every class in the input file.                                      
+        #-----------------------------------------------------------------------
+        open(HFILE, ">$file_h") or die "error on open out ${file_h}\n$!\n";
+        open(CFILE, ">$file_c") or die "error on open out ${file_c}\n$!\n";
+
+        print HFILE &comment(0, $dashes);
+        print HFILE &comment(0, "/\@file ${base}test.h");
+        print HFILE &comment(0, $dashes);
+        print HFILE "#ifndef \U${base}TEST_H\E\n";
+        print HFILE "#define \U${base}TEST_H\E\n\n";
+        print HFILE "#include \"dev_test.h\"\n\n";
+
+        print CFILE &comment(0, $dashes);
+        print CFILE &comment(0, "/\@file ${base}test.cpp");
+        print CFILE &comment(0, "/");
+        print CFILE &comment(0, "/\@author  Make Test Utility       MTU     Utility by DHF");
+        print CFILE &comment(0, "/");
+        print CFILE &comment(0, "/\@version ${today}  ${who}File creation via Make Test Utility");
+        print CFILE &comment(0, $dashes);
+        print CFILE "#include \"${base}test.h\"\n";
+        print CFILE "#include \"dev_test.h\"\n";
+        print CFILE "#include \"dev_test_classes.h\"\n";
+        print CFILE "#include \"lib_config_filepaths.h\"\n";
+        print CFILE "#include \"${filename}\"\n";
+        print CFILE "\n";
+
+        #-----------------------------------------------------------------------
+        #   Start grabbing tokens off the input stream.  The two that we're     
+        #   worried about processing are "class" and "namespace".               
+        #-----------------------------------------------------------------------
+        my @token;
+
+        while (@token = &input_token_get_nocomment, $#token > 0) {
+            my ($file, $number, $type, $token) = @token;
+
+            if ($token eq "class") {
+                &process_class;
+
+            } elsif ($token eq "namespace") {
+                &process_namespace;
+
+            }
+            
+        }
+
+        #-----------------------------------------------------------------------
+        #   Write the one time per file trailer to each output file and close   
+        #   the files.                                                          
+        #-----------------------------------------------------------------------
+        print HFILE "\n#endif // #ifndef \U${base}TEST_H\E //\n\n";
+
+        close HFILE;
+        close CFILE;
+    }
+}
+
+
+#-------------------------------------------------------------------------------
+#   On entry, the keyword "namespace" has been removed from the input stream.   
+#   On exit, the closing brace has been removed from the input stream.          
+#-------------------------------------------------------------------------------
+sub process_namespace
+{
+    #---------------------------------------------------------------------------
+    #   Since "namespace" has already been removed, the next token should be    
+    #   the name of the namespace.                                              
+    #---------------------------------------------------------------------------
+    my ($file, $number, $type, $namespace) = &input_token_get_nocomment;
+
+    my $incoming_namespace_prefix = $namespace_prefix;
+
+    push @namespaces, $namespace;
+    $namespace_prefix .= $namespace . "::";
+
+    my $brace_depth = 0;
+    
+    #---------------------------------------------------------------------------
+    #  After the namespace name, we're expecting an open brace                  
+    #---------------------------------------------------------------------------
+    my $str;
+    ($file, $number, $type, $str) = &input_token_get_nocomment;
+
+    if ($str eq "{") {
+        ++$brace_depth;
+    } else {
+        #-----------------------------------------------------------------------
+        #   Okay, we don't know what's going on.  Maybe we should spit out an   
+        #   error message.                                                      
+        #-----------------------------------------------------------------------
+        &input_token_unget($file, $number, $type, $str);
+        print STDERR "Did not find open brace ({) after namespace " 
+            . $namespaces[$#namespaces];
+        print STDERR ".\nProceeding in a very confused state ...\n";
+    }
+
+    #---------------------------------------------------------------------------
+    #   The brace_depth starts at 1 (assuming the token after the name of the   
+    #   namespace was an open brace).  When it hits 0, we have the closing      
+    #   brace for this namespace.                                               
+    #---------------------------------------------------------------------------
+    while ($brace_depth > 0 and defined($str)) {
+        ($file, $number, $type, $str) = &input_token_get_nocomment;
+
+        if (!defined($str)) {
+            #-------------------------------------------------------------------
+            #   Their code is wrong (well, or ours is).  We ran out of tokens   
+            #   before we found the closing brace.                              
+            #-------------------------------------------------------------------
+            print "wrong brace_depth = ${brace_depth}\n";
+
+        } elsif ($str eq "{") {
+            ++$brace_depth;
+
+        } elsif ($str eq "}") {
+            --$brace_depth;
+
+        } elsif ($str eq "namespace") {
+            &process_namespace;
+
+        } elsif ($str eq "class") {
+            &process_class;
+
+        }
+    }
+
+    $namespace_prefix = $incoming_namespace_prefix;
+    pop @namespaces;
+
+} # sub process_namespace #
+
+
+#-------------------------------------------------------------------------------
+#  @brief   The main parser just found the keyword "class".  Process the class. 
+#                                                                               
+#   On entry, the input stream should be immediately after the "class" token;   
+#   i.e., the next token should be the class name.                              
+#                                                                               
+#   On exit, the input stream should have the class' semi-colon removed.        
+#   Consider:                                                                   
+#       class ForwardDeclaration;                                               
+#       class StandardDeclaration { /* more code */ };                          
+#       class ClassAndVariable { /* more code */ } myVariable;                  
+#-------------------------------------------------------------------------------
+sub process_class
+{
+    my @token = &input_token_get_nocomment;
+    my ($file, $number, $type, $class_name) = @token;
+
+    #---------------------------------------------------------------------------
+    #  There are a number of things that can appear after a class name:         
+    #       class ForwardDeclaration;                                           
+    #       class MostlyNormal { ...};                                          
+    #       class Dervied : public Base { ... };                                
+    #---------------------------------------------------------------------------
+
+    my ($f, $n, $t, $s);    # file, line-number, type, token-string             
+
+    while (
+        ($f,$n,$t,$s) = &input_token_get_nocomment
+      , defined($s) and $s ne ";" and $s ne "{"
+    ){
+        #-----------------------------------------------------------------------
+        #   Eat away until we either have a fowardedly declared class or we're  
+        #   ready to start the actual class.                                    
+        #-----------------------------------------------------------------------
+    }
+
+    #---------------------------------------------------------------------------
+    #  The methods variables are populated by process_class_get_methods and are 
+    #  used by the print_test_class_ routines.                                  
+    #                                                                           
+    #  The %methods variable is used to ensure that the method is only added    
+    #  once to the @methods array.                                              
+    #---------------------------------------------------------------------------
+    local %methods;
+    local @methods;
+
+    if ($s eq "{") {
+        &process_class_get_methods;
+
+        &print_test_class_h($class_name);
+        &print_test_class_cpp($class_name);
+
+        while (
+            ($f,$n,$t,$s) = &input_token_get_nocomment
+          , defined($s) and $s ne ";"
+        ) {
+            #-------------------------------------------------------------------
+            #  Advance the input stream to after the terminating semi-colon.    
+            #-------------------------------------------------------------------
+        }
+    }
+    
+} # sub process_class #
+    
+
+#-------------------------------------------------------------------------------
+#  @brief   Print out the header file for the test class.                       
+#-------------------------------------------------------------------------------
+sub print_test_class_h
+{
+    my ($class) = @_;
+    my $test = $class . "Test";
+    my $close_namespace = "";
+
+    #---------------------------------------------------------------------------
+    #  The @namespaces array is defined in the process_file method and          
+    #  it the contents are managed by the process_namespace method.             
+    #                                                                           
+    #  We effectively want our test class to live under the namespace that the  
+    #  class under test lives -- but inside the additional "test" namespace.    
+    #---------------------------------------------------------------------------
+    foreach my $namespace (@namespaces) {
+        print HFILE "namespace " . $namespace . " {\n";
+        $close_namespace = "} // namespace ${namespace}\n" . $close_namespace;
+    }
+
+    print HFILE "namespace test {\n\n";
+
+    print HFILE &comment(0, $dashes);
+    print HFILE &comment(0, "/");
+    print HFILE &comment(0, "/\@par Class: ${test}");
+    print HFILE &comment(0, "/");
+    print HFILE &comment(0, "/\@par Purpose:");
+    print HFILE &comment(0, "/         The ${test} class provides the regression test for the");
+    print HFILE &comment(0, "/         ${namespace_prefix}${class} class.");
+    print HFILE &comment(0, "/");
+    print HFILE &comment(0, "/\@author  Make Test Utility       MTU     Utility by DHF");
+    print HFILE &comment(0, "/");
+    print HFILE &comment(0, "/\@version ${today}  ${who}File creation via Make Test Utility");
+    print HFILE &comment(0, "/");
+    print HFILE &comment(0, $dashes);
+
+    print HFILE "class ${test} : public dev::Test {\n";
+    print HFILE "    public:\n";
+    print HFILE "        ${test}();\n";
+    print HFILE "        ${test}(const ${test}& that);\n";
+    print HFILE "        virtual ~${test}();\n";
+    print HFILE "        ${test}& operator=(const ${test}& that);\n\n";
+    print HFILE "    protected:\n";
+    print HFILE "        void runTest();\n\n";
+
+    foreach my $method (@methods) {
+        print HFILE "        void ${method}();\n";
+    }
+
+    print HFILE "\n    private:\n\n";
+
+    print HFILE "}; //  class ${test} : public dev::Test //\n\n";
+
+    print HFILE "} // namespace test \n";
+    print HFILE $close_namespace;
+    print HFILE "\n\n";
+
+
+}  # sub print_test_class_h #
+    
+
+#-------------------------------------------------------------------------------
+# @brief    Print out the CPP file for the test skeleton.                       
+#-------------------------------------------------------------------------------
+sub print_test_class_cpp
+{
+    my ($class) = @_;
+    my $test = $class . "Test";
+    my $close_namespace = "";
+
+
+    #---------------------------------------------------------------------------
+    #  See print_test_class_h for an explanation of the @namespace variable.    
+    #---------------------------------------------------------------------------
+    foreach my $namespace (@namespaces) {
+        print CFILE "namespace " . $namespace . " {\n";
+        $close_namespace = "} // namespace ${namespace}\n" . $close_namespace;
+    }
+
+    print CFILE "namespace test {\n\n";
+
+    print CFILE &comment(0, $dashes);
+    print CFILE &comment(0, "  Register the test class for the dev_test_classes.");
+    print CFILE &comment(0, $dashes);
+    print CFILE "TEST_REGISTER(${namespace_prefix}test::${test});\n\n";
+
+    print CFILE &comment(0, $dashes);
+    print CFILE &comment(0, "/ \@brief Default constructor");
+    print CFILE &comment(0, $dashes);
+    print CFILE "${test}::${test}() : Test(\"${namespace_prefix}${class}\")\n";
+    print CFILE "{\n";
+    print CFILE &comment(4, "  This space intentionally left mostly blank.");
+    print CFILE "}\n\n";
+
+    print CFILE &comment(0, $dashes);
+    print CFILE &comment(0, "/ \@brief Copy constructor");
+    print CFILE &comment(0, "/ \@param  that    ${test} object to copy.");
+    print CFILE &comment(0, $dashes);
+    print CFILE "${test}::${test}(const ${test}& that) : Test(that)\n";
+    print CFILE "{\n";
+    print CFILE &comment(4, "  This space intentionally left mostly blank.");
+    print CFILE "}\n\n\n";
+
+    print CFILE &comment(0, $dashes);
+    print CFILE &comment(0, "/ \@brief Destructor");
+    print CFILE &comment(0, $dashes);
+    print CFILE "${test}::~${test}()\n\n";
+    print CFILE "{\n";
+    print CFILE &comment(4, "  This space intentionally left mostly blank.");
+    print CFILE "}\n\n\n";
+
+    print CFILE &comment(0, $dashes);
+    print CFILE &comment(0, "/ \@brief Assignment operator.");
+    print CFILE &comment(0, $dashes);
+    print CFILE "${test}& ${test}::operator=(const ${test}& that)\n";
+    print CFILE "{\n";
+    print CFILE "    Test::operator=(that);\n";
+    print CFILE "    return *this;\n";
+    print CFILE "} // ${class}Test::operator=(const ${test}& that) //\n\n\n";
+
+    print CFILE &comment(0, $dashes);
+    print CFILE &comment(0, "/ \@brief Execute the various test for ${class}.");
+    print CFILE &comment(0, $dashes);
+    print CFILE "void ${class}Test::runTest()\n{\n";
+
+    foreach my $method (@methods) {
+        print CFILE "    $method();\n";
+    }
+    print CFILE "\n} // void ${class}Test::runTest() //\n\n\n";
+
+    $class =~ m/^(.)/;
+    my $letter = "\L$1\E";
+
+    foreach $method (@methods) {
+        print CFILE &comment(0, $dashes);
+        print CFILE &comment(0, "/ \@brief Tests for the ${class}::${method}");
+        print CFILE &comment(0, $dashes);
+        print CFILE "void ${class}Test::${method}()\n{\n";
+        print CFILE "    ${namespace_prefix}${class} ${letter};\n\n";
+        print CFILE &comment(4, $dashes);
+        print CFILE &comment(4, "/ \@test  Test to exercise the ${method}.");
+        print CFILE &comment(4, $dashes);
+        print CFILE &comment(4, "/ \@todo  Add code to test the ${method} method.");
+        print CFILE "    TEST_NOT_IMPLEMENTED;\n";
+        print CFILE "}\n\n\n";
+
+    }
+
+
+    print CFILE "} // namespace test \n";
+    print CFILE $close_namespace;
+    print CFILE "\n\n";
+
+} # sub print_test_class_cpp #
+    
+
+#-------------------------------------------------------------------------------
+#   Search the input stream finding method names until we find a closing brace. 
+#   The input stream should be after the class' opening brace.                  
+#   On exit, the input stream will be after the class' closing brace.           
+#                                                                               
+#   This method populates the parent's local %methods key-pair and the parent's 
+#   @methods array.                                                             
+#-------------------------------------------------------------------------------
+sub process_class_get_methods
+{
+    my $brace_depth = 1;            # depth in braces                           
+    my $paren_depth = 0;            # depth in parenthesises                    
+    my ($f, $n, $t, $s);            # file, number, type, string                
+    my $ppp = "private";            # public, protected, or private             
+
+    my $previous = "";
+
+    #---------------------------------------------------------------------------
+    #   The defined($s) is used to detect end-of-input (and is a very bad thing)
+    #                                                                           
+    #   The $brace_depth tracks how deep into the braces the processing has     
+    #   gone:  +1 for open brace, -1 for close brace.  When 0 is reached, the   
+    #   close brace for the class has been reached (and we terminate).          
+    #---------------------------------------------------------------------------
+    while (
+        ($f, $n, $t, $s) = &input_token_get_nocomment
+      , $brace_depth > 0 and defined($s)
+    ) {
+        if ($s eq "{") {
+            ++$brace_depth;
+        }
+
+        elsif ($s eq "}") {
+            --$brace_depth;
+        }
+        
+        elsif ($s eq "private" or $s eq "protected" or $s eq "public") {
+            $ppp = $s;
+        }
+
+        elsif ($s eq "(") {
+            ++$paren_depth;
+            if ($brace_depth == 1 and $ppp eq "public" and $prev_t =~ /ident/) {
+                if (!defined($methods{$prev_s})) {
+                    push @methods, $prev_s;
+                    $methods{$prev_s} = 1;
+                }
+            } elsif ($brace_depth == 1 and $ppp eq "public" and defined($operators{$prev_s})) {
+                $prev_s = "operator" . $operators{$prev_s};
+                if (!defined($methods{$prev_s})) {
+                    push @methods, $prev_s;
+                    $methods{$prev_s} = 1;
+                }
+            }
+        }
+
+        elsif ($s eq ")") {
+            --$paren_depth;
+        }
+
+        $prev_s = $s;
+        $prev_t = $t;
+    }
+
+    &input_token_unget($f, $n, $t, $s);
+
+} # sub process_class_get_methods
+
+
+#-------------------------------------------------------------------------------
+# @brief    Get the next token that is not inside a comment (nor a start of     
+#           comment).                                                           
+#-------------------------------------------------------------------------------
+sub input_token_get_nocomment
+{
+    my @result;
+
+    while (@result = &input_token_get, $#result > 0) {
+
+        my ($file, $number, $type, $token) = @result;
+
+        if ($in_block_comment != 0 and $token eq "\*/") {
+            $in_block_comment = 0;
+
+        } elsif ($in_block_comment) {
+            # skip the token ... it's block commented out                       
+
+        } elsif ($in_line_comment == $number) {
+            # still in line comment                                             
+
+        } elsif ($token eq "/\*") { 
+            $in_block_comment = $number;
+
+        } elsif ($token eq "//") {
+            $in_line_comment = $number;
+
+        } else {
+            return @result;
+
+        }
+
+    }
+
+    return @result;
+}
+
+
+#-------------------------------------------------------------------------------
+# @brief    Add a file to the input stream ... seach the include paths in       
+#           reverse order that they were found.                                 
+#-------------------------------------------------------------------------------
+sub input_file_add
+{
+    my ($file) = @_;
+    
+    open(INPUT, $file) or die "unable to open file $file\n$!\n";
+    my @lines = <INPUT>;
+    close(INPUT);
+
+    local $in_comment_block = 0;
+
+    my $number = 0;
+    for ($number = 0; $number <= $#lines; ++$number) {
+        chomp($lines[$number]);
+        $lines[$number] =~ s/\r//;
+
+        &input_line_add($file, $number+1, $lines[$number]);
+
+    }
+
+}
+
+
+#-------------------------------------------------------------------------------
+# @brief    Break the input line into tokens and add the tokens to the end of   
+#           the input stream.                                                   
+#                                                                               
+# @note     In C there are six classes of tokens: identifiers, keywords,        
+#           constants, string literals, operators, and other separators.        
+#-------------------------------------------------------------------------------
+sub input_line_add
+{
+    my ($file, $number, $line) = @_;
+
+    if ($in_line_comment != $number) {
+        $in_line_comment = 0;
+    }
+
+    my $input_comment_line = 0;
+
+    $line =~ s/^[ \t]*//;
+    while ($line ne "") {
+        if ($line =~ /^(\*\/)(.*)/) {               # end block comment */
+            $line = $2;
+            push @input, $file . ":" . $number . ":operator:" . $1;
+            $in_comment_block = 0;
+        }
+
+        elsif ($line =~ /^(\/\*)(.*)/) {            # begin block comment /*    
+            $line = $2;
+            push @input, $file . ":" . $number . ":operator:" . $1;
+            $in_comment_block = 1;
+        }
+
+        elsif ($line =~ /^(\dx[a-f0-9]+)(.*)/i) {   #   hex literal             
+            $line = $2;
+            push @input, $file . ":" . $number . ":literal-hex:" . $1;
+        }
+
+        elsif ($line =~ /^(0[0-7]+)(.*)/) {         #   octal literal           
+            $line = $2;
+            push @input, $file . ":" . $number . ":literal-oct:" . $1;
+        }
+
+        elsif ($line =~ /^(\d+)(.*)/) {             #   decimal literal         
+            $line = $2;
+            push @input, $file . ":" . $number . ":literal-dec:" . $1;
+        }
+
+        elsif ($line =~ /^('.*?')(.*)/) {           #  'c' literal              
+            $line = $2;
+            push @input, $file . ":" . $number . ":literal-chr:" . $1;
+        }
+
+        elsif ($line =~ /^(".*?")(.*)/) {           #   "string" literal        
+            $line = $2;
+            my $token = $1;
+            while ($token =~ /\\"$/ and $line =~ /^(.*?")(.*)/) {
+                $token .= $1;
+                $line = $2;
+            }
+
+            push @input, $file . ":" . $number . ":literal-str:" . $token;
+        }
+
+        elsif ($line =~ /^([a-z_][a-z_0-9]*)(.*)/i) {   # identifier            
+            $line = $2;
+            push @input, $file . ":" . $number . ":identifier:" . $1;
+
+        }
+
+        elsif ($line =~ /^(\/\/)(.*)/) {                # line comment //       
+            $line = $2;
+            push @input, $file . ":" . $number . ":operator:" . $1;
+            $in_line_comment = $number;
+        }
+
+        elsif ($line =~ /^(-\>)(.*)/) {
+            $line = $2;
+            push @input, $file . ":" . $number . ":operator:" . $1;
+        }
+
+        elsif ($line =~ /^(\>\>)(.*)/) {
+            $line = $2;
+            push @input, $file . ":" . $number . ":operator:" . $1;
+        }
+
+        elsif ($line =~ /^(\<\<)(.*)/) {
+            $line = $2;
+            push @input, $file . ":" . $number . ":operator:" . $1;
+        }
+
+        elsif ($line =~ /^(\&\&)(.*)/) {
+            $line = $2;
+            push @input, $file . ":" . $number . ":operator:" . $1;
+        }
+
+        elsif ($line =~ /^(\|\|)(.*)/) {
+            $line = $2;
+            push @input, $file . ":" . $number . ":operator:" . $1;
+        }
+
+        elsif ($line =~ /^(==)(.*)/) {
+            $line = $2;
+            push @input, $file . ":" . $number . ":operator:" . $1;
+        }
+
+
+        elsif ($line =~ /^(!=)(.*)/) {
+            $line = $2;
+            push @input, $file . ":" . $number . ":operator:" . $1;
+        }
+
+        elsif ($line =~ /^(~=)(.*)/) {
+            $line = $2;
+            push @input, $file . ":" . $number . ":operator:" . $1;
+        }
+
+        elsif ($line =~ /^(\>\=)(.*)/) {
+            $line = $2;
+            push @input, $file . ":" . $number . ":operator:" . $1;
+        }
+
+        elsif ($line =~ /^(\<\=)(.*)/) {
+            $line = $2;
+            push @input, $file . ":" . $number . ":operator:" . $1;
+        }
+
+        elsif ($line =~ /^(\+\=)(.*)/) {
+            $line = $2;
+            push @input, $file . ":" . $number . ":operator:" . $1;
+        }
+
+        elsif ($line =~ /^(\-\=)(.*)/) {
+            $line = $2;
+            push @input, $file . ":" . $number . ":operator:" . $1;
+        }
+
+        elsif ($line =~ /^(\*\=)(.*)/) {
+            $line = $2;
+            push @input, $file . ":" . $number . ":operator:" . $1;
+        }
+
+        elsif ($line =~ /^(\/\=)(.*)/) {
+            $line = $2;
+            push @input, $file . ":" . $number . ":operator:" . $1;
+        }
+
+        elsif ($line =~ /^(\+\+)(.*)/) {
+            $line = $2;
+            push @input, $file . ":" . $number . ":operator:" . $1;
+        }
+
+        elsif ($line =~ /^(\#\#)(.*)/) {
+            $line = $2;
+            push @input, $file . ":" . $number . ":operator:" . $1;
+        }
+
+        elsif ($line =~ /^(\-\-)(.*)/) {
+            $line = $2;
+            push @input, $file . ":" . $number . ":operator:" . $1;
+        }
+
+        elsif ($line =~ /^([\.\#\(\)\[\]\!\%\^\&\*-=\+\{\}\?\/\.\>\<\:])(.*)/) {
+            $line = $2;
+            push @input, $file . ":" . $number . ":operator:" . $1;
+        }
+
+        elsif ($line =~ /^([\|\&\^\~])(.*)/) {
+            $line = $2;
+            push @input, $file . ":" . $number . ":operator:" . $1;
+        }
+
+        elsif ($line =~ /^(\@[a-z_]\w*)(.*)/i) {
+            $line = $2;
+            push @input, $file . ":" . $number . ":doxygen-command:" . $1;
+        }
+
+        elsif ($line =~ /^\~(.*)/) {
+            $line = $1;
+            push @input, $file . ":" . $number . ":doxygen-command:~";
+        }
+
+        elsif ($line =~ /^[ \t]*\\$/) {
+            # line continuation; ignore it.
+            $line = "";
+        }
+
+        elsif ($in_block_comment > 0 or $in_line_comment == $number) {
+            if ($line =~ m/^(.+?)([ \t]*.*)$/) {
+                $line = $2;
+                push @input, $file . ":"  . $number . ":comment:" . $1;
+            } else {
+                push @input, $file . ":"  . $number . ":comment:" . $line;
+                $line = "";
+            }
+        }
+
+
+        else {
+            print STDERR "unknown token |" . $line . "| $in_line_comment $in_block_comment $file(line $number)\n";
+        }
+
+        $line =~ s/^[ \t]*//;
+    }
+
+}
+
+
+#-------------------------------------------------------------------------------
+# @brief    Return the next line from the input stream.                         
+#-------------------------------------------------------------------------------
+sub input_token_get
+{
+    my @result;
+
+    if ($input_sub <= $#input) {
+        my $line = $input[$input_sub++];
+        $line =~ m/^(.*?):(.*?):(.*?):(.*)/;
+        $result[0] = $1;
+        $result[1] = $2;
+        $result[2] = $3;
+        $result[3] = $4;
+    }
+
+    return @result;
+}
+
+
+#-------------------------------------------------------------------------------
+#  Return the token to the input ... note we know how this is going to be used. 
+#  If you use this wrong, it will most likely crash.  You should only return    
+#  tokens that have been previously gotten.                                     
+#-------------------------------------------------------------------------------
+sub input_token_unget
+{
+    my ($file, $line, $type, $token) = @_;
+
+    $input[--$input_sub] = $file . ":" . $line . ":" . $type . ":" . $token;
+}
+
+
+#-------------------------------------------------------------------------------
+#   Return a string with the given line of comment formatted to fill the output 
+#   line.                                                                       
+#-------------------------------------------------------------------------------
+sub comment() {
+    my ($indent, $line) = @_;
+    my $format;
+    if ($line =~ /---------------------------/) {
+        $format = "%" . $indent . "." . $indent . "s"
+            . "//%-" . (78-$indent) . "." . (78-$indent) . "s";
+    } else {
+        $format = "%" . $indent . "." . $indent . "s//%-" . (78-$indent) . "s";
+    }
+    return sprintf($format, " ", $line) . "\n";
+}

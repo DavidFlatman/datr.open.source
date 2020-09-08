@@ -1,0 +1,49 @@
+#!/usr/bin/perl -w
+
+#-------------------------------------------------------------------------------
+#   Brief:  Process a crash-stack.txt file                                      
+#                                                                               
+#   Classification: UNCLASSIFIED, OPEN SOURCE                                   
+#                                                                               
+#   2020-05-04  DHF     Made open source.                                       
+#-------------------------------------------------------------------------------
+
+if ($#ARGV < 0) {
+    &process("crash-stack.txt");
+} else {
+    foreach my $a (@ARGV) {
+        &process($a);
+    }
+}
+
+
+#-------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
+sub process
+{
+    my ($file) = @_;
+    my $line;
+    my $image = "./a.out";
+
+    open(INPUT, $file) or die "unable to open ${file}\n$1\n";
+
+    while (defined($line = <INPUT>)) {
+        chomp($line);
+        if ($line =~ /^image: (.*)/) {
+            printf "\n" . $line . "\n\n";
+            $image = $1;
+
+        } elsif ($line =~ /^error: (.*)/) {
+            printf $line . "\n\n";
+
+        } elsif ($line =~ /\[(.*)\]/) {
+            my $address = $1;
+            open(ADDR, "addr2line -e ${image} ${address}|");
+            printf "%-60s %s", $line, <ADDR>;
+            close(ADDR);
+
+        }
+    }
+
+}
+

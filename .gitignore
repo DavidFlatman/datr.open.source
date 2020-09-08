@@ -30,3 +30,14 @@
 *.exe
 *.out
 *.app
+
+# output directories
+obj/
+bin/
+moc/
+
+# stray editor files
+*.swp
+
+# 
+crash-stack.txt

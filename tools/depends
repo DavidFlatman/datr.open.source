@@ -1,0 +1,905 @@
+#!/usr/bin/perl -w
+#-------------------------------------------------------------------------------
+#   Program:    depends                                                         
+#                                                                               
+#   Classification:  UNCLASSIFIED, OPEN SOURCE                                  
+#                                                                               
+#   Purpose:                                                                    
+#       Generate a Makefile based on the source code in the given directories   
+#       and subdirectories.                                                     
+#                                                                               
+#   Parameters:                                                                 
+#       --boost-path    Add a path for searching for Boost libraries            
+#       --boost-link    Add a Boost file to link against.                       
+#       -c<cflags>      Add the given cflags to $CFLAGS.                        
+#       -C<cxxflags>    Add the given cxxflags to $CXXFLAGS.                    
+#       -Dmacro=defn    Define the macro                                        
+#       -d<dirname>     Process this directory looking for source code files.   
+#                       Implies -I<dirname>.                                    
+#       -I<dirname>     Passes -I<dirname> to compiler (include this directory  
+#                       in searching for header files).  Does not automatically 
+#                       include the directory to search for files to place in   
+#                       Makefile.                                               
+#       -L<dirname>     Passes -L<dirname> to the linker (include this directory
+#                       when looking for things to link).                       
+#       -l<lib>         Passes -l<lib> to linker (link against the indicated    
+#                       library lib<lib>.a; e.g., -lfoo links against libfoo.a  
+#       -s<name>        Skip any file (directory) with the given name           
+#       --quiet         make should operate silently, no output                 
+#       --terse         make should only outpu tthe file being processed at each
+#                       step of the way.                                        
+#       --verbose       make should operate as make normally does, echoing each 
+#                       command as it is executed (default)                     
+#       --compiler=comp Specify the compiler to use; default is g++             
+#       --boostlibrary  Try to find the given boost link library                
+#                                                                               
+#   Warning:                                                                    
+#       You need to pass the configuration parameters in before you pass in     
+#       the directory parameters.  For argument sake, suppose we have a         
+#       directory boost inside directory common.  If the parameters are:        
+#           -Icommon                                                            
+#           -sboost                                                             
+#       then common/boost will be searched for code.  However, if the parameters
+#       are:                                                                    
+#           -sboost                                                             
+#           -Icommon                                                            
+#       then the common/boost directory will be skipped.                        
+#                                                                               
+#   Example:                                                                    
+#       The DATR project uses the following parameters:                         
+#           OUTPUT_DIR=../../datr-non-cm/linux/                                 
+#           BOOST=${OUTPUT_DIR}boost/                                           
+#           BOOST_LIB=${BOOST}lib/                                              
+#                                                                               
+#                                                                               
+#           depends                                                           \
+#               --terse                                                       \
+#               -std=c++0x                                                    \
+#               -sboost                                                       \
+#               -isystem${BOOST}include/boost-1_60                            \
+#               -D_REENTRANT                                                  \
+#               -d../common                                                   \
+#               -dsrc                                                         \
+#               -I../common/boost                                             \
+#               -I${BOOST}include/boost-1_60                                  \
+#               -L${BOOST_LIB}                                                \
+#               -lso${BOOST_LIB}libboost_filesystem-gcc48-mt-1_60.a           \
+#               -lso${BOOST_LIB}libboost_system-gcc48-mt-1_60.a               \
+#               -lso${BOOST_LIB}libboost_regex-gcc48-mt-1_60.a                \
+#               -lso${BOOST_LIB}libboost_thread-gcc48-mt-1_60.a               \
+#               -lso/usr/lib64/libcurl.so                                     \
+#               --boost=zip=../third-party/boost_1_60_0.zip:src=${OUTPUT_DIR}../third-party/boost_1_60_0:out=${BOOST}:j=12:          \
+#               --boost-dep=${BOOST}/include/boost-1_60/boost/shared_ptr.hpp  \
+#               --temp-dir=${OUTPUT_DIR}                                      \
+#               -lrt                                                            
+#                                                                               
+#   Version:                                                                    
+#       2020-05-06  DHF     Open sourced                                        
+#       2017-05-11  DHF     Added --boost-path                                  
+#                           Added --boost-link                                  
+#                           Added --boost-inc-path                              
+#       2016-11-10  DHF     Rewrite with heavy borrowing from original.         
+#                           Made multi-threaded.                                
+#       2016-08-03  DHF     Made dev_test_main the only automatically           
+#                           executed unit test.                                 
+#       2016-03-16  DHF     Updated spacing around -I.                          
+#       2016-01-14  DHF     Added --boost=...                                   
+#       2016-01-13  DHF     Added --temp-dir parameter.                         
+#       2016-01-06  DHF     Added -isystem parameter                            
+#       2015-08-07  DHF     Added --distribution qualifier.                     
+#       2014-12-02  DHF     Added --boost to search for the boost link          
+#                           libraries to include.                               
+#       2014-02-26  DHF     Added --compiler command line option.               
+#       2014-02-19  DHF     Changed .auto_runtest parameters from               
+#                                   --stats -- failed --files                   
+#                           to                                                  
+#                                   --summary -- failed --files --slow          
+#       2014-01-15  DHF     Added -C command-line option                        
+#       2014-01-14  DHF     Added -rdynamic to debug build.                     
+#       2014-01-14  DHF     Commented out updating lib_version.cpp              
+#       2014-01-07  DHF     Added call to forbidden after compile.              
+#       2013-04-08  DHF     Added boost_regex                                   
+#       2013-02-25  DHF     Added deleting .o file before building              
+#                           it (significant speed boost).                       
+#       2012-10-25  DHF     Added handling of .pl files.                        
+#       2011-08-29  DHF     Added -static to windows LIBS                       
+#       2011-07-18  DHF     Added Windows capability to make.                   
+#       2011-05-19  DHF     Added version back into library.                    
+#       2011-04-??  DHF     Added support for -std=                             
+#       2011-04-18  DHF     Added -mpi qualifier to use mpiCC                   
+#       2010-03-29  DHF     Merged in changed for Fedora 12.                    
+#       2010-03-02  DHF     Files containing test classes were renamed from     
+#                           X_test to Xtest; how this is handled is poor at     
+#                           best.                                               
+#       2010-02-10  DHF     Updated to work with Fedora 12 out of the box       
+#                           for Qt.                                             
+#       2010-01-20  DHF     Added --so option.                                  
+#       2009-12-15  DHF     Removed bug where _application.o was duplicated.    
+#       2009-12-14  DHF     Added debug stuff.                                  
+#       2009-08-12  DHF     Added stripping of /usr/local... [boost]            
+#       2008-11-10  DHF     Added -Weffc++                                      
+#       2008-05-29  DHF     Added -Dmacro[=defin]                               
+#       2008-04-08  DHF     Added mysql detection, refined clean.               
+#       2008-04-03  DHF     Added --terse, --quiet, and --verbose               
+#       2008-03-28  DHF     Added -d<dirname> and -s<filename> parameters.      
+#       2008-03-12  DHF     Added .auto_runtest logic                           
+#       2008-02-25  DHF     Added libxml check.                                 
+#       2008-01-30  DHF     Header comments added.                              
+#-------------------------------------------------------------------------------
+
+use POSIX qw(strftime);
+use threads;
+use threads::shared;
+use Thread::Queue;
+
+local   $last_modified      = "2017-02-02";
+
+local   $verbosity_quiet    = 0;
+local   $verbosity_terse    = 1;
+local   $verbosity_verbose  = 2;
+local   $verbosity          = $verbosity_verbose;
+
+#-------------------------------------------------------------------------------
+#   Thread related variables:  either used by multiple threads or holds threads.
+#-------------------------------------------------------------------------------
+local %include;                             # key includes specified files      
+local %cpp_main;                            # key .cpp files are main programs  
+local %cpp_non_main;                        # key .cpp files not main programs  
+local %dot;                                 # dot files that we found           
+local @perl;                                # perl files that should be copied  
+local %skip;                                # skip any directory with this name 
+
+local $file_queue = Thread::Queue->new();
+local @threads;
+
+share(%include);
+share(%cpp_main);
+share(%cpp_non_main);
+share(%dot);
+share(@perl);
+
+#-------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
+local $here = `pwd`;
+chomp($here);
+$here =~ s/^.*\///;
+
+if ($here eq "linux" or $here eq "windows") {
+    $here = `pwd`;
+    $here =~ m/^.*\/(.*)\//;
+    $here = $1;
+}
+
+
+#-------------------------------------------------------------------------------
+#   Configuration variables:  can be changed by the command line.               
+#-------------------------------------------------------------------------------
+local @all;
+local @boost_inc_path;
+local @boost_path;
+local @boost_link;
+local $cflags           = "-Wall -Wpointer-arith -Wcast-align -O2 ";
+local $compiler         = "g++";
+local $cxxflags         = "-Wall -Wpointer-arith -Wcast-align -O2 ";
+local $I                = "";
+local $library          = $here;
+local $macros           = "";
+local $tempdir          = "";
+local $libs             = "-l${here} ";
+local $libdirs          = "-L\$(OBJDIR) ";
+local $output_path      = "Makefile";
+
+local $thread_count = `nproc`;
+
+local %testmain;
+
+push @all, "\$(OBJDIR)";
+push @all, "\$(BINDIR)";
+
+
+#-------------------------------------------------------------------------------
+#   Parse the command line parameters.                                          
+#-------------------------------------------------------------------------------
+for (my $a = 0; $a <= $#ARGV; ++$a)
+{
+    my $arg = $ARGV[$a];
+
+    if ($arg =~ /^--boost-inc-path=(.*)/) {
+        push @boost_inc_path, $1;
+
+    } elsif ($arg =~ /^--boost-path=(.*)/) {
+        push @boost_path, $1;
+
+    } elsif ($arg =~ /^--boost-link=(.*)/) {
+        push @boost_link, $1;
+
+    } elsif ($arg =~ /^-c(.*)/) {
+        $cflags .= $1 . " ";
+
+    } elsif ($arg =~ /^-C(.*)/) {
+        $cxxflags .= $1 . " ";
+
+    } elsif ($arg =~ /^-compiler=(.*)/) {
+        $compiler = $1;
+
+    } elsif ($arg =~ /^-D/) {
+        $cxxflags .= $arg . " ";
+        $cflags   .= $arg . " ";
+
+    } elsif ($arg =~ /^-d(.*)/) {
+        $I .= "-I$1 ";
+        &directory($1);
+#&queue("common/ch10_dump.cpp");
+#&queue("common/dev_test_main.cpp");
+#&queue("common/lib_irig106_ch10_work_filereader.cpp");
+#&queue("common/lib_irig106_ch10_work_packet.cpp");
+
+    } elsif ($arg =~ /^-i/) {
+        $cxxflags .= $arg . " ";
+
+    } elsif ($arg =~ /^-I(.*)/) {
+        $I .= $arg . " ";
+
+    } elsif ($arg =~ /^-lso(.*)/) {
+        $libs .= $1 . " ";
+
+    } elsif ($arg =~ /^-l-(.*)/) {
+        $libs .= $1 . " ";
+
+    } elsif ($arg =~ /^-l(.*)/) {
+        $libs .= $arg . " ";
+
+    } elsif ($arg =~ /^-L-(.*)/) {
+        $libdirs .= $1 . " ";
+
+    } elsif ($arg =~ /^-L(.*)/) {
+        $libdirs .= $arg . " ";
+
+    } elsif ($arg =~ /^--output=(.*)/) {
+        $output_path = $1;
+
+    } elsif ($arg =~ /^-std/) {
+        $cxxflags .= $arg . " ";
+
+    } elsif ($arg =~ /^-s(.*)/) {
+        $skip{$1} = 1;
+
+    } elsif ($arg =~ /^--threads=(.*)/) {
+        $thread_count = $1;
+
+    } elsif ($arg =~ /--temp-dir=(.*)/) {
+        $tempdir = $1;
+
+        $tempdir =~ s/\/$//;
+
+    } elsif ($arg =~ /--test-main=(.*)/) {
+        $testmain{$1} = 1;
+
+    } elsif ($arg eq "-t") {
+        $thread_count = $ARGV[++$a];
+
+    } elsif ($arg eq "--quiet") {
+        $verbosity = $verbosity_quiet;
+
+    } elsif ($arg eq "--terse") {
+        $verbosity = $verbosity_terse;
+
+    } elsif ($arg eq "--verbose") {
+        $verbosity = $verbosity_verbose;
+
+    } else {
+#        &queue($arg);
+
+    }
+
+} # for (my $a = 0; $a <= $#ARGV; ++$a)
+
+#-------------------------------------------------------------------------------
+#   Find any Boost libraries that they may have specified on the command line.  
+#-------------------------------------------------------------------------------
+&boost;
+
+
+
+local $at               = "\@";
+if ($verbosity == $verbosity_verbose)
+{
+    $at = "";
+}
+
+
+#-------------------------------------------------------------------------------
+#   Start the threads; use a new scope due to locking.                          
+#-------------------------------------------------------------------------------
+for (my $t = 0; $t < $thread_count; ++$t)
+{
+    $file_queue->enqueue(undef);
+    $threads[$t] = threads->create(\&thread_main, $t);
+}
+
+
+#-------------------------------------------------------------------------------
+#   Wait for all the threads to terminate.                                      
+#-------------------------------------------------------------------------------
+for (my $t = 0; $t < $thread_count; ++$t)
+{
+    $threads[$t]->join();
+}
+
+#-------------------------------------------------------------------------------
+#   Create the Makefile                                                         
+#-------------------------------------------------------------------------------
+open(OUTPUT, ">${output_path}") or die "Unable to open ${output_path}\n$!\n";
+&print_fileheader;
+
+
+#-------------------------------------------------------------------------------
+#   Identify the test objs.                                                     
+#-------------------------------------------------------------------------------
+&print_header("#   Test object files");
+&say("TESTOBJ = ");
+foreach my $cpp (sort(keys(%cpp_non_main)))
+{
+    if ($cpp =~ /.*\/(.*)test.cpp$/ or $cpp =~ /(.*)test.cpp/) 
+    {
+        &say("  \\\n  \$(OBJDIR)/${1}test\$(OBJEXT)");
+    }
+}
+&say("\n\n");
+
+#-------------------------------------------------------------------------------
+#   Make the .phony ALL command to default make all items.                      
+#-------------------------------------------------------------------------------
+&say(".PHONY: all\n");
+&say("all:    \\\n");
+foreach my $file (sort(keys(%cpp_main)))
+{
+    my $root = &root($file);
+    &say("    \$(BINDIR)/${root}\$(BINEXT)  \\\n");
+
+}
+foreach my $file (sort(@perl))
+{
+    my $root = &root($file);
+    &say("    \$(BINDIR)/${root}.pl  \\\n");
+
+}
+
+&say("    \$(OBJDIR)/lib${library}.a\n\n");
+
+
+foreach my $file (sort(keys(%cpp_main)))
+{
+    &cpp_file($file);
+
+    my $root = &root($file);
+
+
+    &say(".PHONY: ${root}\$(BINEXT)\n");
+    &say("${root}\$(BINEXT):  \$(BINDIR)/${root}\$(BINEXT)\n\n");
+    &say("\$(BINDIR)/${root}\$(BINEXT): \$(OBJDIR)/${root}\$(OBJEXT) \\\n");
+    &say("  \$(OBJDIR)/lib${library}.a \n");
+    if ($verbosity == $verbosity_terse) {
+#        &say("\t\@echo \$(BINDIR)/${root}\$(BINEXT)\n");
+        &say("\t\@ echo \$\@\n");
+    }
+    if ($root ne "dev_test_main") 
+    {
+#        &say("\t${at}" . ' $(CXX) $(CXXFLAGS) $(LIBDIRS) -o "$@" $(OBJDIR)/' . $root . '$(OBJEXT) $(LIBS)');
+        &say("\t${at}" . ' $(CXX) $(CXXFLAGS) $(LIBDIRS) -o "$@" "$<" $(LIBS)');
+
+    } else {
+        &say("\t${at}" . ' $(CXX) $(CXXFLAGS) $(LIBDIRS) -o "$@" $(OBJDIR)/' . $root . '$(OBJEXT) $(TESTOBJ) $(LIBS)' . "\n");
+        &say("\t${at} ./.auto_runtest \$(BINDIR)/${root}");
+    }
+    &say("\n\n\n");
+
+
+}
+
+#-------------------------------------------------------------------------------
+#   Process Perl files (copy from source to BINDIR).                            
+#-------------------------------------------------------------------------------
+foreach my $file (sort(@perl))
+{
+    my $root = &root($file);
+
+    &say(".PHONY: ${root}.pl\n");
+    &say("${root}.pl: \$(BINDIR)/${root}.pl\n\n");
+    &say("\$(BINDIR)/${root}.pl: ${file} \n");
+    if ($verbosity == $verbosity_terse) {
+        &say("\t\@ echo \$\@\n");
+    }
+    &say("\t${at} cp \"\$\<\" \$(BINDIR)\n\n\n");
+}
+
+
+my @library;
+foreach my $file (keys(%cpp_non_main))
+{
+    &cpp_file($file);
+    push @library, &root($file);
+}
+
+&say("\n\n");
+&print_header("#  library: ");
+&say("\$(OBJDIR)/lib${library}.a: ");
+
+foreach my $obj (sort(@library))
+{
+    &say("\\\n  \$(OBJDIR)/${obj}\$(OBJEXT)  ");
+    push @all, "\$(OBJDIR)/${obj}\$(OBJEXT)";
+}
+&say("\n\t${at} \$(AR) ru \$\@ \$?");
+&say("\n\t${at} \$(RANLIB) \$\@");
+&say("\n\t${at} echo \\\$\$1 --summary --not-impl --failed --slow --files \$? > .auto_runtest");
+&say("\n\t${at} chmod +x .auto_runtest\n");
+
+&say("\n\$(BINDIR):\n\t${at}mkdir -p \$(BINDIR)\n");
+&say("\n\$(OBJDIR):\n\t${at}mkdir -p \$(OBJDIR)\n\n");
+
+#-------------------------------------------------------------------------------
+#   Make the phony debug command                                                
+#-------------------------------------------------------------------------------
+&say(".PHONY: debug\n");
+&say("debug:\n");
+&say("\t\@ \$(MAKE) -f \$(MAKEFILE_LIST) all DEBUG=1\n\n");
+
+#-------------------------------------------------------------------------------
+#   Make the phony clean command.  Need to clean:                               
+#       -   binary files in (BINDIR)                                            
+#       -   object files in (OBJDIR)                                            
+#       -   object library in (OBJDIR)                                          
+#       -   Perl files in (BINDIR)                                              
+#-------------------------------------------------------------------------------
+&say(".PHONY: clean\n");
+&say("clean:\n");
+&say("\t\@rm -f \$(BINDIR)/* \$(OBJDIR)/*\n");
+
+close OUTPUT;
+
+#-------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
+sub cpp_file
+{
+    my ($file) = @_;
+
+    &print_header("#  file:  ${file}");
+    &say("\$(OBJDIR)/" . $include{$file});
+
+    if ($verbosity == $verbosity_terse) {
+        &say("\t\@ echo \$\@\n");
+    }
+    &say("\t${at}\$(CXX) -c \$(CXXFLAGS) \$(INCPATH) -o \"\$\@\" \"\$<\"\n");
+    &say("\t${at}forbidden -s \$\@\n");
+
+    &say("\n\n");
+}
+
+
+#-------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
+sub print_fileheader
+{
+    my $date = strftime("%Y-%m-%d", localtime);
+    my @lines;
+    push @lines, "#";
+    push @lines, "#\@par Classification:  UNCLASSIFIED, OPEN SOURCE";
+    push @lines, "#";
+    push @lines, "#\@program  Makefile for ${library}";
+    push @lines, "#";
+    push @lines, "#   Create by makemake with the following parameters:";
+    foreach my $a (@ARGV)
+    {
+        push @lines, "#       ${a}";
+    }
+    push @lines, "#";
+    push @lines, "#\@author    makemake    MM      Utility by DHF, last modified ${last_modified}";
+    push @lines, "#";
+    push @lines, "#\@version   ${date}  MM      File creation";
+    push @lines, "#";
+
+
+    &print_dashes("=");
+    &print80(@lines);
+    &print_dashes("=");
+
+    &say("\n");
+    &print_header("# Linux Configuration Flags");
+
+    $cflags     = &line_continuation($macros . $cflags);
+    $cxxflags   = &line_continuation($macros . $cxxflags);
+    $I          = &line_continuation($I);
+    $libs       = &line_continuation($libs);
+    $libdirs    = &line_continuation($libdirs);
+
+    print OUTPUT <<EOF
+AR          :=  ar
+
+RANLIB      :=  ranlib
+
+CXX         :=  ${compiler}
+
+CFLAGS      := ${macros} ${cflags}
+
+CXXFLAGS    := ${macros} ${cxxflags}
+
+BINDIR      :=  ${tempdir}/bin
+
+BINEXT      :=
+
+OBJDIR      :=  ${tempdir}/obj
+
+OBJEXT      :=  .o
+
+INCPATH     :=  ${I}
+
+LIBS        :=  ${libs}
+
+LIBDIRS     :=  ${libdirs}
+
+
+#-------------------------------------------------------------------------------
+#   debug configuration flags                                                   
+#-------------------------------------------------------------------------------
+ifneq (\$(DEBUG),)
+CFLAGS    := \$(CFLAGS) -g -O0 -rdynamic
+CXXFLAGS  := \$(CXXFLAGS) -g -O0 -rdynamic -D_DEBUG
+BINDIR    = ${tempdir}/debug
+OBJDIR    = ${tempdir}/obj-debug
+LIBDIRS   := -L${tempdir}/obj-debug ${libdirs}
+endif
+
+EOF
+
+#LIBDIRS   := -L${tempdir}/obj-debug -L${tempdir}/obj -L./boost/lib/ 
+
+}
+
+
+#-------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
+sub print80
+{
+    my (@lines) = @_;
+
+    foreach my $line (@lines)
+    {
+        if (length($line) < 80 or $line =~ /-----$/ or $line =~ /======$/) {
+            printf OUTPUT "%-80.80s\n", $line;
+        } else {
+            printf OUTPUT $line . "\n";
+        }
+    }
+}
+
+
+#-------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
+sub print_header
+{
+   my (@lines) = @_;
+
+    &print_dashes("-");
+    &print80(@lines);
+    &print_dashes("-");
+}
+
+#-------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
+sub print_dashes
+{
+    my ($dash) = @_;
+    if (!defined($dash)) { $dash = "-"; }
+
+    while (length($dash) < 79) { $dash .= $dash; }
+
+
+    &print80("#" . $dash);
+
+#    $dash =~ m/(.{79})/;
+#    $dash = $dash;
+#    print
+#    &say("#" . $dash);
+}
+
+#-------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
+sub say
+{
+    print OUTPUT @_;
+}
+
+#-------------------------------------------------------------------------------
+#@brief Return just the root (no directory, no extension) of the given file.    
+#-------------------------------------------------------------------------------
+sub root
+{
+    my ($result) = @_;
+
+    if ($result =~ /.*\/(.*)/) {
+        $result = $1;
+    }
+    if ($result =~ /(.*)\./) {
+        $result = $1;
+    }
+
+    return $result;
+}
+
+#-------------------------------------------------------------------------------
+#brief  Walk the given directory looking for files to parse.                    
+#-------------------------------------------------------------------------------
+sub directory
+{
+    my ($dir) = @_;
+
+    opendir(DIR, $dir) or die "Unable to open directory ${dir}\n$!\n";
+    my @files = readdir(DIR);
+    closedir(DIR);
+
+    foreach my $f (@files)
+    {
+        my $full = $dir . "/" . $f;
+        if ($f eq "." or $f eq ".." or defined($skip{$f})) {
+            #-------------------------------------------------------------------
+            #   Ignore this and parent directory and -s<directories>            
+            #-------------------------------------------------------------------
+
+        } elsif (opendir(DIR, $full)) {
+            closedir(DIR);
+            &directory($full);
+
+        } else {
+            &queue($full);
+
+        }
+    }
+}
+
+
+#-------------------------------------------------------------------------------
+#@brief Add the given file to the file-queue if it hasn't already been added.   
+#-------------------------------------------------------------------------------
+sub queue
+{
+    my ($file) = @_;
+
+    lock(%include);
+    if (!defined($include{$file})) {
+        $include{$file} = "";
+        $file_queue->enqueue($file);
+    }
+}
+    
+
+
+#-------------------------------------------------------------------------------
+# @brief    Main routine for the threads; search the given files for their      
+#           include information.                                                
+#-------------------------------------------------------------------------------
+sub thread_main
+{
+    my ($thread_number) = @_;
+    my $file;
+
+    #---------------------------------------------------------------------------
+    #   If the thread doesn't find work within one second (timed(1)) then       
+    #   give up.                                                                
+    #---------------------------------------------------------------------------
+    while (defined($file = $file_queue->dequeue_timed(2))) 
+    {
+        if ($file =~ /\.cpp$/) {
+            my @mm;
+            open(DEPENDS, "g++ ${I} ${cxxflags} -MM ${file} |");
+            while (my $m = <DEPENDS>) 
+            {
+                chomp($m);
+
+                if (defined($skip{$m}) or $m =~ /\/boost\//) {
+                    #-----------------------------------------------------------
+                    # skip boost files                                          
+                    #-----------------------------------------------------------
+
+                } else {
+                    if ($m =~ /^(.*)\\$/) {
+                        $m = $1;
+                    }
+                    push @mm, $m;
+                }
+            }
+            close DEPENDS;
+
+            my $mm = "";
+            my $prefix = "";
+            foreach my $m (@mm) 
+            {
+                $mm .= $prefix . $m;
+                $prefix = " \\\n";
+            }
+            $mm .= "\n";
+
+
+            if (system("egrep -q -e ^\\\\s*int\\\\s+main $file") == 0) {
+                lock(%cpp_main);
+                $cpp_main{$file} = 1;
+            } else {
+                lock(%cpp_non_main);
+                $cpp_non_main{$file} = 0;
+
+                if ($file =~ /test.cpp/) {
+                    $cpp_non_main{$file} = "test";
+                }
+            }
+
+            lock(%include);
+            $include{$file} = $mm;
+        } elsif ($file =~ /\.pl$/) {
+            lock(@perl);
+            push @perl, $file
+
+        } else {
+            lock(%include);
+            $include{$file} = $file;
+        }
+
+    } # while (defined($file = $file_queue->dequeue_timed(1))) 
+
+} # sub thread_main
+
+
+#-------------------------------------------------------------------------------
+#   The Boost library naming convention looks something like:                   
+#       -   s       linking statitically to the C++ standard library and        
+#                   compiler runtime support libraries (runtime-link=static)    
+#       -   g       using debug versions of the standard and runtime            
+#                   support libraries (runtime-debugging=on)                    
+#       -   y       using a special debug build of Python (python-debugging=on) 
+#       -   d       building a debug version of your code (variant=debug)       
+#       -   p       using the STLPort standard library rather than the default  
+#                   one supplied with your comiler.  (stdlib=stlport)           
+#                                                                               
+#       -   mt      mutli-threaded                                              
+#                                                                               
+#   Our preferences (if you really feel strongly these are wrong, make a        
+#   command line switch to set the preferences):                                
+#       -   require mt                                                          
+#       -   prefer to link against an archive (.a) file versus using a shared   
+#           library (.so).                                                      
+#       -   prefer latest version of Boost                                      
+#       -   all other things being equal, use the first boost-path that the     
+#           file was found in                                                   
+#                                                                               
+#   A file name *may* look like:                                                
+#       libboost_thread-gcc48-mt-s-1_60.a                                       
+#       libboost_thread-gcc48-mt-sd-1_60.a                                      
+#       libboost_thread-gcc48-mt-1_60.a                                         
+#                                                                               
+#   Note:                                                                       
+#       -   the GCC compiler version is embedded in the filename                
+#       -   the Boost version is embeddedin the filename.                       
+#                                                                               
+#   Our current (test/development/whatever-I'm-using) isn't hideously           
+#   complicated, but it is complicated enough.  So, we're going to tailor the   
+#   initial version of this routine to work with it.                            
+#                                                                               
+#   Translation of the above:  If this doesn't work for you, keep the existing  
+#   functionality (for me) and extend it to meet your needs as well.            
+#                                                                               
+#                                                                               
+#   This routine also needs to find where the Boost include files are and then  
+#   add -isystem <dir> on the cxxflags.                                         
+#                                                                               
+#-------------------------------------------------------------------------------
+sub boost
+{
+    my %file_path;
+    my %file_score;
+
+    #---------------------------------------------------------------------------
+    #   Walk the paths and build up a list of all of the Boost libraries.       
+    #---------------------------------------------------------------------------
+    my $dir_score = 255;
+    foreach my $path (@boost_path)
+    {
+        if (opendir(DIR, $path))
+        {
+            my $file;
+
+            while (defined($file = readdir(DIR)))
+            {
+                my $root = $file;
+                if ($root =~ /libboost_(.*?)-/) {
+                    $root = $1;
+                }
+
+                my $score = $dir_score;
+
+                if ($file =~ /-mt-/) { $score += 0x40000000; }  # multi-thread  
+                if ($file =~ /\.a$/) { $score += 0x20000000; }  # archive       
+                if ($file =~ /-d-/)  { $score -= 0x01000000; }  # debug         
+                if ($file =~ /-s-/)  { $score -= 0x00200000; }  # static        
+                if ($file =~ /-sd-/) { $score -= 0x01200000; }  # debug/static  
+                if ($file =~ /-g-/)  { $score -= 0x00800000; }  # debug stdlib  
+                if ($file =~ /-y-/)  { $score -= 0x00400000; }  # python-debug  
+                if ($file =~ /-p-/)  { $score -= 0x00200000; }  # STLport       
+
+                if (    
+                     !defined($file_score{$root}) 
+                  or $file_score{$root} < $score
+                )
+                {
+                    $file_score{$root} = $score;
+                    $file_path {$root} = $path . "/" . $file;
+                }
+            }
+            closedir(DIR);
+        }
+        --$dir_score;
+    }
+
+    foreach my $f (@boost_link)
+    {
+        if (!defined($file_score{$f}))
+        {
+            die "FAILED TO FIND BOOST FILE: ${f}\n";
+        } else {
+            $libs .= $file_path{$f} . " ";
+        }
+    }
+
+    my $done = 0;
+    for (my $d=0; $d <= $#boost_inc_path and $done == 0; ++$d)
+    {
+        my $dir = $boost_inc_path[$d];
+
+        if (open(BOOST, $dir . "boost/signals2.hpp"))
+        {
+            close BOOST;
+            $done = 1;
+            $cxxflags .= " -isystem " . $dir . " ";
+        }
+    }
+}
+
+
+#-------------------------------------------------------------------------------
+#   Given a stirng, convert it to a bunch of line continuations.  For example,  
+#       yourlib mylib hislib herlib itslib                                      
+#   becomes                                                                     
+#       yourlib \                                                               
+#       mylib \                                                                 
+#       hislib \                                                                
+#       herlib \                                                                
+#       itslib                                                                  
+#-------------------------------------------------------------------------------
+sub line_continuation
+{
+    my ($line) = @_;
+    $line =~ s/[\t ]+/ /g;
+    $line =~ s/^ //;
+    $line =~ s/ $//;
+
+    my $max_len = 0;
+    my @parts = split(' ', $line);
+
+    foreach my $p (@parts)
+    {
+        if (length($p) > $max_len) {
+            $max_len = length($p);
+        }
+    }
+    my $format = sprintf("%%s%%-%ds ", $max_len);
+
+    my $result = "";
+    my $trailing = "";
+    foreach $p (@parts)
+    {
+        $result .= sprintf($format, $trailing,  $p);
+        $trailing = "\\\n                ";
+    }
+
+    return $result;
+    
+}
+

@@ -1,0 +1,302 @@
+#!/usr/bin/perl -w
+
+#-------------------------------------------------------------------------------
+#                                                                               
+#   File:  forbidden                                                            
+#                                                                               
+#   Classification:  UNCLASSIFIED, OPEN SOURCE                                  
+#                                                                               
+#   Purpose:    Given a linker ready file (.a or .o), check it for any          
+#               forbidden functions.                                            
+#                                                                               
+#@par   Command line options:                                                   
+#           -h      Display help text.                                          
+#           -l      List out the forbidden functions.                           
+#           -s      Suppress the filename as part of the output.                
+#                                                                               
+#@note  This program makes use of the standard Linux (UNIX?) utility @e nm that 
+#       lists all the symbol names used in a file.                              
+#                                                                               
+#@par   Limitations                                                             
+#           The given linker ready files should not contain spaces.             
+#           Naming files with spaces, quotation marks, appostrophes and other   
+#           special characters is considered bad form.  You can do it, just     
+#           like you can spit in your friend's coffee.  It's just bad form and  
+#           this utility may end up spewing coffee.                             
+#                                                                               
+#           Stick to alpha-numerics, underscores, and an occassional dot.       
+#           You'll be happier in the long run.  Trust me.                       
+#                                                                               
+#@par Quote:                                                                    
+#           Be not too hasty either with praise or blame; speak always as       
+#           though you were giving evidence before the judgement-seat of the    
+#           Gods.                                                               
+#                                                                     -- Seneca 
+#                                                                               
+#@version 2020-05-04    DHF     Open sourced.                                   
+#                                                                               
+#@version 2014-01-08    DHF     Restructured from %forbidden to %unsafe with    
+#                               explanation to flag additional issues beyond    
+#                               violation.                                      
+#                                                                               
+#@version 2014-01-07    DHF     File creation; forbidden function list based on 
+#                               Application Security and Development Secuirty   
+#                               Technical Implementation Guide Version 3,       
+#                               Release 5 Appendix B.                           
+#                                                                               
+#-------------------------------------------------------------------------------
+
+local $font_red    = sprintf("%c[1;31m", 27);
+#local $font_green  = sprintf("%c[1;32m", 27);
+local $font_yellow = sprintf("%c[1;33m", 27);
+local $font_blue   = sprintf("%c[1;34m", 27);
+local $font_magenta= sprintf("%c[1;35m", 27);
+local $font_cyan   = sprintf("%c[1;36m", 27);
+#local $font_white  = sprintf("%c[1;37m", 27);
+local $font_normal = sprintf("%c[0m", 27);
+
+local %unsafe = (
+      "strcpy",         "buffer overflow possible"
+    , "wcscpy",         "buffer overflow possible"
+    , "_tcscpy",        "buffer overflow possible"
+    , "_mbscpy",        "buffer overflow possible"
+    , "StrCpy",         "buffer overflow possible"
+    , "StrCpyA",        "buffer overflow possible"
+    , "StrCpyW",        "buffer overflow possible"
+    , "lstrcpy",        "buffer overflow possible"
+    , "lstrcpyA",       "buffer overflow possible"
+    , "lstrcpyW",       "buffer overflow possible"
+    , "strcpyA",        "buffer overflow possible"
+    , "strcpyW",        "buffer overflow possible"
+    , "_tccpy",         "buffer overflow possible"
+    , "_mbccpy",        "buffer overflow possible"
+    , "strcat",         "buffer overflow possible"
+    , "wcscat",         "buffer overflow possible"
+    , "_tcscat",        "buffer overflow possible"
+    , "_mbscat",        "buffer overflow possible"
+    , "strCat",         "buffer overflow possible"
+    , "strCatA",        "buffer overflow possible"
+    , "strCatW",        "buffer overflow possible"
+    , "lstrcat",        "buffer overflow possible"
+    , "ltrcatA",        "buffer overflow possible"
+    , "lstrcatW",       "buffer overflow possible"
+    , "strCatBuffW",    "buffer overflow possible"
+    , "strCatBuff",     "buffer overflow possible"
+    , "strCatBuffA",    "buffer overflow possible"
+    , "strCatChainW",   "buffer overflow possible"
+    , "strcatA",        "buffer overflow possible"
+    , "strcatW",        "buffer overflow possible"
+    , "_tccat",         "buffer overflow possible"
+    , "_mbccat",        "buffer overflow possible"
+    , "sprintf",        "buffer overflow possible"
+    , "wsprintf",       "buffer overflow possible"
+    , "fprintf",        "buffer overflow possible"
+    , "gets",           "buffer overflow possible"
+    , "scanf",          "buffer overflow possible"
+    , "fscanf",         "buffer overflow possible"
+    , "sscanf",         "buffer overflow possible"
+    , "vscanf",         "buffer overflow possible"
+    , "vsscanf",        "buffer overflow possible"
+    , "vfscanf",        "buffer overflow possible"
+    , "realpath",       "buffer overflow possible"
+    , "getopt",         "buffer overflow possible"
+    , "getpass",        "buffer overflow possible"
+    , "streadd",        "buffer overflow possible"
+    , "strecpy",        "buffer overflow possible"
+    , "strtrns",        "buffer overflow possible"
+    , "getwd",          "buffer overflow possible: min buffer PATH_MAX bytes"
+    , "setenv",         "can cause race condition"
+    , "putenv",         "can cause race condition"
+    , "setlocale",      "can cause race condition"
+    , "asctime",        "not thread safe; use asctime_r"
+    , "crypt",          "not thread safe; use crypt_r"
+    , "ctime",          "not thread safe; use ctime_r"
+    , "drand48",        "not thread safe; use drand48_r"
+    , "ecvt",           "not thread safe; use ecvt_r"
+    , "encrypt",        "not thread safe; use encrypt_r"
+    , "erand48",        "not thread safe; use erand48_r"
+    , "fcvt",           "not thread safe; use fcvt_r"
+    , "fgetgrent",      "not thread safe; use fgetgrent_r"
+    , "fgetpwent",      "not thread safe; use fgetpwent_r"
+    , "getdate",        "not thread safe; use getdate_r"
+    , "getgrent",       "not thread safe; use getgrent_r"
+    , "getgrgid",       "not thread safe; use getgrgid_r"
+    , "getgrnam",       "not thread safe; use getgrnam_r"
+    , "gethostbyaddr",  "not thread safe; use gethostbyaddr_r"
+    , "gethostbyname2", "not thread safe; use gethostbyname2_r"
+    , "gethostbyname",  "not thread safe; use gethostbyname_r"
+    , "getmntent",      "not thread safe; use getmntent_r"
+    , "getnetgrent",    "not thread safe; use getnetgrent_r"
+    , "getpwent",       "not thread safe; use getpwent_r"
+    , "getpwnam",       "not thread safe; use getpwnam_r"
+    , "getpwuid",       "not thread safe; use getpwuid_r"
+    , "getutent",       "not thread safe; use getutent_r"
+    , "getutid",        "not thread safe; use getutid_r"
+    , "getutline",      "not thread safe; use getutline_r"
+    , "gmtime",         "not thread safe; use gmttime_r"
+    , "hcreate",        "not thread safe; use hcreate_r"
+    , "hdestroy",       "not thread safe; use hdestroy_r"
+    , "hsearch",        "not thread safe; use hsearch_r"
+    , "initstate",      "not thread safe; use initstate_r"
+    , "jrand48",        "not thread safe; use jrand48_r"
+    , "lcong48",        "not thread safe; use lcong48_r"
+    , "lgamma",         "not thread safe; use lgamma_r"
+    , "lgammaf",        "not thread safe; use lgammaf_r"
+    , "lgammal",        "not thread safe; use lgammal_r"
+    , "localtime",      "not thread safe; use localtime_r"
+    , "lrand48",        "not thread safe; use lrand48_r"
+    , "mrand48",        "not thread safe; use mrand48_r"
+    , "nrand48",        "not thread safe; use nrand48_r"
+    , "ptsname",        "not thread safe; use ptsname_r"
+    , "qecvt",          "not thread safe; use qecvt_r"
+    , "qfcvt",          "not thread safe; use qfcvt_r"
+    , "rand",           "not thread safe; use rand_r"
+    , "random",         "not thread safe; use random_r"
+    , "readdir64",      "not thread safe; use readdir64_r"
+    , "readdir",        "not thread safe; use readdir_r"
+    , "seed48",         "not thread safe; use seed48_r"
+    , "setkey",         "not thread safe; use setkey_r"
+    , "setstate",       "not thread safe; use setstate_r"
+    , "srand48",        "not thread safe; use srand48_r"
+    , "srandom",        "not thread safe; use srandom_r"
+    , "strerror",       "not thread safe; use strerror_r"
+    , "strtok",         "not thread safe; use strtok_r"
+    , "tmpnam",         "not thread safe; use tmpnam_r or pass non-NULL pointer"
+    , "ttyname",        "not thread safe; use ttyname_r"
+    , "lib::ms1553::work::Message::busID() const", "deprecated"
+    , "lib::ms1553::work::Message::busName() const", "deprecated"
+    , "lib::ms1553::work::Message::cmd(int) const", "deprecated"
+    , "lib::ms1553::work::Message::isMissingCommand() const", "deprecated"
+    , "lib::ms1553::work::Message::isMissingStatus() const", "deprecated"
+    , "lib::ms1553::work::Message::isMissingTime() const", "deprecated"
+    , "lib::ms1553::work::Message::isMissingData() const", "deprecated"
+    , "lib::DateTime()", "deprecated"
+    , "lib::DeltaTime()", "deprecated"
+
+);
+
+
+#-------------------------------------------------------------------------------
+#   Walk through the command line arguments.  If the argument is not one of our 
+#   configuration options, assume it to be a linker ready file to process.      
+#-------------------------------------------------------------------------------
+local $suppress_filename = 0;
+
+foreach my $a (@ARGV) {
+    if ($a =~ /^-h$/ or $a =~ /^--help$/) {
+        &help;
+
+    } elsif ($a =~ /^-l$/ or $a =~ /^--list$/) {
+        &list;
+
+    } elsif ($a =~ /\.obj$/ or $a =~ /\.exe$/) {
+        # skip it; windows object or executable
+
+    } elsif ($a =~ /^-s$/) {
+        $suppress_filename = 1;
+
+    } else {
+        &process($a);
+
+    }
+}
+
+
+#-------------------------------------------------------------------------------
+#@brief Process an individual file.  The command line may have had several.     
+#@param p0  The relative path to the file to process.                           
+#-------------------------------------------------------------------------------
+sub process
+{
+    my ($file) = @_;
+    my $module = $file;
+
+    if ($suppress_filename) {
+        $module = "";
+    }
+
+    #---------------------------------------------------------------------------
+    #   Execute the nm command on the given file.                               
+    #---------------------------------------------------------------------------
+    open(INPUT, "nm -C ${file} |") or die "unable to nm -C ${file}\n$!\n";
+
+    my $line;
+    while (defined($line = <INPUT>)) {
+        chomp($line);
+
+        if ($line =~ /(.*):$/) {
+            #-------------------------------------------------------------------
+            #   We're processing a library file and have a new module.          
+            #-------------------------------------------------------------------
+            $module = $1;
+
+        } elsif ($line =~ /^(.*) U (.*)/) {
+            #-------------------------------------------------------------------
+            #   We have an undefine symbol in the current module; see if it is  
+            #   forbidden.                                                      
+            #-------------------------------------------------------------------
+            my $symbol = $2;
+            if (defined($unsafe{$symbol})) {
+                my $us = $unsafe{$symbol};
+
+                if ($module ne "") {
+                    print $module . "\n";
+                    $module = "";
+                }
+
+                if ($us =~ /buffer overflow pos/) {
+                    print $font_cyan;
+                } elsif ($us =~ /can cause/) {
+                    print $font_blue;
+                } elsif ($us =~ /not thread safe/) {
+                    print $font_magenta;
+                } elsif ($us =~ /deprecated/) {
+                    print $font_red;
+                } else {
+                    print $font_yellow;
+                }
+
+
+                print 
+                    "    WARNING " . $us . " : " . $symbol . "\n"
+                  . $font_normal 
+                ;
+            }
+        }
+
+    } # while (defined($line = <INPUT>)) 
+
+} # sub process
+
+
+#-------------------------------------------------------------------------------
+#@brief Display help text for the user.                                         
+#-------------------------------------------------------------------------------
+sub help
+{
+    print   "forbidden [-s] libdatr.a my_file.o\n"
+        .   "   The forbidden utility determines if any of the forbidden\n"
+        .   "   functions have been used in a given compilation by examining\n"
+        .   "   the resuling .o or .a file.\n"
+        .   "\n"
+        .   "   -h     Display this help text.\n"
+        .   "   -l     List out the forbidden functions.\n"
+        .   "   -s     Suppress the filename when displaying errors messages.\n"
+    ;
+
+}
+
+
+#-------------------------------------------------------------------------------
+#@brief Display the forbidden functions.                                        
+#-------------------------------------------------------------------------------
+sub list
+{
+    print "forbidden functions:\n";
+    foreach my $f (sort(keys %unsafe)) {
+        printf "%-24s %s\n", $f, $unsafe{$f};
+#        print "    " . $f . "\n";
+    }
+}
+
+

@@ -1,0 +1,43 @@
+#!/bin/bash
+
+#-------------------------------------------------------------------------------
+#   Classification:  UNCLASSIFIED, OPEN SOURCE                                  
+#                                                                               
+#   version 2020-05-04  DHF     Open sourced                                    
+#-------------------------------------------------------------------------------
+
+OUTPUT_DIR=../../datr.open.source-non-cm/linux/
+BOOST=/usr/include/
+BOOST_LIB=${BOOST}lib/
+SUBDIR=$1
+
+if [  -z "$1" ]; then
+    SUBDIR="common"
+fi
+
+
+../tools/depends                                                        \
+    --terse                                                             \
+    -D_REENTRANT                                                        \
+    -sboost                                                             \
+    --boost-inc-path=../../datr-non-cm/linux/boost/include/boost-1_69/  \
+    --boost-inc-path=/usr/include/                                      \
+    -d../${SUBDIR}                                                      \
+    -dsrc                                                               \
+    -I../${SUBDIR}/boost                                                \
+    -std=c++0x                                                          \
+    --boost-path=/usr/lib64                                             \
+    --boost-path=../../datr-non-cm/linux/boost/lib                      \
+    --boost-link=filesystem                                             \
+    --boost-link=system                                                 \
+    --boost-link=regex                                                  \
+    --boost-link=thread                                                 \
+    -lso/usr/lib64/libcurl.so                                           \
+    --boost=zip=../third-party/boost_1_69_0.zip:src=${OUTPUT_DIR}../third-party/boost_1_69_0:out=${BOOST}:j=12:          \
+    --boost-dep=${BOOST}/include/boost-1_69/boost/shared_ptr.hpp        \
+    --temp-dir=${OUTPUT_DIR}                                            \
+    -lpthread                                                           \
+    -lrt
+exit
+#    -I${BOOST}include/boost-1_69                                        \
+
