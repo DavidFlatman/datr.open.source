@@ -1,5 +1,13 @@
 # datr.open.source
 
+    This directory structure holds the files that have been open sourced
+    for the DATR project.
+
+# license
+    
+    The open source license that is used has not yet been determined.  Most
+    likley it will be either BSD or MIT.  LGPL v2.x is also a possiblity.
+
 #   Definitions
         -   TitleCase   -- First letter of each word upper case
         -   camelCase   -- Same as TitleCase with initial letter lower case.
