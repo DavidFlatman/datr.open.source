@@ -11,6 +11,11 @@
                     Linux.
 
         linux   --  Linux build procedures; linux/src is Linux specific code
+
+        qt      --  Qt framework aware code; think of it as common for Qt code.
+
+        qmake   --  Build procedures for Qt framework code; think of it as
+                    linux for Qt code.
     
         tools   --  Developer tools
 
