@@ -1,3 +1,12 @@
+# DO NOT MERGE THIS FILE WITH DEVELOP OR MASTER
+# THIS .gitignore FILE IS UNIQUE TO THIS FEATURE BRANCH
+
+# Unit test files
+test/
+
+# QtCreator Specific
+*.pro.user
+
 # Prerequisites
 *.d
 

@@ -10,6 +10,7 @@
 
 #include <memory>
 #include <QCalendarWidget>
+#include <QStringList>
 
 namespace lib {
 namespace qt {
@@ -42,22 +43,25 @@ namespace qt {
 ///         struct MyDialogClass::Data
 ///         {
 ///                QFormLayout*                 m_Layout;
+///                lib::qt::PathField*          m_InputFile;
 ///                lib::qt::DateTimePicker*     m_StartTime;
 ///                lib::qt::DateTimePicker*     m_EndTime;
 ///                Data()
 ///                     : m_StartTime(new lib::qt::DateTimePicker("Start"))
 ///                     , m_EndTime(new lib::qt::DateTimePicker("End"))
 ///                {
+///                     m_Layout->addRow("Input", m_InputFile);
 ///                     m_Layout->addRow("Start", m_StartTime);
 ///                     m_Layout->addRow("End", m_EndTime);
 ///                }
 ///         };
 ///     @endcode
 ///
+///@version 2020-09-10  PN     Removed isValidDate(). Added cancel().
 ///@version 2020-09-03  PN     File creation. Detailed design. Added constructor
 ///                            , destructor, setMinimumDate(), setMaximumDate()
-///                            , openDialog(), isValidDate(), name() override
-///                            , and setName() override.
+///                            , openDialog(), isValidDate(), name(), setName()
+///                            , value(), and setValue().
 //------------------------------------------------------------------------------
 class DateTimePicker
         : public QWidget
@@ -76,10 +80,10 @@ class DateTimePicker
         ~DateTimePicker();
 
 //------------------------------------------------------------------------------
-// Each QCalenderWidget will have a min and max date.
+// Each QCalenderWidget and QTimeEdit will have a min and max date.
 //------------------------------------------------------------------------------
-        void setMinimumDate(QDateTime const& new_date);
-        void setMaximumDate(QDateTime const& new_date);
+        void setMinimumDateTime(QDateTime const& new_date);
+        void setMaximumDateTime(QDateTime const& new_date);
 
         virtual QString value() const override;
         virtual void setValue(QString const& new_value) override;
@@ -92,14 +96,17 @@ class DateTimePicker
 //------------------------------------------------------------------------------
         void openDialog();
 //------------------------------------------------------------------------------
-// SIGNAL(m_Data->m_Date->textChanged()) , SLOT(onPathChange())
+// SIGNAL(m_Data->m_ButtonBox->accepted()) , SLOT(onPathChange())
 //------------------------------------------------------------------------------
         void onDateChange();
+//------------------------------------------------------------------------------
+// SIGNAL(m_Data->m_ButtonBox->rejected()) , SLOT(cancel())
+//------------------------------------------------------------------------------
+        void cancel();
 
     private:
         struct Data;
         std::unique_ptr<Data> m_Data;
-        bool isValidDate() const;
 
 }; // class DateTimePicker //
 } // namespace qt //

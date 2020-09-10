@@ -10,6 +10,7 @@
 //------------------------------------------------------------------------------
 
 #include "lib_qt_pathfield.h"
+#include "lib_qt_datetimepicker.h"
 
 #include <iostream>
 #include <QApplication>
@@ -27,8 +28,10 @@ int main(int argc, char* argv[])
     QCoreApplication::setOrganizationDomain("navy.mil");
     QCoreApplication::setApplicationName("FileApp");
 
-    lib::qt::PathField path_field("file", nullptr);
-    path_field.show();
+    lib::qt::DateTimePicker date_picker("date", nullptr);
+    date_picker.show();
+//    lib::qt::PathField path_field("file", nullptr);
+//    path_field.show();
 
     return app.exec();
 }

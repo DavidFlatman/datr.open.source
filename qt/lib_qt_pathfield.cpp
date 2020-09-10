@@ -66,7 +66,7 @@ struct PathField::Data
 //------------------------------------------------------------------------------
         m_Directory = QFileInfo(m_Path->text()).dir().path();
     }
-}; // struct PathField::FieldAttributes //
+}; // struct PathField::Data //
 
 //------------------------------------------------------------------------------
 ///@brief Set layout, signals, and slots for the PathField class.
