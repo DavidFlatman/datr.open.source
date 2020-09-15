@@ -7,10 +7,14 @@
 #define LIB_QT_DATETIMEPICKER_H_FILE_GUARD
 
 #include "lib_qt_field.h"
+#include "lib_qt_rememberfield.h"
 
 #include <memory>
+#include <QAbstractButton>
 #include <QCalendarWidget>
+#include <QGroupBox>
 #include <QStringList>
+#include <QTreeWidgetItem>
 
 namespace lib {
 namespace qt {
@@ -19,95 +23,112 @@ namespace qt {
 ///
 ///@par Class: DateTimePicker
 ///
-///@brief   Prompt the user for a start time and a end time.
+///@brief   Dialog to prompt the user for a date and time.
 ///
 ///@par Thread Safety:  none (Qt GUI)
 ///
 ///@par Class Knowledge
 ///         -   This class knows about:
-///             -   Field Class.
+///             -   The selection of QDate and QTime
+///             -   The conversion from QString to QDateTime
 ///         -   This class hides:
-///             -   Struct Data containing the componenets of
-///                 DateTimePicker Class and containing class state data.
+///             -   How m_TimeSelector is populated
+///             -   Struct data containing widget componenets
 ///         -   This class is agnostic about:
-///             -   Whether the date is entered or searched
-///                 from QCalenderWidget.
+///             -   Whether the user correctly sets the min and max of
+///                 m_TimeSelector.
 ///
 ///@par Expected Usage:
 ///     @code
-///         QFormLayout*        m_Layout(new QFormLayout);
-///         DateTimePicker*     m_DateTimePicker(new DateTimePicker);
-///         m_Layout->addRow("Date Selector:", m_DateTimePicker);
-///         setLayout(m_Layout);
+///         struct MyDateTimeField::Data {
+///             QHBoxLayout*            m_Layout;
+///             LineEditRememberField*  m_Field;
+///             DateTimePicker*         m_DateTimePicker;
+///             QPushButton*            m_ThreeDots;
 ///
-///         struct MyDialogClass::Data
+///             Data(QString const& field_name)
+///                 : m_Layout(new QHBoxLayout)
+///                 , m_Field(new LineEditRememberField(field_name, nullptr))
+///                 , m_DateTimePicker(new DateTimePicker(m_Field->value(), nullptr))
+///                 , m_ThreeDots(new QPushButton("..."))
+///             {
+///                 m_Layout->addWidget(m_Field);
+///                 m_Layout->addWidget(m_ThreeDots);
+///             }
+///         }; // Struct MyDateTimeField::Data
+///
+///         MyDateTimeField::MyDateTimeField(
+///               QString const& field_name
+///             , QWidget* parent
+///         )   : QWidget(parent)
+///             , Field(field_name)
+///             , m_Data(new Data(field_name))
 ///         {
-///                QFormLayout*                 m_Layout;
-///                lib::qt::PathField*          m_InputFile;
-///                lib::qt::DateTimePicker*     m_StartTime;
-///                lib::qt::DateTimePicker*     m_EndTime;
-///                Data()
-///                     : m_StartTime(new lib::qt::DateTimePicker("Start"))
-///                     , m_EndTime(new lib::qt::DateTimePicker("End"))
-///                {
-///                     m_Layout->addRow("Input", m_InputFile);
-///                     m_Layout->addRow("Start", m_StartTime);
-///                     m_Layout->addRow("End", m_EndTime);
-///                }
-///         };
+///             setLayout(m_Data->m_Layout);
+///             connect(
+///                 m_Data->m_ThreeDots, SIGNAL(clicked())
+///                 , this, SLOT(showPicker())
+///             );
+///         } // MyDateTimeField::MyDateTimeField() //
 ///     @endcode
 ///
+///@version 2020-09-15  PN     Added setLineEdit(), todayButtonPressed()
+///                            , nowButtonPressed(), onDateChange()
+///                            , onTimeChange(), populateList()
+///                            , updateLineEdit(), findItemInTree().
+///@version 2020-09-14  PN     Added setMinimumDate(), setMaximumDate()
+///                            , setMinimumTime(), setMaximumTime, setDate()
+///                            , setTime(), showPicker(), hidePicker()
+///                            , date(), and time().
+///@version 2020-09-11  PN     Moved all functions to DateTimeField class.
+///                            Updated DateTimePicker to be a dialog container
+///                            for handling user selection of date and time.
 ///@version 2020-09-10  PN     Removed isValidDate(). Added cancel().
 ///@version 2020-09-03  PN     File creation. Detailed design. Added constructor
 ///                            , destructor, setMinimumDate(), setMaximumDate()
 ///                            , openDialog(), isValidDate(), name(), setName()
 ///                            , value(), and setValue().
+///
 //------------------------------------------------------------------------------
-class DateTimePicker
-        : public QWidget
-        , public Field
+class DateTimePicker : public QGroupBox
 {
     Q_OBJECT
 
-    public:
-        explicit DateTimePicker(
-              QString const& field_name
-            , QWidget* parent = nullptr
-        );
-        DateTimePicker(DateTimePicker&& that) = default;
-        DateTimePicker(const DateTimePicker& that) = delete;
-        DateTimePicker& operator=(const DateTimePicker& that) = delete;
-        ~DateTimePicker();
+public:
+    DateTimePicker(QWidget* parent = nullptr);
+    ~DateTimePicker();
 
 //------------------------------------------------------------------------------
-// Each QCalenderWidget and QTimeEdit will have a min and max date.
+// Each QCalenderWidget and QTimeEdit will have a min and max.
 //------------------------------------------------------------------------------
-        void setMinimumDateTime(QDateTime const& new_date);
-        void setMaximumDateTime(QDateTime const& new_date);
+    void setMinimumDate(QDate const& new_date);
+    void setMaximumDate(QDate const& new_date);
+    void setMinimumTime(QTime const& new_time);
+    void setMaximumTime(QTime const& new_time);
+    void setDate(QDate const& new_date);
+    void setTime(QTime const& new_time);
+    void setLineEdit(QString const& new_date_time);
+    void showPicker();
+    void hidePicker();
+    QDate date() const;
+    QTime time() const;
 
-        virtual QString value() const override;
-        virtual void setValue(QString const& new_value) override;
-        virtual QString name() const override;
-        virtual void setName(const QString &new_name) override;
+public slots:
+    void todayButtonPressed();
+    void nowButtonPressed();
+    void doneButtonPressed();
+    void onDateChange();
+    void onTimeChange();
 
-    public slots:
-//------------------------------------------------------------------------------
-// SIGNAL(m_Data->m_ThreeDots->clicked()) , SLOT(openDialog())
-//------------------------------------------------------------------------------
-        void openDialog();
-//------------------------------------------------------------------------------
-// SIGNAL(m_Data->m_ButtonBox->accepted()) , SLOT(onPathChange())
-//------------------------------------------------------------------------------
-        void onDateChange();
-//------------------------------------------------------------------------------
-// SIGNAL(m_Data->m_ButtonBox->rejected()) , SLOT(cancel())
-//------------------------------------------------------------------------------
-        void cancel();
+signals:
+    void acceptChanges();
 
-    private:
-        struct Data;
-        std::unique_ptr<Data> m_Data;
-
+private:
+    struct Data;
+    std::unique_ptr<Data> m_Data;
+    void populateList();
+    void updateLineEdit();
+    QTreeWidgetItem* findItemInTree(QTime const& time);
 }; // class DateTimePicker //
 } // namespace qt //
 } // namespace lib //

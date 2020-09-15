@@ -67,7 +67,6 @@ class LineEditRememberField
     
         virtual QString value() const override; 
         virtual void setValue(QString const& new_value) override;
-    
 }; // class LineEditRememberField
 } // namespace qt
 } // namespace lib

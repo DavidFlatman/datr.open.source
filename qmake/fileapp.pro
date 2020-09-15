@@ -33,13 +33,15 @@ OBJECTS_DIR     =   obj
 MOC_DIR         =   moc
 
 
-HEADERS         += ../qt/lib_qt_datetimepicker.h
+HEADERS         += ../qt/lib_qt_datetimepicker.h \
+    ../qt/lib_qt_datetimefield.h
 HEADERS         += ../qt/lib_qt_lineeditrememberfield.h
 HEADERS         += ../qt/lib_qt_rememberfield.h
 HEADERS         += ../qt/lib_qt_pathfield.h
 HEADERS         += ../qt/lib_qt_field.h
 
-SOURCES         += ../qt/fileapp.cpp
+SOURCES         += ../qt/fileapp.cpp \
+    ../qt/lib_qt_datetimefield.cpp
 SOURCES         += ../qt/lib_qt_lineeditrememberfield.cpp
 SOURCES         += ../qt/lib_qt_pathfield.cpp
 SOURCES         += ../qt/lib_qt_rememberfield.cpp
