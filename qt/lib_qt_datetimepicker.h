@@ -116,7 +116,7 @@ public:
 public slots:
     void todayButtonPressed();
     void nowButtonPressed();
-    void doneButtonPressed();
+    void okButtonPressed();
     void onDateChange();
     void onTimeChange();
 

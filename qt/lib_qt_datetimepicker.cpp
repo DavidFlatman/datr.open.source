@@ -68,7 +68,7 @@ struct DateTimePicker::Data {
         , m_Today(new QPushButton("Today"))
         , m_Now(new QPushButton("Now"))
         , m_Cancel(new QPushButton("Cancel"))
-        , m_Done(new QPushButton("Done"))
+        , m_Done(new QPushButton("Ok"))
     {
         m_TimeSelector->setHeaderLabel("Time");
         m_TimeSelector->header()->setDefaultAlignment(Qt::AlignCenter);
@@ -118,7 +118,7 @@ DateTimePicker::DateTimePicker(QWidget* parent)
     );
     connect(
           m_Data->m_Done, SIGNAL(clicked())
-        , this, SLOT(doneButtonPressed())
+        , this, SLOT(okButtonPressed())
     );
     connect(
           m_Data->m_Cancel, SIGNAL(clicked())
@@ -301,7 +301,7 @@ void DateTimePicker::nowButtonPressed()
 ///@brief Hides the window and emits the acceptChanges signal for the
 ///       DateTimeField class to receive.
 //------------------------------------------------------------------------------
-void DateTimePicker::doneButtonPressed()
+void DateTimePicker::okButtonPressed()
 {
     hidePicker();
     emit acceptChanges();

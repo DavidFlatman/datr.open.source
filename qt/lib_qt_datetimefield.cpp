@@ -157,7 +157,7 @@ void DateTimeField::openDialog()
 //------------------------------------------------------------------------------
 ///@brief Update the value of the m_Field based on user selection in
 ///       m_DateTimePicker.
-///@pre The "done" button is pressed in the m_DateTimePicker window.
+///@pre The "ok" button is pressed in the m_DateTimePicker window.
 //------------------------------------------------------------------------------
 void DateTimeField::onDateTimeChange()
 {
