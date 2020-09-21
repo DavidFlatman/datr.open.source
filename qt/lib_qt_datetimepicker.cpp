@@ -246,6 +246,26 @@ void DateTimePicker::hidePicker()
 } // DateTimePicker::hidePicker() //
 
 //------------------------------------------------------------------------------
+///@brief Add a new format to the format selector.
+///@param text    QString containing the text to be displayed on format
+///               selector.
+///       format    QString containing the format.
+//------------------------------------------------------------------------------
+void DateTimePicker::addFormat(QString const& text, QString const& format)
+{
+    m_Data->m_FormatSelector->addFormat(text, format);
+} // DateTimePicker::addFormat() //
+
+//------------------------------------------------------------------------------
+///@brief Remove a format from the format selector.
+///@param row    Int containing the row of the format to be removed.
+//------------------------------------------------------------------------------
+void DateTimePicker::removeFormat(int const& row)
+{
+    m_Data->m_FormatSelector->removeFormat(row);
+} // DateTimePicker::removeFormat() //
+
+//------------------------------------------------------------------------------
 ///@brief Sets the current selected date for m_Date.
 ///@param new_date    QDate containing the new date selected.
 //------------------------------------------------------------------------------

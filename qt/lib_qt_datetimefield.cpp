@@ -114,6 +114,26 @@ void DateTimeField::setMaximumTime(QTime const& new_time)
 } // DateTimeField::setMaximumDateTime() //
 
 //------------------------------------------------------------------------------
+///@brief Add a new format to the format selector.
+///@param text    QString containing the text to be displayed on format
+///               selector.
+///       format    QString containing the format.
+//------------------------------------------------------------------------------
+void DateTimeField::addFormat(QString const& text, QString const& format)
+{
+    m_Data->m_DateTimePicker->addFormat(text, format);
+} // DateTimePicker::addFormat() //
+
+//------------------------------------------------------------------------------
+///@brief Remove a format from the format selector.
+///@param row    Int containing the row of the format to be removed.
+//------------------------------------------------------------------------------
+void DateTimeField::removeFormat(int const& row)
+{
+    m_Data->m_DateTimePicker->removeFormat(row);
+} // DateTimePicker::removeFormat() //
+
+//------------------------------------------------------------------------------
 ///@brief Get value of m_Field.
 //------------------------------------------------------------------------------
 QString DateTimeField::value() const
