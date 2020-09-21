@@ -19,13 +19,14 @@ namespace qt {
 ///                                                                             
 ///@par Class: LineEditRememberField                                                       
 ///                                                                             
-///@brief                                                     
+///@brief Line edit widget to be used by other classes. All values are saved
+///       upon exiting the application. Previous values are restored from local
+///       file.
 ///                                                                             
 ///@par Thread Safety:  none (Qt GUI)                                           
 ///                                                                             
 ///@par Class Knowledge                                                         
 ///         -   This class knows about:
-///             -   Field class
 ///             -   RememberedField class
 ///             -   QLineEdit class
 ///             -   When to store/restore the RememberField
@@ -55,13 +56,13 @@ class LineEditRememberField
 {
     public:
         explicit LineEditRememberField(
-            QString const& fieldName
-          , QWidget* parent = nullptr
+              QString const& fieldName
+            , QWidget* parent = nullptr
           );
         LineEditRememberField(
-            QString const& fieldName
-          , QString const& fieldValue
-          , QWidget* parent = nullptr
+              QString const& fieldName
+            , QString const& fieldValue
+            , QWidget* parent = nullptr
           );
         virtual ~LineEditRememberField();
     

@@ -34,7 +34,7 @@ struct DateTimeField::Data {
     Data(QString const& field_name)
         : m_Layout(new QHBoxLayout)
         , m_Field(new LineEditRememberField(field_name, nullptr))
-        , m_DateTimePicker(new DateTimePicker(nullptr))
+        , m_DateTimePicker(new DateTimePicker("Date Time Picker",nullptr))
         , m_ThreeDots(new QPushButton("..."))
     {
         m_Layout->addWidget(m_Field);
@@ -52,6 +52,7 @@ DateTimeField::DateTimeField(
     , Field(field_name)
     , m_Data(new Data(field_name))
 {
+    m_Data->m_DateTimePicker->setParent(this, Qt::Window);
     setLayout(m_Data->m_Layout);
     connect(
           m_Data->m_ThreeDots, SIGNAL(clicked())
@@ -64,7 +65,8 @@ DateTimeField::DateTimeField(
 } // DateTimeField::DateTimeField() //
 
 //------------------------------------------------------------------------------
-///@brief Reclaim resources held by object.
+///@brief Reclaim resources held by object. Explicitly call DateTimePicker to
+///       save format upon exit.
 //------------------------------------------------------------------------------
 DateTimeField::~DateTimeField()
 {
@@ -142,7 +144,7 @@ QString DateTimeField::name() const
 //------------------------------------------------------------------------------
 void DateTimeField::setName(QString const& new_name)
 {
-    return m_Data->m_Field->setName(new_name);
+    m_Data->m_Field->setName(new_name);
 } // DateTimeField::setName() //
 
 //------------------------------------------------------------------------------

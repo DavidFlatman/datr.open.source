@@ -72,6 +72,8 @@ namespace qt {
 ///         } // MyDateTimeField::MyDateTimeField() //
 ///     @endcode
 ///
+///@version 2020-09-21  PN     Added addFormat() and removeFormat(). Replaced
+///                            QComboBox with FormatSelectorRememberField.
 ///@version 2020-09-15  PN     Added setLineEdit(), todayButtonPressed()
 ///                            , nowButtonPressed(), onDateChange()
 ///                            , onTimeChange(), populateList()
@@ -95,7 +97,10 @@ class DateTimePicker : public QGroupBox
     Q_OBJECT
 
 public:
-    DateTimePicker(QWidget* parent = nullptr);
+    explicit DateTimePicker(
+          QString const& title
+        , QWidget* parent = nullptr
+    );
     ~DateTimePicker();
 
 //------------------------------------------------------------------------------
@@ -110,6 +115,8 @@ public:
     void setLineEdit(QString const& new_date_time);
     void showPicker();
     void hidePicker();
+    void addFormat(QString const& text, QString const& format);
+    void removeFormat(int const& row);
     QDate date() const;
     QTime time() const;
 
@@ -119,6 +126,7 @@ public slots:
     void okButtonPressed();
     void onDateChange();
     void onTimeChange();
+    void updateLineEdit();
 
 signals:
     void acceptChanges();
@@ -127,8 +135,6 @@ private:
     struct Data;
     std::unique_ptr<Data> m_Data;
     void populateList();
-    void updateLineEdit();
-    QTreeWidgetItem* findItemInTree(QTime const& time);
 }; // class DateTimePicker //
 } // namespace qt //
 } // namespace lib //

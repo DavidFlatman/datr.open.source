@@ -229,11 +229,18 @@ void PathField::setValue(const QString &new_value)
     m_Data->m_Path->setValue(new_value);
 } // PathField::setValue() //
 
+//------------------------------------------------------------------------------
+///@brief Get name of m_Path.
+//------------------------------------------------------------------------------
 QString PathField::name() const
 {
-    m_Data->m_Path->name();
+    return m_Data->m_Path->name();
 } // PathField::name() //
 
+//------------------------------------------------------------------------------
+///@brief Set name for m_Path.
+///@param new_value    QString containing name of field.
+//------------------------------------------------------------------------------
 void PathField::setName(const QString &new_name)
 {
     m_Data->m_Path->setName(new_name);

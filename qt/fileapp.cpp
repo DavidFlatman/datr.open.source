@@ -28,7 +28,7 @@ int main(int argc, char* argv[])
     QCoreApplication::setOrganizationDomain("navy.mil");
     QCoreApplication::setApplicationName("FileApp");
 
-    lib::qt::DateTimeField date_field("date", nullptr);
+    lib::qt::DateTimeField date_field("DateTime", nullptr);
     date_field.show();
 //    lib::qt::PathField path_field("file", nullptr);
 //    path_field.show();

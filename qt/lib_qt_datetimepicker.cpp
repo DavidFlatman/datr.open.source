@@ -2,6 +2,17 @@
 ///@file lib_qt_datetimepicker.cpp
 ///@par  Classification:  UNCLASSIFIED, OPEN SOURCE
 ///
+///@version 2020-09-21  PN     Added addFormat() and removeFormat(). Replaced
+///                            QComboBox with FormatSelectorRememberField.
+///@version 2020-09-18  PN     Replaced QTreeWidget with QListWidget and added a
+///                            QLabel for the m_TimeSelector. Removed
+///                            findItemInTree(). Updated setMinimumTime() and
+///                            setMaximumTime().
+///@version 2020-09-17  PN     Removed header color change. Updated
+///                            nowButtonPressed() to also change m_Calendar.
+///                            Replaced implementation for converting from QTime
+///                            to QString with the QVariant class.
+///                            Added a selector for changing DateTime format.
 ///@version 2020-09-15  PN     Added implementation for setLineEdit()
 ///                            , todayButtonPressed(), nowButtonPressed()
 ///                            , onDateChange(), onTimeChange(), populateList()
@@ -24,17 +35,17 @@
 //------------------------------------------------------------------------------
 
 #include "lib_qt_datetimepicker.h"
+#include "lib_qt_formatselectorrememberfield.h"
 
 #include <iostream>
 #include <QCalendarWidget>
 #include <QDateTime>
 #include <QGridLayout>
 #include <QHeaderView>
+#include <QLabel>
 #include <QLineEdit>
-#include <QList>
+#include <QListWidget>
 #include <QPushButton>
-#include <QTreeWidget>
-#include <QTreeWidgetItem>
 
 
 namespace lib {
@@ -44,70 +55,67 @@ namespace qt {
 ///@brief Data struct for the DateTimePicker class
 //------------------------------------------------------------------------------
 struct DateTimePicker::Data {
-    QGridLayout*            m_Layout;
-    QLineEdit*              m_LineEdit;
-    QCalendarWidget*        m_Calendar;
-    QHeaderView*            m_Header;
-//------------------------------------------------------------------------------
-// Note: We are using QTreeWidget instead of QListWidget because QListWidget
-// does not support headers.
-//------------------------------------------------------------------------------
-    QTreeWidget*            m_TimeSelector;
-    QPushButton*            m_Today;
-    QPushButton*            m_Now;
-    QPushButton*            m_Cancel;
-    QPushButton*            m_Done;
-    QDate                   m_Date;
-    QTime                   m_Time;
+    QGridLayout*                    m_Layout;
+    QLineEdit*                      m_LineEdit;
+    FormatSelectorRememberField*    m_FormatSelector;
+    QCalendarWidget*                m_Calendar;
+    QVBoxLayout*                    m_TimeLayout;
+    QLabel*                         m_TimeLabel;
+    QListWidget*                    m_TimeSelector;
+    QPushButton*                    m_Today;
+    QPushButton*                    m_Now;
+    QPushButton*                    m_Cancel;
+    QPushButton*                    m_Ok;
+    QDate                           m_Date;
+    QTime                           m_Time;
 
     Data()
         : m_Layout(new QGridLayout)
         , m_LineEdit(new QLineEdit)
+        , m_FormatSelector(new FormatSelectorRememberField("format", nullptr))
         , m_Calendar(new QCalendarWidget)
-        , m_TimeSelector(new QTreeWidget)
+        , m_TimeLayout(new QVBoxLayout)
+        , m_TimeLabel(new QLabel("Time"))
+        , m_TimeSelector(new QListWidget)
         , m_Today(new QPushButton("Today"))
         , m_Now(new QPushButton("Now"))
         , m_Cancel(new QPushButton("Cancel"))
-        , m_Done(new QPushButton("Ok"))
+        , m_Ok(new QPushButton("Ok"))
+        , m_Date(m_Calendar->selectedDate())
     {
-        m_TimeSelector->setHeaderLabel("Time");
-        m_TimeSelector->header()->setDefaultAlignment(Qt::AlignCenter);
-//------------------------------------------------------------------------------
-//  Setting header color for both m_Calendar and m_Time for consistency.
-//------------------------------------------------------------------------------
-        m_TimeSelector->header()->setStyleSheet(
-            "QHeaderView::section { background-color:blue }"
+        m_TimeLabel->setAlignment(Qt::AlignCenter);
+        m_TimeLabel->setStyleSheet(
+            "border: 1px solid; padding: 2px"
         );
-        m_Calendar->setStyleSheet(
-            "QCalendarWidget QWidget#qt_calendar_navigationbar"
-            "{ background-color:blue }"
-        );
+        m_TimeLayout->addWidget(m_TimeLabel);
+        m_TimeLayout->addWidget(m_TimeSelector);
         m_Layout->setVerticalSpacing(25);
-        m_Layout->addWidget(m_LineEdit, 0, 0, 1, 5);
-        m_Layout->addWidget(m_Calendar, 1, 0, 1, 1);
-        m_Layout->addWidget(m_TimeSelector, 1, 2, 1, 2);
+        m_Layout->addWidget(m_LineEdit, 0, 0);
+        m_Layout->addWidget(m_FormatSelector, 0, 2, 1, 2);
+        m_Layout->addWidget(m_Calendar, 1, 0);
+        m_Layout->addLayout(m_TimeLayout, 1, 2, 1, 2);
         m_Layout->addWidget(m_Today, 2, 0);
         m_Layout->addWidget(m_Now, 2, 1);
         m_Layout->addWidget(m_Cancel, 2, 2);
-        m_Layout->addWidget(m_Done, 2, 3);
-        m_Date = m_Calendar->selectedDate();
+        m_Layout->addWidget(m_Ok, 2, 3);   
     }
 };
 
 //------------------------------------------------------------------------------
 ///@brief Initialize inherited classe, connecting slot and signals, and layout.
 //------------------------------------------------------------------------------
-DateTimePicker::DateTimePicker(QWidget* parent)
-  : QGroupBox(parent)
+DateTimePicker::DateTimePicker(QString const& title, QWidget* parent)
+  : QGroupBox(title, parent)
   , m_Data(new Data())
 {
+    setAlignment(Qt::AlignCenter);
     setLayout(m_Data->m_Layout);
     populateList();
 //------------------------------------------------------------------------------
 // Select first item in m_TimeSelector to avoid nullptr when calling
 // m_TimeSelector->currentItem();
 //------------------------------------------------------------------------------
-    m_Data->m_TimeSelector->setCurrentItem(m_Data->m_TimeSelector->itemAt(1,1));
+    m_Data->m_TimeSelector->setCurrentItem(m_Data->m_TimeSelector->item(1));
     connect(
           m_Data->m_Today, SIGNAL(clicked())
         , this, SLOT(todayButtonPressed())
@@ -117,7 +125,7 @@ DateTimePicker::DateTimePicker(QWidget* parent)
         , this, SLOT(nowButtonPressed())
     );
     connect(
-          m_Data->m_Done, SIGNAL(clicked())
+          m_Data->m_Ok, SIGNAL(clicked())
         , this, SLOT(okButtonPressed())
     );
     connect(
@@ -130,8 +138,13 @@ DateTimePicker::DateTimePicker(QWidget* parent)
     );
     connect(
           m_Data->m_TimeSelector, SIGNAL(
-          currentItemChanged(QTreeWidgetItem *, QTreeWidgetItem *)
+          currentItemChanged(QListWidgetItem *, QListWidgetItem *)
       ) , this, SLOT(onTimeChange())
+    );
+    connect(
+          m_Data->m_FormatSelector, SIGNAL(
+          currentIndexChanged(const QString &)
+      ) , this, SLOT(updateLineEdit())
     );
 } // DateTimePicker::DateTimePicker() //
 
@@ -173,16 +186,14 @@ void DateTimePicker::setMinimumTime(QTime const& new_time)
 {
     if(new_time.minute() == 0 || new_time.minute() == 30)
     {
-        QTreeWidgetItem* item = findItemInTree(new_time);
-        QTreeWidgetItemIterator iter(m_Data->m_TimeSelector);
-        while((*iter) != item)
+        for(int i = 0; i < m_Data->m_TimeSelector->count(); ++i)
         {
-            (*iter)->setHidden(true);
-            ++iter;
-            if((*iter) == nullptr)
+            QListWidgetItem* item = m_Data->m_TimeSelector->item(i);
+            if(item->data(Qt::AccessibleDescriptionRole) == new_time)
             {
                 break;
             }
+            item->setHidden(true);
         }
     } else {
         std::cout << "setMinimumTime: Invalid Input" << std::endl;
@@ -200,20 +211,18 @@ void DateTimePicker::setMaximumTime(QTime const& new_time)
 {
     if(new_time.minute() == 0 || new_time.minute() == 30)
     {
-        QTreeWidgetItem* item = findItemInTree(new_time);
-        QTreeWidgetItemIterator iter(m_Data->m_TimeSelector);
         bool belowItem = false;
-        while((*iter) != nullptr)
+        for(int i = 0; i < m_Data->m_TimeSelector->count(); ++i)
         {
+            QListWidgetItem* item = m_Data->m_TimeSelector->item(i);
             if(belowItem)
             {
-                (*iter)->setHidden(true);
+                item->setHidden(true);
             }
-            if((*iter) == item)
+            if(item->data(Qt::AccessibleDescriptionRole) == new_time)
             {
                 belowItem = true;
             }
-            ++iter;
         }
     } else {
         std::cout << "setMaximumTime: Invalid Input" << std::endl;
@@ -221,7 +230,7 @@ void DateTimePicker::setMaximumTime(QTime const& new_time)
 } // DateTimePicker::setMaximumTime //
 
 //------------------------------------------------------------------------------
-///@brief Shows the widget window.
+///@brief Shows the date time picker window.
 //------------------------------------------------------------------------------
 void DateTimePicker::showPicker()
 {
@@ -229,7 +238,7 @@ void DateTimePicker::showPicker()
 } // DateTimePicker::showPicker() //
 
 //------------------------------------------------------------------------------
-///@brief Hides the widget window.
+///@brief Hides the date time picker window.
 //------------------------------------------------------------------------------
 void DateTimePicker::hidePicker()
 {
@@ -295,6 +304,7 @@ void DateTimePicker::todayButtonPressed()
 void DateTimePicker::nowButtonPressed()
 {
     setTime(QTime::currentTime());
+    todayButtonPressed();
 } // DateTimePicker::nowButtonPressed() //
 
 //------------------------------------------------------------------------------
@@ -320,110 +330,37 @@ void DateTimePicker::onDateChange()
 //------------------------------------------------------------------------------
 void DateTimePicker::onTimeChange()
 {
-    int hours = m_Data->m_TimeSelector->currentItem()->text(0)
-            .split(":")[0].toInt();
-    QString endString = m_Data->m_TimeSelector->currentItem()->text(0)
-            .split(":")[1];
-    int minutes = endString.split(" ")[0].toInt();
-    bool beforeNoon = (endString.split(" ")[1] == "AM");
-    if(beforeNoon)
-    {
-        if(hours == 12)
-        {
-            hours = 0;
-        }
-    } else {
-        if(hours != 12)
-        {
-            hours += 12;
-        }
-    }
-    setTime(QTime(hours, minutes, 0));
+    setTime(QVariant(m_Data->m_TimeSelector->currentItem()
+                     ->data(Qt::AccessibleDescriptionRole)).toTime());
 } // DateTimePicker::onTimeChange() //
-
-//------------------------------------------------------------------------------
-///@brief Populate m_Time of available times that the user can select.
-//------------------------------------------------------------------------------
-void DateTimePicker::populateList()
-{
-    bool am = true;
-    QString text;
-    QTreeWidgetItem* item;
-    item = new QTreeWidgetItem(m_Data->m_TimeSelector);
-    item->setText(0, "12:00 AM");
-    item->setTextAlignment(0, Qt::AlignCenter);
-    item = new QTreeWidgetItem(m_Data->m_TimeSelector);
-    item->setText(0, "12:30 AM");
-    item->setTextAlignment(0, Qt::AlignCenter);
-    for(int i = 0; i < 2; i++)
-    {
-        for(int j = 1; j < 13; j++)
-        {
-            if(j == 12)
-            {
-                if(!am)
-                {
-                    continue;
-                } else {
-                    am = false;
-                }
-            }
-            for(int k = 0; k < 60; k += 30)
-            {
-                item = new QTreeWidgetItem(m_Data->m_TimeSelector);
-//------------------------------------------------------------------------------
-// Format time. Preappends a '0' in front of the second digit. Example: 1:00 PM
-//------------------------------------------------------------------------------
-                text = (QString::number(j) + ":" +
-                QString("%1").arg(k, 2, 10, QChar('0')));
-                if(am)
-                {
-                    text += " AM";
-                } else {
-                    text += " PM";
-                }
-                item->setText(0, text);
-                item->setTextAlignment(0, Qt::AlignCenter);
-            }
-        }
-    }
-} // DateTimePicker::populateList() //
 
 //------------------------------------------------------------------------------
 ///@brief Sets m_LineEdit to the current values of m_Date and m_Time.
 //------------------------------------------------------------------------------
 void DateTimePicker::updateLineEdit()
 {
-    setLineEdit(QDateTime(m_Data->m_Date, m_Data->m_Time, Qt::UTC).toString());
+    setLineEdit(QDateTime(m_Data->m_Date, m_Data->m_Time, Qt::UTC)
+                .toString(m_Data->m_FormatSelector->value()));
+    m_Data->m_LineEdit->setToolTip(m_Data->m_FormatSelector->value());
 } // DateTimePicker::updateLineEdit() //
 
 //------------------------------------------------------------------------------
-///@brief Returns the pointer to QTreeWidgetItem that is in the m_TimeSelector
-///       based on the given QTime.
-///@param time    QTime containing the time of the QTreeWidget item we are
-///               searching for in m_TimeSelector.
+///@brief Populate m_Time of available times that the user can select.
 //------------------------------------------------------------------------------
-QTreeWidgetItem* DateTimePicker::findItemInTree(QTime const& time)
+void DateTimePicker::populateList()
 {
-    int hours = time.hour();
-    int minutes = time.minute();
-    bool beforeNoon = true;
-    if(hours > 12)
+    QListWidgetItem* item;
+    for(int i = 0; i < 24; i++)
     {
-        hours -= 12;
-        beforeNoon = false;
+        item = new QListWidgetItem(QTime(i, 0, 0).toString("h:mm A"));
+        item->setData(Qt::AccessibleDescriptionRole, QVariant(QTime(i,0,0)));
+        item->setTextAlignment(Qt::AlignCenter);
+        m_Data->m_TimeSelector->addItem(item);
+        item = new QListWidgetItem(QTime(i, 30, 0).toString("h:mm A"));
+        item->setData(Qt::AccessibleDescriptionRole, QVariant(QTime(i,30,0)));
+        item->setTextAlignment(Qt::AlignCenter);
+        m_Data->m_TimeSelector->addItem(item);
     }
-    QString findItem = (QString::number(hours) + ":" +
-                        QString("%1").arg(minutes, 2, 10, QChar('0')));
-    if(beforeNoon)
-    {
-        findItem.append(" AM");
-    } else {
-        findItem.append(" PM");
-    }
-    return m_Data->m_TimeSelector
-            ->findItems(findItem, Qt::MatchExactly, 0).first();
-
-} // DateTimePicker::findItemInTree() //
+} // DateTimePicker::populateList() //
 } // namespace qt //
 } // namespace lib //

@@ -83,6 +83,8 @@ public:
     void setMaximumDate(QDate const& new_date);
     void setMinimumTime(QTime const& new_time);
     void setMaximumTime(QTime const& new_time);
+    void addFormat(QString const& text, QString const& format);
+    void removeFormat(int const& row);
 
     virtual QString value() const override;
     virtual void setValue(QString const& new_value) override;
@@ -95,7 +97,7 @@ public slots:
 //------------------------------------------------------------------------------
     void openDialog();
 //------------------------------------------------------------------------------
-// SIGNAL(m_Data->m_ButtonBox->accepted()) , SLOT(onDateChange())
+// SIGNAL(m_Data->m_DateTimePicker->acceptChanges()) , SLOT(onDateTimeChange())
 //------------------------------------------------------------------------------
     void onDateTimeChange();
 

@@ -21,9 +21,9 @@ namespace qt {
 ///@brief Set m_Name and restore value for the LineEditRememberField Class.
 //------------------------------------------------------------------------------
 LineEditRememberField::LineEditRememberField(
-    QString const& fieldName
+    QString const& field_name
   , QWidget* parent
-) : RememberField(fieldName)
+) : RememberField(field_name)
   , QLineEdit(parent)
 {
     setValue(rememberedValue());
@@ -33,13 +33,13 @@ LineEditRememberField::LineEditRememberField(
 ///@brief Set m_Name and m_Value for the LineEditRememberField Class.
 //------------------------------------------------------------------------------
 LineEditRememberField::LineEditRememberField(       
-    QString const& fieldName
-  , QString const& fieldValue
+    QString const& field_name
+  , QString const& field_value
   , QWidget* parent
-) : RememberField(fieldName)
+) : RememberField(field_name)
   , QLineEdit(parent)
 {
-    setValue(fieldValue);
+    setValue(field_value);
 } // LineEditRememberField::LineEditRememberField() //
 
 //------------------------------------------------------------------------------
@@ -62,7 +62,7 @@ QString LineEditRememberField::value() const
 ///@brief Set value for the QLineEdit text field.
 ///@param new_value    QString containing the path for user selected file.
 //------------------------------------------------------------------------------
-void LineEditRememberField::setValue(const QString &new_value)
+void LineEditRememberField::setValue(QString const& new_value)
 {
     QLineEdit::setText(new_value);
 } // LineEditRememberField::setValue() //
