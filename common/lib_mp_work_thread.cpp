@@ -4,6 +4,8 @@
 ///                                                                             
 ///@par Thread Safety:  unknown none class object                               
 ///                                                                             
+///@version 2020-09-21  JRS     Replaced boost::mutexed_singleton               
+///                                                                             
 ///@version 2020-05-04  DHF     Open sourced                                    
 ///                                                                             
 ///@version 2010-01-26  DHF     Changed outer namespace from tools to lib.      
@@ -13,9 +15,18 @@
 
 #include "lib_mp_work_thread.h"
 
+#ifdef _WIN32
+#include <Windows.h>
+#endif
+
 namespace lib {
 namespace mp {
 namespace work {
+
+// static data members from RegisteredThreads
+std::mutex RegisteredThreads::m_mutex;
+RegisteredThreads* RegisteredThreads::m_instance = nullptr;
+
 
 //------------------------------------------------------------------------------
 ///@brief   Return the native handle of the calling thread.                     

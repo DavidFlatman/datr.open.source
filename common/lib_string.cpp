@@ -263,10 +263,10 @@ bool isOctal(const std::string& str)
 std::string comma(const std::string& str, const std::string& delim, int count)
 {
     std::string ans=str;
-    int decimal = str.size();
+    int decimal = static_cast<int>(str.size());
     int negative = 0;
 
-    if (str.find('.') != str.npos) {decimal = str.find('.');}
+    if (str.find('.') != str.npos) {decimal = static_cast<int>(str.find('.'));}
     if (str[0] == '-') {negative=1;}
 
     for (int i=decimal-count ; i > negative ; i -= count)
@@ -491,7 +491,7 @@ std::string left(const std::string&str, int ct)
 //----------------------------------------------------------------------------- 
 std::string right(const std::string& str, int ct)
 {
-    int len = str.length();
+    int len = static_cast<int>(str.length());
 
     return  (len <= ct || ct < 0) ? str : str.substr(len-ct, ct);
 }

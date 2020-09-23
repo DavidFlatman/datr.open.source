@@ -47,7 +47,7 @@
 ///                                                                             
 ///@version 2015-03-25  DHF     Change "or" to "||" for Visual Studio.          
 ///                                                                             
-///@version 2015-01-22  DHF     Reoganized to distinguish between compiler      
+///@version 2015-01-22  DHF     Reorganized to distinguish between compiler     
 ///                             versus operating system; update values based on 
 ///                             sourceforge.net/p/predef/wiki/OperatingSystems/ 
 ///                             and sourceforge.net/p/predef/wiki/Compilers/    
@@ -186,8 +186,8 @@
 #if defined(IS_WINDOWS) && !defined(_WIN64)
     #define IS_WINDOWS_32BIT
 #endif
-#if defined(IS_WIDNOWS) && defined(_WIN64)
-    #define IS_WINDWOS_64BIT
+#if defined(IS_WINDOWS) && defined(_WIN64)
+    #define IS_WINDOWS_64BIT
 #endif
 
 

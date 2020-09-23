@@ -6,6 +6,7 @@
 #ifndef LIB_TIME_WORK_DATEDELTATIMEBASE_H_FILE_GUARD
 #define LIB_TIME_WORK_DATEDELTATIMEBASE_H_FILE_GUARD
 
+#include "lib_compiler_info.h"
 #include <stdint.h>
 #include <time.h>
 #ifndef IS_VISUAL_STUDIO

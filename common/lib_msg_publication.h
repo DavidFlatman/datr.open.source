@@ -125,7 +125,7 @@ class Publication
                         boost::bind(
                             &Subscription<SUB_TYPE>::inbox
                           , &sub
-                          , _1
+                          , boost::placeholders::_1
                         )
                     )
                 );
@@ -159,7 +159,7 @@ class Publication
                     boost::bind(
                         &Subscription<TYPE>::inbox
                       , &sub
-                      , _1
+                      , boost::placeholders::_1
                     )
                 )
             );

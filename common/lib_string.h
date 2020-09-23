@@ -13,6 +13,7 @@
 #include <stdlib.h>
 #include <string>
 #include <vector>
+#include "lib_compiler_info.h"  // get the compiler type discriminators
 
 namespace lib {
 

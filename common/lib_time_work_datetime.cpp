@@ -53,6 +53,7 @@
 #include "lib_si_ds_prefixes.h"
 #include "lib_string.h"
 #include "lib_time_ds.h"
+#include "lib_compiler_info.h"
 
 #include <assert.h>
 #include <boost/algorithm/string.hpp>       // boost::to_lower  
@@ -70,7 +71,20 @@
 #include <windows.h>
 #endif
 
+// use the C++ definitions if possible, not the C macros. Especially do this if you're making a routine called min.
+#ifdef min
+#undef min
+#undef max
+#endif
+
 #ifdef _WIN32
+
+// The POSIX/C functions localtime() and gmtime() aren't guaranteed to be
+// thread safe, while localtime_r() and gmtime_r() are.
+// The Windows versions of localtime() and gmtime() are guaranteeds thread
+// safe, but there isn't a defined localtime_r() and gmtime_r().
+// These stubs work around the failings of the POSIX system by providing
+// localtime_r() and gmtime_r() as shims around the Windows functions.
 
 #ifdef localtime_r
 #undef localtime_r
@@ -83,16 +97,67 @@
 static struct tm* localtime_r(const time_t* tp, struct tm* result)
 {
     memcpy(result, ::localtime(tp), sizeof(tm));
-
     return result;
 }
 
 static struct tm* gmtime_r(const time_t* tp, struct tm* result)
 {
     memcpy(result, ::gmtime(tp), sizeof(tm));
-
     return result;
 }
+
+#if IS_VISUAL_STUDIO
+
+// gettimeofday isn't native on Windows, it looks like.
+// from https://social.msdn.microsoft.com/Forums/vstudio/en-us/430449b3-f6dd-4e18-84de-eebd26a8d668/gettimeofday
+#if defined(_MSC_VER) || defined(_MSC_EXTENSIONS)
+#define DELTA_EPOCH_IN_MICROSECS  11644473600000000Ui64
+#else
+#define DELTA_EPOCH_IN_MICROSECS  11644473600000000ULL
+#endif
+
+struct timezone
+{
+    int  tz_minuteswest; /* minutes W of Greenwich */
+    int  tz_dsttime;     /* type of dst correction */
+};
+
+static int gettimeofday(struct timeval* tv, struct timezone* tz = NULL)
+{
+    FILETIME ft;
+    unsigned __int64 tmpres = 0;
+    static int tzflag;
+
+    if (NULL != tv)
+    {
+        GetSystemTimeAsFileTime(&ft);
+
+        tmpres |= ft.dwHighDateTime;
+        tmpres <<= 32;
+        tmpres |= ft.dwLowDateTime;
+
+        /*converting file time to unix epoch*/
+        tmpres -= DELTA_EPOCH_IN_MICROSECS;
+        tmpres /= 10;  /*convert into microseconds*/
+        tv->tv_sec = (long)(tmpres / 1000000UL);
+        tv->tv_usec = (long)(tmpres % 1000000UL);
+    }
+
+    if (NULL != tz)
+    {
+        if (!tzflag)
+        {
+            _tzset();
+            tzflag++;
+        }
+        tz->tz_minuteswest = _timezone / 60;
+        tz->tz_dsttime = _daylight;
+    }
+
+    return 0;
+}
+
+#endif // #if IS_VISUAL_STUDIO
 
 #endif              // #ifdef _WIN32    
 
@@ -251,7 +316,7 @@ bool DateTime::fromString(const std::string& str, bool strict)
         if (offset == std::string::npos) {
             result = false;
         } else {
-            month = offset / 3 + 1;  // 3 = number of characters, 1 = january   
+            month = static_cast<int>(offset) / 3 + 1;  // 3 = number of characters, 1 = january   
         }
     }
 
@@ -309,7 +374,7 @@ DateTime DateTime::now()
     clock_gettime(CLOCK_REALTIME, &result);
 
     #else 
-    
+
     timeval t;
     gettimeofday(&t, NULL);
     result.tv_sec = t.tv_sec;
@@ -329,8 +394,8 @@ DateTime DateTime::now()
 //------------------------------------------------------------------------------
 DateTime DateTime::maximum()
 {
-    static const DateTime max("2500-12-12 23:59:59.000000");
-    return max;
+    static const DateTime maxTime("2500-12-12 23:59:59.000000");
+    return maxTime;
 }
 
 //------------------------------------------------------------------------------

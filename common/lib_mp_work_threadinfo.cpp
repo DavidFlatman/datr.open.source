@@ -23,6 +23,11 @@
 #include "lib_log_work_messagefactory.h"
 #include "lib_string.h"
 
+#ifdef _WIN32
+#include <Windows.h>
+#endif
+
+
 namespace lib {
 namespace mp {
 namespace work {

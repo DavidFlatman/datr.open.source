@@ -6,6 +6,8 @@
 ///                                                                             
 ///@brief   Object respenting a single log message.                             
 ///                                                                             
+///@version 2020-05-04  JRS     Removed some compiler warnings                  
+///                                                                             
 ///@version 2020-05-04  DHF     Open sourced                                    
 ///                                                                             
 ///@version 2017-02-16  DHF     Modified Messages empty severity level to       
@@ -27,6 +29,7 @@
 ///                                                                             
 //------------------------------------------------------------------------------
 
+#include "lib_compiler_info.h"
 #include "lib_log_work_message.h"
 #include "lib_log_work.h"
 #include "lib_si_ds_prefixes.h"
@@ -324,7 +327,7 @@ std::string Message::toString(PARTS part) const
     //--------------------------------------------------------------------------
     // Trim off the extra space on the end ...                                  
     //--------------------------------------------------------------------------
-    result = left(result, result.length()-1);
+    result = left(result, static_cast<int>(result.length())-1);
 
     #undef IF
 
@@ -528,7 +531,7 @@ int Messages::find(ds::messageid_t messageid)
     int result(-1);
 
     for (size_t m=0; m < size() && result == -1; ++m) {
-        if ((*this)[m]->messageID() == messageid) result = m;
+        if ((*this)[m]->messageID() == messageid) result = static_cast<int>(m);
     }
 
     return result;
@@ -556,7 +559,7 @@ int Messages::find(
          && (*this)[m]->classID() == classid
         ) 
         {
-            result = m;
+            result = static_cast<int>(m);
         }
     }
 

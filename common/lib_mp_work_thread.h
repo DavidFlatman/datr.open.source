@@ -6,9 +6,9 @@
 #define LIB_MP_THREAD_H
 
 #include <boost/thread.hpp>
-#include "boost/utility/mutexed_singleton.hpp"
 #include <set>
 #include <string>
+#include <mutex>
 
 #include "lib_ds_shared_ptr.h"
 #include "lib_mp_work_threadinfo.h"
@@ -18,17 +18,78 @@ namespace mp {
 namespace work {
 
 //------------------------------------------------------------------------------
-///@brief   Provide access to the registered threads.                           
+///@brief   Provide access to the registered threads.
+///@note    Extremely simplified and stripped-down singleton implementation.
+///         Use RegisteredThreads::lock as a scoped lock.
+/// 
+///         e.g.
+///         {
+///             RegisteredThreads::lock lock;
+///             RegisteredThreads::instance()->do_something(...);
+///         }
+///@note    Requires manual destruction via RegisteredThreads::destroy()
+///@note    instance() is not thread-locked! a separate lock instance is
+///         required to control the usage of the singleton to allow multiple
+///         operations on the singleton without multiple lock requirements.
+///         This behavior is different than using boost::mutexed_singleton in
+///         that using boost::mutexed_singleton::instance automatically does
+///         a lock at every reference.
+///@version 2020-09-21  JRS     Replaced boost::mutexed_singleton because it
+///         wasn't compiling under all platforms
+///
 //------------------------------------------------------------------------------
 class RegisteredThreads
-    : public boost::mutexed_singleton<RegisteredThreads>
-    , public std::set<ThreadInfo*>
+    : public std::set<ThreadInfo*>
 {
     public:
-        RegisteredThreads(boost::restricted) {}
+        /// @brief get a scoped lock on the singleton
+        struct lock
+        {
+            std::lock_guard<std::mutex> m_lock;
+            lock()
+                : m_lock(RegisteredThreads::m_mutex)
+            {
+            }
+        };
+
+        /// @brief get access to the single instance in the system
+        /// @note is thread safe, but it's wise to check the return value.
+        /// @not requires C++ 11 magic statics and uses lambdas.
+        /// @return single instance in the system
+        static RegisteredThreads* instance()
+        {
+            static bool static_init = []()->bool {
+                m_instance = new RegisteredThreads;
+                return true;
+            }();
+            return m_instance;
+        }
+
+        /// @brief destroy the single instance in the system
+        /// @note once it's dead, it's dead and won't come back to life.
+        static void destroy()
+        {
+            lock llock;
+            delete m_instance;
+            m_instance = nullptr;
+        }
+
+        RegisteredThreads() = default;
 
     private:
+        // make the class noncopyable by deleting the assign and copy
+        RegisteredThreads(const RegisteredThreads&) = delete;
+        RegisteredThreads& operator=(const RegisteredThreads&) = delete;
+
+        ~RegisteredThreads()
+        {
+            // the process was responsible for cleaning up.
+        }
+
+        static std::mutex m_mutex;
+        static RegisteredThreads* m_instance;
 };
+
 
 //------------------------------------------------------------------------------
 ///                                                                             
@@ -182,7 +243,8 @@ class Thread
         //----------------------------------------------------------------------
         virtual ~Thread()
         {
-            RegisteredThreads::instance->erase(this);
+            RegisteredThreads::lock lock;
+            RegisteredThreads::instance()->erase(this);
         }
 
         //======================================================================
@@ -202,7 +264,8 @@ class Thread
             thread->setHandle(self());
             thread->setRunning(true);
 
-            RegisteredThreads::instance->insert(thread);
+            RegisteredThreads::lock lock;
+            RegisteredThreads::instance()->insert(thread);
         }
 
         //----------------------------------------------------------------------
