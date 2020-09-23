@@ -19,7 +19,8 @@ namespace qt {
 ///
 ///@par Class: DateTimeField
 ///
-///@brief   Prompt the user for a start time and a end time.
+///@brief   Field that contains a QLineEdit and a "three dots button" for
+///         handling user input of a date.
 ///
 ///@par Thread Safety:  none (Qt GUI)
 ///
@@ -57,10 +58,11 @@ namespace qt {
 ///         };
 ///     @endcode
 ///
-///@version 2020-09-11  PN     File creation. Detailed design. Added constructor
-///                            , destructor, setMinimumDate(), setMaximumDate()
-///                            , openDialog(), isValidDate(), name(), setName()
-///                            , value(), setValue(), and cancel().
+///@version 2020-09-21  PN     Added addFormat() and removeFormat().
+///@version 2020-09-14  PN     Add setMaximumDate(), setMinimumDate
+///                            , setMaximumTime() and setMinimumTime().
+///@version 2020-09-11  PN     File creation. Moved all previous functions from
+///                            DateTimePicker class to DateTimeField.
 //------------------------------------------------------------------------------
 
 class DateTimeField

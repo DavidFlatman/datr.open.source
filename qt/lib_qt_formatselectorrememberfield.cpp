@@ -32,7 +32,7 @@ FormatSelectorRememberField::FormatSelectorRememberField(
     if(rememberedValue().isEmpty())
     {
 //------------------------------------------------------------------------------
-// Set m_FormatSelector to placeholder text at the start of the application.
+// Set FormatSelector to placeholder text.
 //------------------------------------------------------------------------------
         setCurrentIndex(-1);
     } else {
@@ -55,11 +55,10 @@ FormatSelectorRememberField::FormatSelectorRememberField(
     addItem("ISODate", "yyyy-MM-ddTHH:mm:sst");
     addItem("RFC2822Date", "dd MMM yyyy HH:mm:ss ±z");
     addItem("DATR", "yyyy-MM-dd HH:mm:ss");
-    setValue(field_value);
+    addFormat(field_name, field_value);
 }
 //------------------------------------------------------------------------------
-///@brief Reclaim resources held by object. Set current format to be remembered
-///       on next startup.
+///@brief Reclaim resources held by object. Set current format to be remembered.
 //------------------------------------------------------------------------------
 FormatSelectorRememberField::~FormatSelectorRememberField()
 {
@@ -68,8 +67,8 @@ FormatSelectorRememberField::~FormatSelectorRememberField()
 
 //------------------------------------------------------------------------------
 ///@brief Add a new format to the format selector.
-///@param text    QString containing the text to be displayed on format
-///               selector.
+///@param text      QString containing the text to be displayed on format
+///                 selector.
 ///       format    QString containing the format.
 //------------------------------------------------------------------------------
 void FormatSelectorRememberField::addFormat(
@@ -77,7 +76,18 @@ void FormatSelectorRememberField::addFormat(
     , QString const& format
 )
 {
-    addItem(text, format);
+    if(text.isEmpty() || format.isEmpty())
+    {
+        std::cout << "Warning: addFormat() inputs cannot be empty" << std::endl;
+        return;
+    }
+    if(findData(QVariant(format), Qt::UserRole, Qt::MatchExactly) == -1)
+    {
+        addItem(text, format);
+        setCurrentIndex(count()-1);
+    } else {
+        std::cout << "Warning: Format already in selector!" << std::endl;
+    }
 } // FormatSelectorRememberField::addFormat() //
 
 //------------------------------------------------------------------------------
@@ -86,11 +96,18 @@ void FormatSelectorRememberField::addFormat(
 //------------------------------------------------------------------------------
 void FormatSelectorRememberField::removeFormat(int const& row)
 {
-    removeItem(row);
+    if(row < count() && row >= 0)
+    {
+        removeItem(row);
+    } else {
+        std::cout << "Warning: removeFormat() out of range" << std::endl;
+    }
 } // FormatSelectorRememberField::removeFormat() //
 
 //------------------------------------------------------------------------------
-///@brief Get the format of the current selection in the format selector.
+///@brief Get the format of the current selection in the format selector. If
+///       current index is set to placeholder, return the first format in the
+///       selector.
 //------------------------------------------------------------------------------
 QString FormatSelectorRememberField::value() const
 {
@@ -108,15 +125,7 @@ QString FormatSelectorRememberField::value() const
 //------------------------------------------------------------------------------
 void FormatSelectorRememberField::setValue(QString const& new_value)
 {
-    if(new_value.isEmpty())
-    {
-        return;
-    }
-    if(findData(QVariant(new_value), Qt::UserRole, Qt::MatchExactly) == -1)
-    {
-        addFormat(new_value, new_value);
-        setCurrentIndex(count()-1);
-    }
+    addFormat("Remembered Format", new_value);
 } // FormatSelectorRememberField::setValue()
 } // namespace qt //
 } // namespace lib //

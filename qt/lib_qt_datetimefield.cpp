@@ -2,6 +2,11 @@
 ///@file lib_qt_datetimefield.cpp
 ///@par  Classification:  UNCLASSIFIED, OPEN SOURCE
 ///
+///@version 2020-09-21  PN     Add addFormat() and removeFormat().
+///@version 2020-09-14  PN     Update connect() to handle DateTimePicker
+///                            acceptChanges() signal. Add setMaximumDate()
+///                            , setMinimumDate, setMaximumTime() and
+///                            setMinimumTime().
 ///@version 2020-09-11  PN     File creation.
 //------------------------------------------------------------------------------
 

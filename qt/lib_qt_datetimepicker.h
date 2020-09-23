@@ -72,8 +72,7 @@ namespace qt {
 ///         } // MyDateTimeField::MyDateTimeField() //
 ///     @endcode
 ///
-///@version 2020-09-21  PN     Added addFormat() and removeFormat(). Replaced
-///                            QComboBox with FormatSelectorRememberField.
+///@version 2020-09-21  PN     Added addFormat() and removeFormat().
 ///@version 2020-09-15  PN     Added setLineEdit(), todayButtonPressed()
 ///                            , nowButtonPressed(), onDateChange()
 ///                            , onTimeChange(), populateList()

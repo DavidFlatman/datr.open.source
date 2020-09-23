@@ -11,7 +11,9 @@
 ///@version 2020-09-17  PN     Removed header color change. Updated
 ///                            nowButtonPressed() to also change m_Calendar.
 ///                            Replaced implementation for converting from QTime
-///                            to QString with the QVariant class.
+///                            to QString with the QVariant class. Added
+///                            QComboBox* m_FormatSelector to allow user to
+///                            select QDateTime format.
 ///                            Added a selector for changing DateTime format.
 ///@version 2020-09-15  PN     Added implementation for setLineEdit()
 ///                            , todayButtonPressed(), nowButtonPressed()
@@ -196,7 +198,7 @@ void DateTimePicker::setMinimumTime(QTime const& new_time)
             item->setHidden(true);
         }
     } else {
-        std::cout << "setMinimumTime: Invalid Input" << std::endl;
+        std::cout << "Warning: setMinimumTime() Invalid Input" << std::endl;
     }
 } // DateTimePicker::setMinimumTime //
 
@@ -225,7 +227,7 @@ void DateTimePicker::setMaximumTime(QTime const& new_time)
             }
         }
     } else {
-        std::cout << "setMaximumTime: Invalid Input" << std::endl;
+        std::cout << "Warning: setMaximumTime() Invalid Input" << std::endl;
     }
 } // DateTimePicker::setMaximumTime //
 
