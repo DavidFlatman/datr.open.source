@@ -4,6 +4,8 @@
 ///                                                                             
 ///@par Thread Safety:  unknown none class object                               
 ///                                                                             
+///@version 2020-09-23  JRS     switched from boost::thread to std::thread      
+///                                                                             
 ///@version 2020-09-21  JRS     Replaced boost::mutexed_singleton               
 ///                                                                             
 ///@version 2020-05-04  DHF     Open sourced                                    
@@ -31,7 +33,7 @@ RegisteredThreads* RegisteredThreads::m_instance = nullptr;
 //------------------------------------------------------------------------------
 ///@brief   Return the native handle of the calling thread.                     
 //------------------------------------------------------------------------------
-boost::thread::native_handle_type Thread::self()
+std::thread::native_handle_type Thread::self()
 {
     #ifdef _WIN32
 //    return boost::thread::native_handle_type(GetCurrentThreadId());           

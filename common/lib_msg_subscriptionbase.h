@@ -6,8 +6,6 @@
 #ifndef LIB_MSG_SUBSCRIPTIONBASE_H_FILE_GUARD
 #define LIB_MSG_SUBSCRIPTIONBASE_H_FILE_GUARD
 
-#include <boost/scoped_ptr.hpp>
-#include <boost/shared_ptr.hpp>
 #include <boost/signals2.hpp>
 
 namespace lib {

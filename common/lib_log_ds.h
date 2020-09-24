@@ -62,7 +62,7 @@ namespace log {
 namespace ds {
 
 //------------------------------------------------------------------------------
-///@brief   Define the "m_Class" code identifitying the C++ class that          
+///@brief   Define the "m_Class" code identifying the C++ class that          
 ///         generated the error.  @see MessageID.                               
 ///                                                                             
 ///@note    In general, we do @e not like to have an uber file that must be     

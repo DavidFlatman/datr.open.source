@@ -190,23 +190,20 @@ std::string compress(const std::string& str, bool trm=true);
 std::string xmlEncode(const std::string& str);
 std::string xmlDecode(const std::string& str);
 
-#if 1
-// Shouldn't be implemented; use boost::algorithm::all                          
 bool isAllDigit(const std::string& str);
 bool isAlphaNumeric(const std::string& str);
 
-// Shouldn't be implemented; use boost::lexical_cast                            
-double toDouble(const std::string& str);
+double toDouble(const std::string& str, double errorValue = 0);
 
-// Shouldn't be implemented; use boost::trim*                                   
-std::string trim(const std::string& str);
-std::string trimLeft(const std::string& str);
-std::string trimRight(const std::string& str);
+std::string trim(const std::string& str, const std::string& white = " \t\n\v\r\f");
+std::string trimLeft(const std::string& str, const std::string& white = " \t\n\v\r\f");
+std::string trimRight(const std::string& str, const std::string& white = " \t\n\v\r\f");
 
-// Shouldn't be implemented; use boost::to_upper/to_lower                       
 std::string toLower(const std::string& str);
 std::string toUpper(const std::string& str);
-#endif
+
+void replace_all(std::string& str, const std::string& search,
+    const std::string& format, int max_replace = 100000);
 
 //------------------------------------------------------------------------------
 //  Fixed size char array manipulation.                                         

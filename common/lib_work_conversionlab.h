@@ -65,8 +65,6 @@
 #include "lib_ds_shared_ptr.h"
 #include "lib_work_conversionlabbase.h"
 
-#include <boost/scoped_ptr.hpp>
-
 namespace lib {
 namespace work {
 

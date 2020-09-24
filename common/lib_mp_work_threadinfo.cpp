@@ -6,6 +6,8 @@
 ///                                                                             
 ///@brief   Provide information about a thread.                                 
 ///                                                                             
+///@version 2020-09-23  JRS     replace boost references with std references.   
+///                                                                             
 ///@version 2020-05-04  DHF     Open sourced                                    
 ///                                                                             
 ///@version 2015-08-02  DHF     DeltaTime::seconds renamed inSeconds.           
@@ -19,7 +21,6 @@
 //------------------------------------------------------------------------------
 
 #include "lib_mp_work_threadinfo.h"
-
 #include "lib_log_work_messagefactory.h"
 #include "lib_string.h"
 
@@ -50,7 +51,7 @@ ThreadInfo::ThreadInfo(const std::string& name)
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
 ThreadInfo::ThreadInfo(
-    boost::thread::native_handle_type handle
+    std::thread::native_handle_type handle
   , const std::string& name
 ) : lib::work::NamedObject(name)
   , m_Handle(handle)
@@ -58,7 +59,7 @@ ThreadInfo::ThreadInfo(
   , m_IsRunning(true)
 {
 
-} // ThreadInfo::ThreadInfo(boost::thread::native_handle_type handle) //
+} // ThreadInfo::ThreadInfo(std::thread::native_handle_type handle) //
 
 //------------------------------------------------------------------------------
 ///@brief   Reclaim resources held by object.                                   
@@ -74,7 +75,7 @@ ThreadInfo::~ThreadInfo()
 std::string ThreadInfo::name() const
 {
 
-    boost::mutex::scoped_lock   lock(m_ThreadMutex);
+    std::lock_guard<std::mutex>   lock(m_ThreadMutex);
     return lib::work::NamedObject::name();
 
 } // std::string ThreadInfo::name() const //
@@ -85,7 +86,7 @@ std::string ThreadInfo::name() const
 void ThreadInfo::setName(const std::string& name)
 {
 
-    boost::mutex::scoped_lock lock(m_ThreadMutex);
+    std::lock_guard<std::mutex> lock(m_ThreadMutex);
 
     lib::work::NamedObject::setName(name);
 
@@ -118,7 +119,7 @@ lib::time::work::DeltaTime ThreadInfo::runTime() const
 double ThreadInfo::cpuPercentCurrent() const
 {
 
-    boost::mutex::scoped_lock lock(m_ThreadMutex);
+    std::lock_guard<std::mutex> lock(m_ThreadMutex);
 
     return cpuPercentCurrentNoLock();
 } // double ThreadInfo::cpuPercentCurrent() const //
@@ -171,7 +172,7 @@ double ThreadInfo::cpuPercentTotal() const
 const std::deque<double>& ThreadInfo::historyOfCPU() const
 {
 
-    boost::mutex::scoped_lock lock(m_ThreadMutex);
+    std::lock_guard<std::mutex> lock(m_ThreadMutex);
 
     return m_HistoryOfCPU;
 } // const std::deque<double>& ThreadInfo::historyOfCPU() const //
@@ -183,7 +184,7 @@ const std::deque<double>& ThreadInfo::historyOfCPU() const
 double ThreadInfo::updateHistory()
 {
 
-    boost::mutex::scoped_lock lock(m_ThreadMutex);
+    std::lock_guard<std::mutex> lock(m_ThreadMutex);
 
     if (m_HistoryOfCPU.size() == s_MaxHistorySize) {
         m_HistoryOfCPU.pop_front();
@@ -270,7 +271,7 @@ lib::time::work::DeltaTime ThreadInfo::runningRunTime() const
 void ThreadInfo::setRunning(bool state)
 {
 
-    boost::mutex::scoped_lock lock(m_ThreadMutex);
+    std::lock_guard<std::mutex> lock(m_ThreadMutex);
 
     if (state) {
         m_StartTime = lib::time::work::DateTime::now();

@@ -366,10 +366,10 @@ class Subscriber
         ///         Nobody is really going to be subscribing to objects of      
         ///         NULL_DEFAULT_TYPE_n.  So, we implement the process methods  
         ///         for the default values of the template parameters then the  
-        ///         user of the template isn't harrassed by "you didn't         
+        ///         user of the template isn't harassed by "you didn't         
         ///         implement this."  At the same time, we're *not* using TYPE1 
         ///         because if the user of the template actually passed in a    
-        ///         parameter, then we want them to be harased about any missing
+        ///         parameter, then we want them to be harassed about any missing
         ///         'process' methods that they may have forgotten to implement.
         //----------------------------------------------------------------------
         virtual void process(
@@ -426,7 +426,7 @@ class Subscriber
         //----------------------------------------------------------------------
         ///@brief   Give the sub class running in the thread context a chance to
         ///         abort the thread before we get started by overriding the    
-        ///         initalize function.                                         
+        ///         initialize function.                                         
         ///                                                                     
         ///         Credit where credit is due, this concept was taken from     
         ///         Kirk Wilson's egrims work at ECR.                           

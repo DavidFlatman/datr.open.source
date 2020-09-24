@@ -6,8 +6,6 @@
 #ifndef LIB_MSG_PUBLISHERSUBSCRIBERBASE_H_FILE_GUARD
 #define LIB_MSG_PUBLISHERSUBSCRIBERBASE_H_FILE_GUARD
 
-#include <boost/scoped_ptr.hpp>
-
 namespace lib {
 namespace msg {
 

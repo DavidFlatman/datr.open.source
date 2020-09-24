@@ -9,7 +9,6 @@
 #include "lib_mp_work_thread.h"
 #include "lib_work_namedobject.h"
 
-
 #include <string>
 #include <stdint.h>
 
@@ -90,8 +89,8 @@ class Threadable : virtual public lib::work::NamedObject
         ThreadPtr thread() { return m_Thread; }
 
         //----------------------------------------------------------------------
-        ///@brief   Give the derived class an oppontunity to indicate that      
-        ///         there is a problem (most likely in incomplete initaliation).
+        ///@brief   Give the derived class an opportunity to indicate that      
+        ///         there is a problem (most likely incomplete initialization). 
         ///                                                                     
         ///@note 1  It is envisioned that derived class will throw an           
         ///         exception if there is a problem (merely returning bool      

@@ -5,6 +5,8 @@
 ///                                                                             
 ///@author  Make Test Utility       MTU     Utility by DHF                      
 ///                                                                             
+///@version 2020-09-23  JRS     cleanup for some warnings.                      
+///                                                                             
 ///@version 2020-05-04  DHF     Open sourced                                    
 ///                                                                             
 ///@version 2020-02-11  KCG     Changed boost::shared_ptr to lib::ds::shared_ptr
@@ -80,7 +82,7 @@ int fillVector(std::vector<std::string>& vec, int offset = 0)
    if (offset >= 42 && vec.size() < 5) vec.push_back("George W. Bush");
    if (offset >= 43 && vec.size() < 5) vec.push_back("Barack H. Obama");
 
-   return vec.size();
+   return static_cast<int>(vec.size());
 }
 
 //------------------------------------------------------------------------------
@@ -615,7 +617,7 @@ void PublisherTest::connect()
         pub.connect(sub);
         FAIL("unexpected connection made");
     } catch(const VectorPublisher::ConnectionError& e) {
-        PASS("expected exception thrown");
+        PASS(std::string("expected exception thrown ") + e.what());
     } catch(...) {
         FAIL("unknown exception thrown");
     }
@@ -629,7 +631,7 @@ void PublisherTest::connect()
         pub.connect(sub);
         FAIL("unexpected connection made");
     } catch(const VectorWithOffsetPublisher::ConnectionError& e) {
-        PASS("expected exception thrown");
+        PASS(std::string("expected exception thrown ") + e.what());
     } catch(...) {
         FAIL("unknown exception thrown");
     }
@@ -643,7 +645,7 @@ void PublisherTest::connect()
         pub.connect(sub, true);
         PASS("connection made");
     } catch(const VectorWithOffsetPublisher::ConnectionError& e) {
-        FAIL("unexpected exception thrown");
+        FAIL(std::string("unexpected exception thrown ") + e.what());
     } catch(...) {
         FAIL("unknown exception thrown");
     }

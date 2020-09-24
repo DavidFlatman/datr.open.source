@@ -6,6 +6,8 @@
 ///                                                                             
 ///@brief   Holds helper routines for the lib_msg_publisher.h file.             
 ///                                                                             
+///@version 2020-09-23  JRS     replace boost references with std references.   
+///                                                                             
 ///@version 2020-05-04  DHF     Open sourced                                    
 ///                                                                             
 ///@version 2020-02-11  KCG     Changed boost::shared_ptr to lib::ds::shared_ptr
@@ -73,9 +75,9 @@ namespace msg {
     if (                                                                    \
         pubUsed[P_COUNT] == 0                                               \
      && PublisherConnectionHelper<                                          \
-            boost::is_same<S_TYPE, P_TYPE>::value                           \
-          , boost::is_base_and_derived<S_TYPE, P_TYPE>::value               \
-          , boost::is_convertible<lib::ds::shared_ptr<const P_TYPE>, lib::ds::shared_ptr<const S_TYPE> >::value                    \
+            std::is_same<S_TYPE, P_TYPE>::value                           \
+          , std::is_base_of<S_TYPE, P_TYPE>::value && std::is_same<S_TYPE, P_TYPE>::value \
+          , std::is_convertible<lib::ds::shared_ptr<const P_TYPE>, lib::ds::shared_ptr<const S_TYPE> >::value                    \
           , S_TYPE                                                          \
           , P_TYPE                                                          \
         >::connect(sub, pub, S_ONLY, D_ONLY)                                \

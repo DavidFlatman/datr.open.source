@@ -7,7 +7,6 @@
 #include <memory>
 #include <stddef.h>              // std::nullptr_t
 
-//#include <boost/shared_ptr.hpp>//temp will be removed when std:: is inserted
 namespace lib {
 namespace ds {
 //------------------------------------------------------------------------------

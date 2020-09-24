@@ -10,9 +10,6 @@
 #include "lib_ds_shared_ptr.h"
 #include "lib_mp_work_threadablecollection.h"
 
-#include <boost/scoped_ptr.hpp>
-#include <boost/type_traits.hpp>
-
 namespace lib {
 namespace msg {
 
@@ -41,6 +38,8 @@ class PublisherProxyBase : public lib::mp::work::ThreadableCollection
 ///         SO VERY MUCH.                                                       
 ///                           -- Death, <i>Hogfather</i> by Terry Pratchett     
 ///                                                                             
+///@version 2020-09-23  JRS     replace boost references with std references.   
+///                                                                             
 ///@version 2020-05-04  DHF     Open sourced                                    
 ///                                                                             
 ///@version 2020-02-11  KCG     Changed boost::shared_ptr to lib::ds::shared_ptr
@@ -68,7 +67,7 @@ class PublisherProxy
     public:
         PublisherProxy() = default;
         PublisherProxy(const PublisherProxy& p) = default;
-        virtual ~PublisherProxy() { }
+        virtual ~PublisherProxy() = default;
 
         PublisherProxy& operator=(const PublisherProxy& p) = default;
 
@@ -113,8 +112,8 @@ class PublisherProxy
         {
             #define is_same_not_null(SUB_TYPE, PUB_TYPE)                    \
                 (                                                           \
-                    boost::is_same<SUB_TYPE, PUB_TYPE>::value &&            \
-                   !boost::is_base_of<lib::ds::NULL_BASE, PUB_TYPE>::value  \
+                    std::is_same<SUB_TYPE, PUB_TYPE>::value &&            \
+                   !std::is_base_of<lib::ds::NULL_BASE, PUB_TYPE>::value  \
                 )
             #define is_published_type(SUB_TYPE)                             \
                 (                                                           \

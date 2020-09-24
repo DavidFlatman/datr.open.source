@@ -4,9 +4,11 @@
 ///                                                                             
 ///@par Classification:  UNCLASSIFIED, OPEN SOURCE                              
 ///                                                                             
-///@brief   Object respenting a single log message.                             
+///@brief   Object representing a single log message.                           
 ///                                                                             
-///@version 2020-05-04  JRS     Removed some compiler warnings                  
+///@version 2020-09-23  JRS     Removed boost string operation                  
+///                                                                             
+///@version 2020-09-22  JRS     Removed some compiler warnings                  
 ///                                                                             
 ///@version 2020-05-04  DHF     Open sourced                                    
 ///                                                                             
@@ -34,8 +36,6 @@
 #include "lib_log_work.h"
 #include "lib_si_ds_prefixes.h"
 #include "lib_string.h"
-
-#include <boost/algorithm/string.hpp>
 
 #ifdef IS_VISUAL_STUDIO
 #include <process.h>            //  Microsoft is not standard.  
@@ -384,7 +384,7 @@ Message& Message::operator=(const std::string& str)
     m_SeverityLevel = lib::log::work::fromString(str.substr(62,1));
     m_Message = str.substr(64, str.size());
 
-    boost::trim(m_ApplicationMnemonic);
+    lib::trim(m_ApplicationMnemonic);
 
     return *this;
 }

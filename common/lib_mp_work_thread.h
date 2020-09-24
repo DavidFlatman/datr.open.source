@@ -5,7 +5,7 @@
 #ifndef LIB_MP_THREAD_H
 #define LIB_MP_THREAD_H
 
-#include <boost/thread.hpp>
+#include <thread>
 #include <set>
 #include <string>
 #include <mutex>
@@ -42,7 +42,7 @@ class RegisteredThreads
     : public std::set<ThreadInfo*>
 {
     public:
-        /// @brief get a scoped lock on the singleton
+        /// @brief get a lock on the singleton
         struct lock
         {
             std::lock_guard<std::mutex> m_lock;
@@ -109,7 +109,7 @@ class RegisteredThreads
 ///             -#  thread collections (startAll, joinAll, killAll, ...)        
 ///\n\n                                                                         
 ///         We seriously considered the boost threading model: instant          
-///         portablity.  We probably would have pushed forward with it if       
+///         portability.  We probably would have pushed forward with it if       
 ///         they had made their destructor virtual ... or maybe even their      
 ///         start_thread virtual.  But no.                                      
 ///\n\n                                                                         
@@ -182,6 +182,8 @@ class RegisteredThreads
 ///             }                                                               
 ///         @endcode                                                            
 ///                                                                             
+///@version 2020-09-23  JRS     replace boost references with std references.   
+///                                                                             
 ///@version 2020-05-04  DHF     Open sourced                                    
 ///                                                                             
 ///@version 2020-02-11  KCG     Changed boost::shared_ptr to lib::ds::shared_ptr
@@ -204,7 +206,7 @@ class Thread;
 
 class Thread 
     : public ThreadInfo
-    , public boost::thread
+    , public std::thread
 {
     public:
         //----------------------------------------------------------------------
@@ -216,7 +218,7 @@ class Thread
         template<typename F>
         Thread(const std::string& name, F* f)
             : ThreadInfo(name)
-            , boost::thread(trackThread<F>, this, f)
+            , std::thread(trackThread<F>, this, f)
         {
         }
 
@@ -225,7 +227,7 @@ class Thread
         template<typename F, typename A1>
         Thread(const std::string& name, F* f, A1 a1)
             : ThreadInfo(name)
-            , boost::thread(trackThread<F, A1>, this, f, a1)
+            , std::thread(trackThread<F, A1>, this, f, a1)
         {
         }
 
@@ -234,7 +236,7 @@ class Thread
         template<typename F, typename A1, typename A2>
         Thread(const std::string& name, F* f, A1 a1, A2 a2)
             : ThreadInfo(name)
-            , boost::thread(trackThread<F, A1, A2>, this, f, a1, a2)
+            , std::thread(trackThread<F, A1, A2>, this, f, a1, a2)
         {
         }
 
@@ -250,7 +252,7 @@ class Thread
         //======================================================================
         //  static methods                                                      
         //======================================================================
-        static boost::thread::native_handle_type self();
+        static std::thread::native_handle_type self();
 
     protected:
 

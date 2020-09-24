@@ -6,10 +6,8 @@
 #ifndef LIB_MP_QUEUE_H
 #define LIB_MP_QUEUE_H
 
-#include <boost/shared_ptr.hpp>
-#include <boost/thread/condition.hpp>
-#include <boost/thread/locks.hpp>
-#include <boost/thread/mutex.hpp>
+#include <condition_variable>
+#include <mutex>
 #include <deque>
 
 namespace lib {
@@ -36,11 +34,13 @@ namespace work {
 ///                                                                             
 ///@par Thread Safety:  object                                                  
 ///                                                                             
+///@version 2020-09-23  JRS     replace boost references with std references.   
+///                                                                             
 ///@version 2020-05-04  DHF     Open sourced                                    
 ///                                                                             
 ///@version 2019-10-02  DHF     Made maximumSize() constant.                    
 ///                                                                             
-///@version 2015-11-23  DHF     Add abort metchanism.                           
+///@version 2015-11-23  DHF     Add abort mechanism.                           
 ///                             Changed underlying structure to a std::dequeue  
 ///                             in order to have the clear() method.            
 ///                                                                             
@@ -91,13 +91,13 @@ class Queue
             //------------------------------------------------------------------
             /// @todo size check?                                               
             //------------------------------------------------------------------
-            boost::unique_lock<boost::mutex> lock(m_QueueMutex);
+            std::unique_lock<std::mutex> lock(m_QueueMutex);
             if (m_Governor > 0 && m_Governor <= m_Queue.size()) {
                 m_QueueReady.wait(lock);
                 if (m_Aborted) return;
             }
 
-            //boost::mutex::scoped_lock lock(m_QueueMutex);                     
+            //std::lock_guard<std::mutex> lock(m_QueueMutex);
             m_Queue.push_back(item);
             if (m_Queue.size() > m_MaximumSize) m_MaximumSize = m_Queue.size();
             lock.unlock();
@@ -120,7 +120,7 @@ class Queue
         {
             if (m_Aborted) return false;
 
-            boost::unique_lock<boost::mutex> lock(m_QueueMutex);
+            std::unique_lock<std::mutex> lock(m_QueueMutex);
             while (m_Queue.empty() && !m_Interrupt && !m_Aborted) {
                 m_DataReady.wait(lock);
             }
@@ -143,7 +143,7 @@ class Queue
         ///         to change without notice).                                  
         //----------------------------------------------------------------------
         size_t size() const {
-            boost::mutex::scoped_lock lock(m_QueueMutex);
+            std::lock_guard<std::mutex> lock(m_QueueMutex);
             return m_Queue.size(); 
         }
 
@@ -160,7 +160,7 @@ class Queue
         //----------------------------------------------------------------------
         bool empty() const
         {
-            boost::mutex::scoped_lock lock(m_QueueMutex);
+            std::lock_guard<std::mutex> lock(m_QueueMutex);
             return m_Queue.empty();
         }
 
@@ -171,7 +171,7 @@ class Queue
         //----------------------------------------------------------------------
         void setInterrupt(bool value = true)
         {
-            boost::mutex::scoped_lock lock(m_QueueMutex);
+            std::lock_guard<std::mutex> lock(m_QueueMutex);
             m_Interrupt = value;
             m_DataReady.notify_one();
         }
@@ -190,7 +190,7 @@ class Queue
         void abort()
         {
             m_Aborted = true;
-            boost::mutex::scoped_lock lock(m_QueueMutex);
+            std::lock_guard<std::mutex> lock(m_QueueMutex);
             m_Queue.clear();
             m_QueueReady.notify_all();
             m_DataReady.notify_all();
@@ -200,7 +200,7 @@ class Queue
 
     private:
         //----------------------------------------------------------------------
-        //  Try to live without these ... copying the underling queue may make  
+        //  Try to live without these ... copying the underlying queue may make 
         //  sense, but copying the locks doesn't.                               
         //----------------------------------------------------------------------
         Queue& operator=(const Queue& that);
@@ -217,7 +217,7 @@ class Queue
         uint64_t m_MaximumSize;
 
         //----------------------------------------------------------------------
-        ///@brief The actual holder of thed data.                               
+        ///@brief The actual holder of the data.                               
         //----------------------------------------------------------------------
         std::deque<TYPE> m_Queue;
 
@@ -225,14 +225,14 @@ class Queue
         ///@brief The lock to use before accessing m_Queue; doesn't really      
         ///       change the state, therefore mutable.                          
         //----------------------------------------------------------------------
-        mutable boost::mutex m_QueueMutex;
+        mutable std::mutex m_QueueMutex;
 
         //----------------------------------------------------------------------
         ///@brief Used to wake up a thread waiting to get data out of the queue.
         //----------------------------------------------------------------------
-        boost::condition m_DataReady;
+        std::condition_variable m_DataReady;
 
-        boost::condition m_QueueReady;
+        std::condition_variable m_QueueReady;
 
         //----------------------------------------------------------------------
         ///@brief Simplistically, indicates if setInterrupt was issued; used to 

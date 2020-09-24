@@ -10,7 +10,8 @@
 #include "lib_work_namedobject.h"
 #include "lib_time_work_datetime.h"
 #include "lib_time_work_deltatime.h"
-#include <boost/thread.hpp>
+#include <thread>
+#include <mutex>
 #include <deque>
 
 namespace lib {
@@ -25,6 +26,8 @@ namespace work {
 ///                                                                             
 ///@par Thread Safety:  object                                                  
 ///                                                                             
+///@version 2020-09-23  JRS     replace boost references with std references.   
+///                                                                             
 ///@version 2020-05-04  DHF     Open sourced                                    
 ///                                                                             
 ///@version 2010-04-07  DHF     File creation                                   
@@ -33,7 +36,7 @@ class ThreadInfo : public lib::work::NamedObject
 {
     public:
         ThreadInfo(const std::string& name = "");
-        ThreadInfo(boost::thread::native_handle_type handle, const std::string& name = "");
+        ThreadInfo(std::thread::native_handle_type handle, const std::string& name = "");
         virtual ~ThreadInfo();
 
         lib::time::work::DeltaTime cpuTime() const;
@@ -53,7 +56,7 @@ class ThreadInfo : public lib::work::NamedObject
         void setName(const std::string& name);
         std::string name() const;
 
-        void setHandle(boost::thread::native_handle_type handle)
+        void setHandle(std::thread::native_handle_type handle)
         {
             m_Handle = handle;
         }
@@ -64,7 +67,7 @@ class ThreadInfo : public lib::work::NamedObject
     protected:
 
     private:
-        boost::thread::native_handle_type   m_Handle;
+        std::thread::native_handle_type   m_Handle;
         lib::time::work::DateTime           m_StartTime;
         mutable lib::time::work::DeltaTime  m_PercentLastCPU;
         mutable lib::time::work::DateTime   m_PercentLastUpdateTime;
@@ -73,16 +76,16 @@ class ThreadInfo : public lib::work::NamedObject
         lib::time::work::DeltaTime          m_RunTime;
         bool                                m_IsRunning;
 
-        mutable boost::mutex                m_ThreadMutex;
+        mutable std::mutex                m_ThreadMutex;
 
         double cpuPercentCurrentNoLock() const;
         lib::time::work::DeltaTime runningCPUTime() const;
         lib::time::work::DeltaTime runningRunTime() const;
 
         //----------------------------------------------------------------------
-        //  These woudl probably be painful to implement correctly.             
+        //  These would probably be painful to implement correctly.             
         //----------------------------------------------------------------------
-        ThreadInfo(boost::thread::native_handle_type handle);
+        ThreadInfo(std::thread::native_handle_type handle);
         ThreadInfo& operator=(const ThreadInfo& that);
 }; // class ThreadInfo //
 

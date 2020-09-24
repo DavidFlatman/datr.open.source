@@ -10,8 +10,7 @@
 #include "lib_msg_publisherbase.h"
 #include "lib_msg_subscription.h"
 #include <boost/signals2.hpp>
-#include <boost/type_traits/is_base_and_derived.hpp>
-#include <boost/type_traits/is_same.hpp>
+#include <type_traits>
 #include <stdint.h>
 
 namespace lib {
@@ -51,6 +50,8 @@ namespace msg {
 ///                             may get the original version or may get the     
 ///                             modified version.  Let's save ourselves that    
 ///                             headache and only allow @e const objects.       
+///                                                                             
+///@version 2020-09-23  JRS     replace boost references with std references.   
 ///                                                                             
 ///@version 2020-05-04  DHF     Open sourced                                    
 ///                                                                             
@@ -115,9 +116,10 @@ class Publication
             //  Note:   We only use same and derived once.  However, the "value"
             //          isn't really a bool but a trinary operator...           
             //------------------------------------------------------------------
-            bool same = boost::is_same<SUB_TYPE, TYPE>::value;
-            bool derived = boost::is_base_and_derived<SUB_TYPE, TYPE>::value;
-
+            bool same = std::is_same<SUB_TYPE, TYPE>::value;
+            bool derived = 
+                std::is_base_of<SUB_TYPE, TYPE>::value
+                && std::is_same<SUB_TYPE, TYPE>::value;
             uint32_t result(0);
             if (same || derived) {
                 boost::signals2::connection connection1(

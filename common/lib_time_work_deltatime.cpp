@@ -8,6 +8,8 @@
 ///     @code                                                                   
 ///     @endcode                                                                
 ///                                                                             
+///@version 2020-09-23  JRS     replace boost references with std references.   
+///                                                                             
 ///@version 2020-05-04  DHF     Open sourced                                    
 ///                                                                             
 ///@version 2014-10-07  MNT     Reimplemented                                   
@@ -29,8 +31,7 @@
 #include "lib_string.h"                     // lib::format      
 #include "lib_time_ds.h"
 
-#include <boost/algorithm/string.hpp>       // boost::to_lower  
-#include <boost/regex.hpp>
+#include <regex>
 #include "debug.h"
 
 namespace lib {
@@ -204,17 +205,17 @@ bool DeltaTime::fromString(const std::string& time, bool strict)
     // covering all syntax options listed even further above.
     //--------------------------------------------------------------------------
 
-    static const boost::regex regex_ddhhmmss(  match_ddhhmmss);
-    static const boost::regex regex_ddhhmmssff(match_ddhhmmss + match_decimals);
-    static const boost::regex regex_ddhhmm(    match_ddhhmm);
-    static const boost::regex regex_ddhh(      match_ddhh);
-    static const boost::regex regex_hhmmss(    match_hhmmss);
-    static const boost::regex regex_hhmmssff(  match_hhmmss   + match_decimals);
-    static const boost::regex regex_mmss(      match_mmss);
-    static const boost::regex regex_mmssff(    match_mmss     + match_decimals);
-    static const boost::regex regex_ss(        match_ss);
-    static const boost::regex regex_ssff(      match_ss       + match_decimals);
-    static const boost::regex regex_ff(                         match_decimals);
+    static const std::regex regex_ddhhmmss(  match_ddhhmmss);
+    static const std::regex regex_ddhhmmssff(match_ddhhmmss + match_decimals);
+    static const std::regex regex_ddhhmm(    match_ddhhmm);
+    static const std::regex regex_ddhh(      match_ddhh);
+    static const std::regex regex_hhmmss(    match_hhmmss);
+    static const std::regex regex_hhmmssff(  match_hhmmss   + match_decimals);
+    static const std::regex regex_mmss(      match_mmss);
+    static const std::regex regex_mmssff(    match_mmss     + match_decimals);
+    static const std::regex regex_ss(        match_ss);
+    static const std::regex regex_ssff(      match_ss       + match_decimals);
+    static const std::regex regex_ff(                         match_decimals);
 
     //--------------------------------------------------------------------------
     // Extract time data from the string using either of the regular expressions
@@ -231,56 +232,56 @@ bool DeltaTime::fromString(const std::string& time, bool strict)
     
     std::string fraction;
 
-    boost::smatch matches;
+    std::smatch matches;
 
-    if (boost::regex_match(time, matches, regex_ddhhmmss)) {
+    if (std::regex_match(time, matches, regex_ddhhmmss)) {
         days        = lib::toUnsigned(matches[1],10);
         hours       = lib::toUnsigned(matches[2],10);
         min         = lib::toUnsigned(matches[3],10);
         sec         = lib::toUnsigned(matches[4],10);
         hoursMayNeedCheck = minMayNeedCheck = secMayNeedCheck = true;
-    } else if (boost::regex_match(time, matches, regex_ddhhmmssff)) {
+    } else if (std::regex_match(time, matches, regex_ddhhmmssff)) {
         days        = lib::toUnsigned(matches[1],10);
         hours       = lib::toUnsigned(matches[2],10);
         min         = lib::toUnsigned(matches[3],10);
         sec         = lib::toUnsigned(matches[4],10);
         fraction    = matches[5];
         hoursMayNeedCheck = minMayNeedCheck = secMayNeedCheck = true;
-    } else if (boost::regex_match(time, matches, regex_ddhhmm)) {
+    } else if (std::regex_match(time, matches, regex_ddhhmm)) {
         days        = lib::toUnsigned(matches[1],10);
         hours       = lib::toUnsigned(matches[2],10);
         min         = lib::toUnsigned(matches[3],10);
         hoursMayNeedCheck = minMayNeedCheck = true;
-    } else if (boost::regex_match(time, matches, regex_ddhh)) {
+    } else if (std::regex_match(time, matches, regex_ddhh)) {
         days        = lib::toUnsigned(matches[1],10);
         hours       = lib::toUnsigned(matches[2],10);
         hoursMayNeedCheck = true;
-    } else if (boost::regex_match(time, matches, regex_hhmmss)) {
+    } else if (std::regex_match(time, matches, regex_hhmmss)) {
         hours       = lib::toUnsigned(matches[1],10);
         min         = lib::toUnsigned(matches[2],10);
         sec         = lib::toUnsigned(matches[3],10);
         minMayNeedCheck = secMayNeedCheck = true;
-    } else if (boost::regex_match(time, matches, regex_hhmmssff)) {
+    } else if (std::regex_match(time, matches, regex_hhmmssff)) {
         hours       = lib::toUnsigned(matches[1],10);
         min         = lib::toUnsigned(matches[2],10);
         sec         = lib::toUnsigned(matches[3],10);
         fraction    = matches[4];
         minMayNeedCheck = secMayNeedCheck = true;
-    } else if (boost::regex_match(time, matches, regex_mmss)) {
+    } else if (std::regex_match(time, matches, regex_mmss)) {
         min         = lib::toUnsigned(matches[1],10);
         sec         = lib::toUnsigned(matches[2],10);
         secMayNeedCheck = true;
-    } else if (boost::regex_match(time, matches, regex_mmssff)) {
+    } else if (std::regex_match(time, matches, regex_mmssff)) {
         min         = lib::toUnsigned(matches[1],10);
         sec         = lib::toUnsigned(matches[2],10);
         fraction    = matches[3];
         secMayNeedCheck = true;
-    } else if (boost::regex_match(time, matches, regex_ss)) {
+    } else if (std::regex_match(time, matches, regex_ss)) {
         sec         = lib::toUnsigned(matches[1],10);
-    } else if (boost::regex_match(time, matches, regex_ssff)) {
+    } else if (std::regex_match(time, matches, regex_ssff)) {
         sec         = lib::toUnsigned(matches[1],10);
         fraction    = matches[2];
-    } else if (boost::regex_match(time, matches, regex_ff)) {
+    } else if (std::regex_match(time, matches, regex_ff)) {
         fraction    = matches[1];
     } else {
         return false;   // Syntax Error!

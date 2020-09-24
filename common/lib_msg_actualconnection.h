@@ -24,6 +24,8 @@ namespace msg {
 ///@note    This is another template not expected to be called except by the    
 ///         publisher code.                                                     
 ///                                                                             
+///@version 2020-09-23  JRS     replace boost references with std references.   
+///                                                                             
 ///@version 2020-05-04  DHF     Open sourced                                    
 ///                                                                             
 ///@version 2016-11-01  DHF     lib::msg::NULL* moved to lib::ds::NULL*         
@@ -36,8 +38,8 @@ uint32_t actualConnection(Subscription<SUB_TYPE>* s, Publication<PUB_TYPE>* p)
 {
     uint32_t result(0);
     if (
-        (!boost::is_base_and_derived<ds::NULL_BASE, SUB_TYPE>::value)
-     && (!boost::is_base_and_derived<ds::NULL_BASE, PUB_TYPE>::value)
+        (!(std::is_base_of<ds::NULL_BASE, SUB_TYPE>::value && std::is_same<ds::NULL_BASE, SUB_TYPE>::value))
+     && (!(std::is_base_of<ds::NULL_BASE, SUB_TYPE>::value && std::is_same<ds::NULL_BASE, PUB_TYPE>::value))
     )
     {
         p->connect(*s);

@@ -19,12 +19,12 @@ namespace ds {
 ///         original purpose was to create default parameters to the            
 ///         lib::msg::Subscriber template.                                      
 ///                                                                             
-///@note    All of the NULL_DEFAULT_TYPE_n types are boost::is_convertible to   
+///@note    All of the NULL_DEFAULT_TYPE_n types are std::is_convertible to   
 ///         NULL_BASE.                                                          
 ///                                                                             
 ///@par Thread Safety:  object (go figure)                                      
 ///         The class doesn't do anything ... so it's not possible for multiple 
-///         threads to step on eacher other's toes.                             
+///         threads to step on each other's toes.                               
 ///                                                                             
 ///@version 2020-05-04  DHF     Open sourced                                    
 ///                                                                             

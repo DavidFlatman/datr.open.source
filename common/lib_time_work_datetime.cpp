@@ -12,6 +12,10 @@
 ///                                                                             
 ///@par Thread Safety:  class                                                   
 ///                                                                             
+///@version 2020-09-23  JRS     replace boost references with std references.   
+///                                                                             
+///@version 2020-09-22  JRS     Switched from OS-specific times to std::chrono  
+///                                                                             
 ///@version 2020-05-04  DHF     Open sourced                                    
 ///                                                                             
 ///@version 2019-06-07  DHF     Added "smoothed" functionality.                 
@@ -56,20 +60,14 @@
 #include "lib_compiler_info.h"
 
 #include <assert.h>
-#include <boost/algorithm/string.hpp>       // boost::to_lower  
-#include <boost/regex.hpp>
+#include <regex>
 #include <ctype.h>              // isalpha, isdigit (may need change for MS)    
 #include <stdio.h>
 #include <stdint.h>
 #include <string.h>             // memset   
 #include <stdexcept>
 #include <time.h>
-
-#ifndef _MSC_VER
-#include <sys/time.h>
-#else
-#include <windows.h>
-#endif
+#include <chrono>
 
 // use the C++ definitions if possible, not the C macros. Especially do this if you're making a routine called min.
 #ifdef min
@@ -105,59 +103,6 @@ static struct tm* gmtime_r(const time_t* tp, struct tm* result)
     memcpy(result, ::gmtime(tp), sizeof(tm));
     return result;
 }
-
-#if IS_VISUAL_STUDIO
-
-// gettimeofday isn't native on Windows, it looks like.
-// from https://social.msdn.microsoft.com/Forums/vstudio/en-us/430449b3-f6dd-4e18-84de-eebd26a8d668/gettimeofday
-#if defined(_MSC_VER) || defined(_MSC_EXTENSIONS)
-#define DELTA_EPOCH_IN_MICROSECS  11644473600000000Ui64
-#else
-#define DELTA_EPOCH_IN_MICROSECS  11644473600000000ULL
-#endif
-
-struct timezone
-{
-    int  tz_minuteswest; /* minutes W of Greenwich */
-    int  tz_dsttime;     /* type of dst correction */
-};
-
-static int gettimeofday(struct timeval* tv, struct timezone* tz = NULL)
-{
-    FILETIME ft;
-    unsigned __int64 tmpres = 0;
-    static int tzflag;
-
-    if (NULL != tv)
-    {
-        GetSystemTimeAsFileTime(&ft);
-
-        tmpres |= ft.dwHighDateTime;
-        tmpres <<= 32;
-        tmpres |= ft.dwLowDateTime;
-
-        /*converting file time to unix epoch*/
-        tmpres -= DELTA_EPOCH_IN_MICROSECS;
-        tmpres /= 10;  /*convert into microseconds*/
-        tv->tv_sec = (long)(tmpres / 1000000UL);
-        tv->tv_usec = (long)(tmpres % 1000000UL);
-    }
-
-    if (NULL != tz)
-    {
-        if (!tzflag)
-        {
-            _tzset();
-            tzflag++;
-        }
-        tz->tz_minuteswest = _timezone / 60;
-        tz->tz_dsttime = _daylight;
-    }
-
-    return 0;
-}
-
-#endif // #if IS_VISUAL_STUDIO
 
 #endif              // #ifdef _WIN32    
 
@@ -238,28 +183,28 @@ bool DateTime::fromString(const std::string& str, bool strict)
     //  yyyy-mm-dd                                                              
     //  yyyy/mm/dd                                                              
     //--------------------------------------------------------------------------
-    static const boost::regex d0("^\\s*(\\d{4})[/-](\\d{2})[/-](\\d{2})(.*)");
+    static const std::regex d0("^\\s*(\\d{4})[/-](\\d{2})[/-](\\d{2})(.*)");
 
     //--------------------------------------------------------------------------
     //  mm-dd-yyyy                                                              
     //  mm/dd/yyyy                                                              
     //--------------------------------------------------------------------------
-    static const boost::regex d1("^\\s*(\\d{2})[/-](\\d{2})[/-](\\d{4})(.*)");
+    static const std::regex d1("^\\s*(\\d{2})[/-](\\d{2})[/-](\\d{4})(.*)");
 
     //--------------------------------------------------------------------------
     //  ddmmmyyyy                                                               
     //--------------------------------------------------------------------------
-    static const boost::regex d2("^\\s*(\\d{2})(\\w{3})(\\d{2,})(.*)");
+    static const std::regex d2("^\\s*(\\d{2})(\\w{3})(\\d{2,})(.*)");
 
     //--------------------------------------------------------------------------
     //  mmm dd, yyyy                                                            
     //--------------------------------------------------------------------------
-    static const boost::regex d4("^\\s*(\\w{3}) (\\d{1,2}), (\\d{2,})(.*)");
+    static const std::regex d4("^\\s*(\\w{3}) (\\d{1,2}), (\\d{2,})(.*)");
 
     //--------------------------------------------------------------------------
     //  ddd                                                                     
     //--------------------------------------------------------------------------
-    static const boost::regex d5("^\\s*(\\d{1,3}):*(.*)");
+    static const std::regex d5("^\\s*(\\d{1,3}):*(.*)");
 
     std::string m;
     int    month(0);
@@ -268,36 +213,36 @@ bool DateTime::fromString(const std::string& str, bool strict)
     std::string remainder;
     std::string yearStr;
 
-    boost::smatch p;
+    std::smatch p;
 
-    if (boost::regex_match(str, p, d0)) {
+    if (std::regex_match(str, p, d0)) {
         year    = lib::toUnsigned(p[1], 10);
         month   = lib::toUnsigned(p[2], 10);
         day     = lib::toUnsigned(p[3], 10);
         remainder = p[4];
         yearStr = p[1];
 
-    } else if (boost::regex_match(str, p, d1)) {
+    } else if (std::regex_match(str, p, d1)) {
         month   = lib::toUnsigned(p[1], 10);
         day     = lib::toUnsigned(p[2], 10);
         year    = lib::toUnsigned(p[3], 10);
         remainder = p[4];
         yearStr = p[3];
 
-    } else if (boost::regex_match(str,p,d2)) {
+    } else if (std::regex_match(str,p,d2)) {
         day     = lib::toUnsigned(p[1], 10);
         m       = p[2];
         year    = lib::toUnsigned(p[3], 10);
         remainder = p[4];
         yearStr = p[3];
-    } else if (boost::regex_match(str,p,d4)) {
+    } else if (std::regex_match(str,p,d4)) {
         m       = p[1];
         day     = lib::toUnsigned(p[2], 10);
         year    = lib::toUnsigned(p[3], 10);
         remainder = p[4];
         yearStr = p[3];
 
-    } else if (boost::regex_match(str, p, d5)) {
+    } else if (std::regex_match(str, p, d5)) {
         day     = lib::toUnsigned(p[1], 10);
         year    = baseline().year();
         remainder = p[2];
@@ -312,7 +257,7 @@ bool DateTime::fromString(const std::string& str, bool strict)
     //--------------------------------------------------------------------------
     if (m != "") {
         static const std::string months("janfebmaraprmayjunjulaugsepoctnovdec");
-        size_t offset = months.find(boost::to_lower_copy(m));
+        size_t offset = months.find(lib::toLower(m));
         if (offset == std::string::npos) {
             result = false;
         } else {
@@ -369,19 +314,16 @@ DateTime DateTime::now()
 {
     DateTime result;
 
-    #ifndef _WIN32
+    using namespace std::chrono;
+    auto timepoint = system_clock::now();
+    auto secs = time_point_cast<seconds>(timepoint);
+    auto ns = time_point_cast<nanoseconds>(timepoint) -
+        time_point_cast<nanoseconds>(secs);
 
-    clock_gettime(CLOCK_REALTIME, &result);
-
-    #else 
-
-    timeval t;
-    gettimeofday(&t, NULL);
-    result.tv_sec = t.tv_sec;
-    result.tv_nsec = t.tv_usec * (lib::si::ds::nano / lib::si::ds::micro);
-
-    #endif
-
+    // epoch is well-defined in C++20 and later, and usually Unix epoch before that.
+    // using system_clock::to_time_t guarantees Unix epoch always.
+    result.tv_sec = system_clock::to_time_t(timepoint);
+    result.tv_nsec = ns.count();
     result.setSmoothed(false);
 
     return result;
@@ -775,11 +717,11 @@ bool DateTime::isValid(const std::string& str)
     int day = 0;
     int month = -1;
 
-    boost::smatch p;
+    std::smatch p;
     for (size_t f=0; DDMMMYYYY_formats[f] && !result; ++f) {
-        boost::regex r(DDMMMYYYY_formats[f], boost::regex::icase);
+        std::regex r(DDMMMYYYY_formats[f], std::regex::icase);
 
-        result = (boost::regex_match(str, p, r));
+        result = (std::regex_match(str, p, r));
 
         if (result) {
             month = f;

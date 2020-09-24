@@ -4,6 +4,8 @@
 ///                                                                             
 ///@brief   Allow control (join, start) of multiple threads at one time.        
 ///                                                                             
+///@version 2020-09-23  JRS     removed boost usage. debugJoinAll is not quite right.
+///                                                                             
 ///@version 2020-05-04  DHF     Open sourced                                    
 ///                             Changed (*this)[j]->thread() == NULL to         
 ///                             (*this)[j]->thread().get() == nullptr           
@@ -17,8 +19,6 @@
 #include "lib_mp_work_threadablecollection.h"
 #include "lib_log_work_messagefactory.h"
 #include "lib_mp_work_thread.h"
-
-#include <boost/scoped_array.hpp>
 
 namespace lib {
 namespace mp {
@@ -127,7 +127,7 @@ void ThreadableCollection::joinAll()
 //------------------------------------------------------------------------------
 void ThreadableCollection::joinAllDebug()
 {                                                                               
-    boost::scoped_array<bool> done(new bool[size()]);                           
+    std::vector<bool> done(size());                                             
                                                                                 
     for (size_t d = 0; d < size(); ++d) {                                       
         done[d] = false;                                                        
@@ -138,13 +138,17 @@ void ThreadableCollection::joinAllDebug()
     while (completed < size()) {                                                
         for (size_t t = 0; t < size(); ++t) {                                   
             if (!done[t]) {                                                     
-                lib::ds::shared_ptr<Thread> thread((*this)[t]->thread());
+                lib::ds::shared_ptr<Thread> thread((*this)[t]->thread());       
                                                                                 
-                boost::posix_time::time_duration timeout(                       
-                    boost::posix_time::milliseconds(1000)                       
-                );                                                              
+                // TODO: JRS 20200924 need boost::thread::timed_join equivalent 
+                //boost::posix_time::time_duration timeout(                     
+                //    boost::posix_time::milliseconds(1000)                     
+                //);                                                            
+                //bool joined = thread->timed_join(timeout);                    
+                thread->join();                                                 
+                bool joined = true;                                             
                                                                                 
-                if (thread->timed_join(timeout)) {                              
+                if (joined) {                                                   
                     (*this)[t]->afterJoin();                                    
                                                                                 
                     ++completed;                                                

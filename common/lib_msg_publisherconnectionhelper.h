@@ -45,7 +45,7 @@ namespace msg {
 ///             template<typename SUB_TYPE, typename PUB_TYPE>                  
 ///             int connect(Subscription<SUB_TYPE>& s, Publication<PUB_TYPE>& p)
 ///             {                                                               
-///                 if ((boost::is_same<SUB_TYPE, PUB_TYPE>::value)) {          
+///                 if ((std::is_same<SUB_TYPE, PUB_TYPE>::value)) {          
 ///                     p.connect(s);                                           
 ///                 }                                                           
 ///             }                                                               

@@ -12,7 +12,6 @@
 #include "lib_mp_work_threadable.h"
 #include "lib_msg_publisher.h"
 
-#include <boost/type_traits.hpp>
 #include <vector>
 
 

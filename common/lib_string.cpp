@@ -1,7 +1,9 @@
 //------------------------------------------------------------------------------
 ///@file lib_string.cpp                                                         
 ///@par Classification:  UNCLASSIFIED, OPEN SOURCE                              
-///@brief A collection of funcitons that operate on std::string                 
+///@brief A collection of functions that operate on std::string                 
+///                                                                             
+///@version 2020-09-23  JRS     replace boost references with std references.   
 ///                                                                             
 ///@version 2020-05-04  DHF     Open sourced                                    
 ///                                                                             
@@ -29,7 +31,6 @@
 #include "lib_string.h"
 
 #include <assert.h>
-#include <boost/algorithm/string.hpp>
 #include <math.h>                       // pow                  
 #include <stdarg.h>                     // va<mumble> routines  
 #include <stdio.h>
@@ -99,7 +100,7 @@ bool isAllDigit(const std::string& str)
 }
 
 //------------------------------------------------------------------------------
-/// Return true if the given string constains only alpha and numeric characters 
+/// Return true if the given string contains only alpha and numeric characters 
 //------------------------------------------------------------------------------
 bool isAlphaNumeric(const std::string& str)
 {
@@ -108,11 +109,7 @@ bool isAlphaNumeric(const std::string& str)
 
     for (s = str.begin(); ans && s != str.end(); ++s) 
     {
-        ans = 
-            (*s >= '0' && *s <= '9') 
-         || (*s >= 'a' || *s <= 'z') 
-         || (*s >= 'A' || *s <= 'Z') 
-        ;
+        ans = isalnum(*s);
     }
     return ans;
 }
@@ -167,7 +164,7 @@ bool isHex(const std::string& str)
 ///                                                                             
 /// Added in v1.15 - The "5-5" and "4e-5-8" bugs have been fixed.               
 ///                                                                             
-///@todo Rewrite the stuff above and jetison the historical commentary.         
+///@todo Rewrite the stuff above and jettison the historical commentary.         
 //----------------------------------------------------------------------------- 
 bool isNumber(const std::string& str, bool allowcomma)
 {
@@ -328,11 +325,14 @@ std::string format(const std::string& format, ...)
 //------------------------------------------------------------------------------
 ///@brief Converts a string value to a double                                   
 //------------------------------------------------------------------------------
-double toDouble(const std::string& str)
+double toDouble(const std::string& str, double errorValue)
 {
     double ans;
     assert(isNumber(str));
-    sscanf(str.c_str(), "%lg", &ans);
+    if (sscanf(str.c_str(), "%lg", &ans) != 1)
+    {
+        ans = errorValue;
+    }
     return ans;
 }
 
@@ -349,7 +349,7 @@ double toDouble(const std::string& str)
 ///         (or is 0) then base 16 is assumed.                                  
 ///                                                                             
 ///         If the string begins with 0 (and not 0x) and the base is not        
-///         speicifed then base 8 is assumed.                                   
+///         specified then base 8 is assumed.                                   
 ///                                                                             
 ///@par Expected Usage                                                          
 ///         @code                                                               
@@ -430,7 +430,7 @@ uint64_t toUnsigned(const std::string& str, int base)
     } 
     
     //--------------------------------------------------------------------------
-    //  If the base was specified, ignore the base indicator in the stirng.     
+    //  If the base was specified, ignore the base indicator in the string.     
     //--------------------------------------------------------------------------
     else if (str.substr(0,2) == "0x" || str.substr(0,2) == "0X") 
     {
@@ -551,15 +551,14 @@ std::string compress(const std::string& str, bool trim)
     return ans;
 }
 
-#if 0
+#if 1
 
 //------------------------------------------------------------------------------
 ///@brief   Trim the "white" space off the beginning and end of the given string
 //------------------------------------------------------------------------------
-//void trim(std::string& str, const std::string& white)                         
-std::string trim(const std::string& str)
+std::string trim(const std::string& str, const std::string& white)
 {
-    std::string ans, white(" \t\n\v\r\f");
+    std::string ans;
     size_t pos = str.find_first_not_of(white);
     if (pos == std::string::npos) {
         ans = "";
@@ -570,7 +569,32 @@ std::string trim(const std::string& str)
     return ans;
 }
 
-static inline bool is_upper(char c) { return (c) >= 'A' && (c) <= 'Z'; }
+
+std::string trimLeft(const std::string& str, const std::string& white)
+{
+	std::string ans;
+	size_t pos = str.find_first_not_of(white);
+	if (pos == std::string::npos) {
+		ans = str;
+	}
+	else {
+		ans = str.substr(pos);
+	}
+	return ans;
+}
+
+std::string trimRight(const std::string& str, const std::string& white)
+{
+	std::string ans;
+	size_t pos = str.find_last_not_of(white);
+	if (pos == std::string::npos) {
+		ans = str;
+	}
+	else {
+		ans = str.substr(0, pos);
+	}
+	return ans;
+}
 
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
@@ -581,12 +605,11 @@ std::string toLower(const std::string& source)
     ans = source;
 
     for (size_t i=0; i < ans.size(); ++i) {
-        if (is_upper(ans[i])) ans[i] ^= 32;
+        ans[i] = tolower(ans[i]);
     }
     return ans;
 }
 
-static inline bool is_lower(char c) { return (c) >= 'a' && (c) <= 'z'; }
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
 //void toUpper(const std::string& source, std::string& destination)             
@@ -596,11 +619,35 @@ std::string toUpper(const std::string& source)
     ans = source;
 
     for (size_t i=0; i < ans.size(); ++i) {
-        if (is_lower(ans[i])) ans[i] ^= 32;
+        ans[i] = toupper(ans[i]);
     }
     return ans;
 }
 #endif
+
+//------------------------------------------------------------------------------
+///@brief   replace all instances of search in str with format, no more
+///         than max_replace times. case sensitive search and replace.
+///         max_replace is to prevent an infinite loop in the case where
+///         the caller puts search in format.
+//------------------------------------------------------------------------------
+void replace_all(std::string& str, const std::string& search,
+    const std::string& format, int max_replace)
+{
+    if (!search.empty())
+    {
+        size_t search_len = search.length();
+        size_t pos = str.find(search);
+        for (int i = 0; i < max_replace && pos != std::string::npos; ++i)
+        {
+            // yes, it would be more efficient to use a string formatter than
+            // add three std::string subexpressions and assign it to the result.
+            str = str.substr(0, pos) + format + str.substr(pos + search_len);
+            pos = str.find(search);
+        }
+    }
+}
+
 
 static const struct SUBSTITUTION_PAIRS {
     const char* str1;
@@ -626,7 +673,7 @@ std::string xmlEncode(const std::string& str)
     std::string ans(str);
 
     for (uint32_t s=0; s < substitution_pairs_size; ++s) {
-        boost::replace_all(
+        replace_all(
             ans
           , substitution_pairs[s].str1
           , substitution_pairs[s].str2
@@ -647,7 +694,7 @@ std::string xmlDecode(const std::string& str)
 
     while (s) {
         --s;
-        boost::replace_all(
+        replace_all(
             ans
           , substitution_pairs[s].str2
           , substitution_pairs[s].str1
