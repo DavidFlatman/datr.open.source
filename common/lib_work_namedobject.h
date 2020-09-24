@@ -22,6 +22,8 @@ namespace work {
 ///         The setName is not reentrant and is usually only set at             
 ///         construction time.                                                  
 ///                                                                             
+///@version 2020-09-24  JRS     updated with automated C++ 11 recommendations.  
+///                                                                             
 ///@version 2020-05-04  DHF     Open sourced                                    
 ///                                                                             
 ///@version 2013-10-16  DHF     Added default constructor to allow the class to 
@@ -35,13 +37,10 @@ class NamedObject
 {
     public:
         NamedObject(const std::string& name = "anonymous") : m_Name(name) {}
-        NamedObject(const NamedObject& that) : m_Name(that.m_Name) {}
-        virtual ~NamedObject() {}
+        NamedObject(const NamedObject& that) = default;
+        virtual ~NamedObject() = default;
 
-        NamedObject& operator=(const NamedObject& that) {
-            m_Name = that.m_Name;
-            return *this;
-        }
+        NamedObject& operator=(const NamedObject& that) = default;
 
         virtual void setName(const std::string& name) {m_Name = name;}
         virtual std::string name() const { return m_Name; }

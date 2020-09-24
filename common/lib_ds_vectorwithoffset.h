@@ -27,6 +27,8 @@ namespace ds {
 ///         This class is based on the std::vector which is only class          
 ///         thread safe.                                                        
 ///                                                                             
+///@version 2020-09-24  JRS     updated with automated C++ 11 recommendations.  
+///                                                                             
 ///@version 2020-05-04  DHF     Open sourced                                    
 ///                             Removed boost::scoped_ptr                       
 ///                                                                             
@@ -68,7 +70,7 @@ class VectorWithOffset
             this->reserve(that.capacity());
         }
 
-        virtual ~VectorWithOffset<TYPE>() { }
+        virtual ~VectorWithOffset<TYPE>() = default;
 
         VectorWithOffset<TYPE>& operator=(const VectorWithOffset<TYPE>& that)
         {

@@ -79,6 +79,8 @@ namespace work  {
 ///             } // namespace lib                                              
 ///         @endcode                                                            
 ///                                                                             
+///@version 2020-09-24  JRS     updated with automated C++ 11 recommendations.  
+///                                                                             
 ///@version 2020-09-08  DHF     Added m_StartTime and #include <chrono>         
 ///                                                                             
 ///@version 2020-09-01  DHF     Removed PROXY macros, and *_ACTUAL macros.      
@@ -154,8 +156,8 @@ namespace work  {
 class Test 
 {
     public:
-        typedef void (*OutputFunction)(const std::string& message);
-        typedef unsigned int verbosity_t;
+        using OutputFunction = void (*)(const std::string& message);
+        using verbosity_t = unsigned int;
 
         static const verbosity_t vFailed;    ///< failed tests & failed stats   
         static const verbosity_t vHeader;    ///< header for test start         

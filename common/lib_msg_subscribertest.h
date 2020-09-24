@@ -19,6 +19,8 @@ namespace test {
 ///         The SubscriberTest class provides the regression test for the       
 ///         lib::msg::Subscriber class.                                         
 ///                                                                             
+///@version 2020-09-24  JRS     updated with automated C++ 11 recommendations.  
+///                                                                             
 ///@version 2020-05-04  DHF     Open sourced                                    
 ///                                                                             
 ///@version 2010-01-26  DHF     Changed outer namespace from tools to lib.      
@@ -43,7 +45,7 @@ class SubscriberTest : public dev::test::work::Test {
         ///@par  Purpose:                                                       
         ///          The runTest method executes the actual test.               
         //----------------------------------------------------------------------
-        void runTest();
+        void runTest() override;
 
     private:
 

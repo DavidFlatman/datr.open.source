@@ -29,6 +29,8 @@ namespace work {
 ///         This class is only expected to be directly used by the ConversionLab
 ///         template.                                                           
 ///                                                                             
+///@version 2020-09-24  JRS     updated with automated C++ 11 recommendations.  
+///                                                                             
 ///@version 2020-05-04  DHF     Open sourced                                    
 ///                                                                             
 ///@version 2018-10-30  DHF     File creation                                   
@@ -38,7 +40,7 @@ template <typename OUTPUT_TYPE_PTR>
 class ConversionLabBase
 {
     public:
-        virtual ~ConversionLabBase() { }
+        virtual ~ConversionLabBase() = default;
 
         //----------------------------------------------------------------------
         ///@brief   Return the next output element from the conversion lab.     

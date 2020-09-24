@@ -21,6 +21,8 @@ namespace test {
 ///                                                                             
 ///@author  Make Test Utility       MTU     Utility by DHF                      
 ///                                                                             
+///@version 2020-09-24  JRS     updated with automated C++ 11 recommendations.  
+///                                                                             
 ///@version 2020-05-04  DHF     Open sourced                                    
 ///                                                                             
 ///@version 2014-08-07  MTU     File creation                                   
@@ -34,7 +36,7 @@ class ConversionLabTest : public dev::test::work::Test {
         ConversionLabTest& operator=(const ConversionLabTest& that);
 
     protected:
-        void runTest();
+        void runTest() override;
 
     private:
 

@@ -22,6 +22,8 @@ namespace msg {
 ///@tparam TYPE     The base type being subscribed to.  The actual object       
 ///                 passed will be boost::shared_ptr<const TYPE>.               
 ///                                                                             
+///@version 2020-09-24  JRS     updated with automated C++ 11 recommendations.  
+///                                                                             
 ///@version 2020-05-04  DHF     Open sourced                                    
 ///                                                                             
 ///@version 2020-02-11  KCG     Changed boost::shared_ptr to lib::ds::shared_ptr
@@ -65,7 +67,7 @@ class Subscription : public SubscriptionBase
         ///@note  Implements the SubscriptionBase::process pure virutal method. 
         ///                                                                     
         //----------------------------------------------------------------------
-        void processQueueItem() {
+        void processQueueItem() override {
             lib::ds::shared_ptr<const TYPE> item;
 
             if (m_Queue.pop(item)) {

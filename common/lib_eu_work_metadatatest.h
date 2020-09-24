@@ -21,7 +21,9 @@ namespace test {
 ///                                                                             
 ///@author  Make Test Utility       MTU     Utility by DHF                      
 ///                                                                             
-///@version 2020-08-27  flatman     File creation via Make Test Utility         
+///@version 2020-09-24  JRS     updated with automated C++ 11 recommendations.  
+///                                                                             
+///@version 2020-08-27  DHF         File creation via Make Test Utility         
 ///                                                                             
 //------------------------------------------------------------------------------
 class MetaDataTest : public dev::test::work::Test {
@@ -32,7 +34,7 @@ class MetaDataTest : public dev::test::work::Test {
         MetaDataTest& operator=(const MetaDataTest& that);
 
     protected:
-        void runTest();
+        void runTest() override;
 
 
     private:

@@ -28,6 +28,8 @@
 ///             foo.cpp: main (10): x = 0x2a                                    
 ///         @endcode                                                            
 ///                                                                             
+///@version 2020-09-24  JRS     updated with automated C++ 11 recommendations.  
+///                                                                             
 ///@version 2020-05-04  DHF     Open sourced.                                   
 ///                                                                             
 ///@version 2015-03-17  DHF     Added header comments.                          
@@ -82,7 +84,7 @@ std::string HEX(TYPE x, int base = 16) {
         return "0x00";
     }
 
-    std::string sign = "";
+    std::string sign;
     if (x < 0) {
         sign = "-";
         x = 0 - x;

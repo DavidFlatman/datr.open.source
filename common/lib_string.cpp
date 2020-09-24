@@ -3,6 +3,8 @@
 ///@par Classification:  UNCLASSIFIED, OPEN SOURCE                              
 ///@brief A collection of functions that operate on std::string                 
 ///                                                                             
+///@version 2020-09-24  JRS     updated with automated C++ 11 recommendations.  
+///                                                                             
 ///@version 2020-09-23  JRS     replace boost references with std references.   
 ///                                                                             
 ///@version 2020-05-04  DHF     Open sourced                                    
@@ -513,7 +515,7 @@ std::string collapse(const std::string& str, bool trim)
         trailingWhite = str.substr(str.find_last_not_of(white)+1, str.size());
     }
 
-    for (size_t i=0 ; i < str.size() ; i++) {if (!isspace(str[i])) {ans += str[i];} }
+    for (char i : str) {if (!isspace(i)) {ans += i;} }
     
     if (!trim) {ans = leadingWhite + ans + trailingWhite;}
     return ans;
@@ -540,10 +542,10 @@ std::string compress(const std::string& str, bool trim)
     }
     else {temp = "";}
 
-    for (size_t i=0 ; i < temp.size() ; i++) 
+    for (char i : temp) 
     {
-        if (!lastWasWhite || !isspace(temp[i])) {ans += temp[i];}
-        if (isspace(temp[i])) {lastWasWhite = true;}
+        if (!lastWasWhite || !isspace(i)) {ans += i;}
+        if (isspace(i)) {lastWasWhite = true;}
         else {lastWasWhite=false;}
     }
     
@@ -604,8 +606,8 @@ std::string toLower(const std::string& source)
     std::string ans;
     ans = source;
 
-    for (size_t i=0; i < ans.size(); ++i) {
-        ans[i] = tolower(ans[i]);
+    for (char & an : ans) {
+        an = tolower(an);
     }
     return ans;
 /*
@@ -625,8 +627,8 @@ std::string toUpper(const std::string& source)
     std::string ans;
     ans = source;
 
-    for (size_t i=0; i < ans.size(); ++i) {
-        ans[i] = toupper(ans[i]);
+    for (char & an : ans) {
+        an = toupper(an);
     }
     return ans;
 /*
@@ -692,11 +694,11 @@ std::string xmlEncode(const std::string& str)
 {
     std::string ans(str);
 
-    for (uint32_t s=0; s < substitution_pairs_size; ++s) {
+    for (auto substitution_pair : substitution_pairs) {
         replace_all(
             ans
-          , substitution_pairs[s].str1
-          , substitution_pairs[s].str2
+          , substitution_pair.str1
+          , substitution_pair.str2
         );
     }
 

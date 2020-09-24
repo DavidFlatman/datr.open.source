@@ -38,6 +38,8 @@ class PublisherProxyBase : public lib::mp::work::ThreadableCollection
 ///         SO VERY MUCH.                                                       
 ///                           -- Death, <i>Hogfather</i> by Terry Pratchett     
 ///                                                                             
+///@version 2020-09-24  JRS     updated with automated C++ 11 recommendations.  
+///                                                                             
 ///@version 2020-09-23  JRS     replace boost references with std references.   
 ///                                                                             
 ///@version 2020-05-04  DHF     Open sourced                                    
@@ -188,7 +190,7 @@ class PublisherProxy
         }
 
 
-        void operator()() { }       // needed on because of lib::mp::work::Threadable
+        void operator()() override { }       // needed on because of lib::mp::work::Threadable
 
         //----------------------------------------------------------------------
         ///@warning Each template-type that you specify for your PublisherProxy 

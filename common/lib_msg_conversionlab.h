@@ -3,6 +3,8 @@
 ///                                                                             
 ///@par Classification:  UNCLASSIFIED, OPEN SOURCE                              
 ///                                                                             
+///@version 2020-09-24  JRS     updated with automated C++ 11 recommendations.  
+///                                                                             
 ///@version 2020-05-04  DHF     Open sourced                                    
 ///                             Removed boost::scoped_ptr                       
 ///                                                                             
@@ -214,7 +216,7 @@ class ConversionLab
             ,CONVERSION_LAB(p1, p2, p3, p4) 
             { }
 
-        virtual ~ConversionLab() { }
+        virtual ~ConversionLab() = default;
 
         //----------------------------------------------------------------------
         ///@brief   Handle the published input type for the conversion lab.     

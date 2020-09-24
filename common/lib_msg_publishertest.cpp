@@ -5,6 +5,8 @@
 ///                                                                             
 ///@author  Make Test Utility       MTU     Utility by DHF                      
 ///                                                                             
+///@version 2020-09-24  JRS     updated with automated C++ 11 recommendations.  
+///                                                                             
 ///@version 2020-09-23  JRS     cleanup for some warnings.                      
 ///                                                                             
 ///@version 2020-05-04  DHF     Open sourced                                    
@@ -37,50 +39,50 @@ namespace test {
 //------------------------------------------------------------------------------
 int fillVector(std::vector<std::string>& vec, int offset = 0)
 {
-   if (offset >= 0 && vec.size() < 5) vec.push_back("George Washington");
-   if (offset >= 1 && vec.size() < 5) vec.push_back("John Adams");
-   if (offset >= 2 && vec.size() < 5) vec.push_back("Thomas Jefferson");
-   if (offset >= 3 && vec.size() < 5) vec.push_back("James Madison");
-   if (offset >= 4 && vec.size() < 5) vec.push_back("James Monroe");
-   if (offset >= 5 && vec.size() < 5) vec.push_back("John Quincy Adams");
-   if (offset >= 6 && vec.size() < 5) vec.push_back("Andrew Jackson");
-   if (offset >= 7 && vec.size() < 5) vec.push_back("Martin Van Buren");
-   if (offset >= 8 && vec.size() < 5) vec.push_back("William Henry Harrison");
-   if (offset >= 9 && vec.size() < 5) vec.push_back("John Tyler");
-   if (offset >= 10 && vec.size() < 5) vec.push_back("James K. Pok");
-   if (offset >= 11 && vec.size() < 5) vec.push_back("Zachary Taylor");
-   if (offset >= 12 && vec.size() < 5) vec.push_back("Milliard Fillmore");
-   if (offset >= 13 && vec.size() < 5) vec.push_back("Franklin Pierce");
-   if (offset >= 14 && vec.size() < 5) vec.push_back("James Buchanan");
-   if (offset >= 15 && vec.size() < 5) vec.push_back("Abraham Lincoln");
-   if (offset >= 16 && vec.size() < 5) vec.push_back("Andrew Johnson");
-   if (offset >= 17 && vec.size() < 5) vec.push_back("Ulysses S. Grant");
-   if (offset >= 18 && vec.size() < 5) vec.push_back("Rutherford B. Hayes");
-   if (offset >= 19 && vec.size() < 5) vec.push_back("James A. Garfield");
-   if (offset >= 20 && vec.size() < 5) vec.push_back("Chester A Arthur");
-   if (offset >= 21 && vec.size() < 5) vec.push_back("Grover Cleveland");
-   if (offset >= 22 && vec.size() < 5) vec.push_back("Benjamin Harrison");
-   if (offset >= 23 && vec.size() < 5) vec.push_back("Grover Cleveland");
-   if (offset >= 24 && vec.size() < 5) vec.push_back("William McKinley");
-   if (offset >= 25 && vec.size() < 5) vec.push_back("Theodore Roosevelt");
-   if (offset >= 26 && vec.size() < 5) vec.push_back("William Howard Taft");
-   if (offset >= 27 && vec.size() < 5) vec.push_back("Woodrow Wilson");
-   if (offset >= 28 && vec.size() < 5) vec.push_back("Warren G. Harding");
-   if (offset >= 29 && vec.size() < 5) vec.push_back("Calvin Coolidge");
-   if (offset >= 30 && vec.size() < 5) vec.push_back("Herbert Hoover");
-   if (offset >= 31 && vec.size() < 5) vec.push_back("Franklin D. Roosevelt");
-   if (offset >= 32 && vec.size() < 5) vec.push_back("Harry S Truman");
-   if (offset >= 33 && vec.size() < 5) vec.push_back("Dwight D. Eisenhower");
-   if (offset >= 34 && vec.size() < 5) vec.push_back("John F. Kennedy");
-   if (offset >= 35 && vec.size() < 5) vec.push_back("Lyndon B. Johnson");
-   if (offset >= 36 && vec.size() < 5) vec.push_back("Richard M. Nixon");
-   if (offset >= 37 && vec.size() < 5) vec.push_back("Gerald Ford");
-   if (offset >= 38 && vec.size() < 5) vec.push_back("James Carter");
-   if (offset >= 39 && vec.size() < 5) vec.push_back("Ronald Reagan");
-   if (offset >= 40 && vec.size() < 5) vec.push_back("George H. W. Bush");
-   if (offset >= 41 && vec.size() < 5) vec.push_back("William J. Clinton");
-   if (offset >= 42 && vec.size() < 5) vec.push_back("George W. Bush");
-   if (offset >= 43 && vec.size() < 5) vec.push_back("Barack H. Obama");
+   if (offset >= 0 && vec.size() < 5) vec.emplace_back("George Washington");
+   if (offset >= 1 && vec.size() < 5) vec.emplace_back("John Adams");
+   if (offset >= 2 && vec.size() < 5) vec.emplace_back("Thomas Jefferson");
+   if (offset >= 3 && vec.size() < 5) vec.emplace_back("James Madison");
+   if (offset >= 4 && vec.size() < 5) vec.emplace_back("James Monroe");
+   if (offset >= 5 && vec.size() < 5) vec.emplace_back("John Quincy Adams");
+   if (offset >= 6 && vec.size() < 5) vec.emplace_back("Andrew Jackson");
+   if (offset >= 7 && vec.size() < 5) vec.emplace_back("Martin Van Buren");
+   if (offset >= 8 && vec.size() < 5) vec.emplace_back("William Henry Harrison");
+   if (offset >= 9 && vec.size() < 5) vec.emplace_back("John Tyler");
+   if (offset >= 10 && vec.size() < 5) vec.emplace_back("James K. Pok");
+   if (offset >= 11 && vec.size() < 5) vec.emplace_back("Zachary Taylor");
+   if (offset >= 12 && vec.size() < 5) vec.emplace_back("Milliard Fillmore");
+   if (offset >= 13 && vec.size() < 5) vec.emplace_back("Franklin Pierce");
+   if (offset >= 14 && vec.size() < 5) vec.emplace_back("James Buchanan");
+   if (offset >= 15 && vec.size() < 5) vec.emplace_back("Abraham Lincoln");
+   if (offset >= 16 && vec.size() < 5) vec.emplace_back("Andrew Johnson");
+   if (offset >= 17 && vec.size() < 5) vec.emplace_back("Ulysses S. Grant");
+   if (offset >= 18 && vec.size() < 5) vec.emplace_back("Rutherford B. Hayes");
+   if (offset >= 19 && vec.size() < 5) vec.emplace_back("James A. Garfield");
+   if (offset >= 20 && vec.size() < 5) vec.emplace_back("Chester A Arthur");
+   if (offset >= 21 && vec.size() < 5) vec.emplace_back("Grover Cleveland");
+   if (offset >= 22 && vec.size() < 5) vec.emplace_back("Benjamin Harrison");
+   if (offset >= 23 && vec.size() < 5) vec.emplace_back("Grover Cleveland");
+   if (offset >= 24 && vec.size() < 5) vec.emplace_back("William McKinley");
+   if (offset >= 25 && vec.size() < 5) vec.emplace_back("Theodore Roosevelt");
+   if (offset >= 26 && vec.size() < 5) vec.emplace_back("William Howard Taft");
+   if (offset >= 27 && vec.size() < 5) vec.emplace_back("Woodrow Wilson");
+   if (offset >= 28 && vec.size() < 5) vec.emplace_back("Warren G. Harding");
+   if (offset >= 29 && vec.size() < 5) vec.emplace_back("Calvin Coolidge");
+   if (offset >= 30 && vec.size() < 5) vec.emplace_back("Herbert Hoover");
+   if (offset >= 31 && vec.size() < 5) vec.emplace_back("Franklin D. Roosevelt");
+   if (offset >= 32 && vec.size() < 5) vec.emplace_back("Harry S Truman");
+   if (offset >= 33 && vec.size() < 5) vec.emplace_back("Dwight D. Eisenhower");
+   if (offset >= 34 && vec.size() < 5) vec.emplace_back("John F. Kennedy");
+   if (offset >= 35 && vec.size() < 5) vec.emplace_back("Lyndon B. Johnson");
+   if (offset >= 36 && vec.size() < 5) vec.emplace_back("Richard M. Nixon");
+   if (offset >= 37 && vec.size() < 5) vec.emplace_back("Gerald Ford");
+   if (offset >= 38 && vec.size() < 5) vec.emplace_back("James Carter");
+   if (offset >= 39 && vec.size() < 5) vec.emplace_back("Ronald Reagan");
+   if (offset >= 40 && vec.size() < 5) vec.emplace_back("George H. W. Bush");
+   if (offset >= 41 && vec.size() < 5) vec.emplace_back("William J. Clinton");
+   if (offset >= 42 && vec.size() < 5) vec.emplace_back("George W. Bush");
+   if (offset >= 43 && vec.size() < 5) vec.emplace_back("Barack H. Obama");
 
    return static_cast<int>(vec.size());
 }
@@ -91,7 +93,7 @@ class VectorPublisher
     , public lib::msg::Publisher<std::vector<std::string> >
 {
     public:
-        void operator()()
+        void operator()() override
         {
             for (int i=0; i < 40; ++i) {
                 lib::ds::shared_ptr<std::vector<std::string> > item;
@@ -110,7 +112,7 @@ class VectorWithOffsetPublisher
     , public lib::msg::Publisher<lib::ds::VectorWithOffset<std::string> >
 {
     public:
-        void operator()()
+        void operator()() override
         {
             for (int i=0; i < 40; ++i) {
                 lib::ds::shared_ptr<lib::ds::VectorWithOffset<std::string> > item;
@@ -133,7 +135,7 @@ class BothPublisher
         >
 {
     public:
-        void operator()()
+        void operator()() override
         {
             for (int i=0; i < 40; ++i) {
                 lib::ds::shared_ptr<lib::ds::VectorWithOffset<std::string> > item;
@@ -159,7 +161,7 @@ class VectorSubscriber
 {
     public:
         VectorSubscriber() : m_StdCount(0) { }
-        void process(lib::ds::shared_ptr<const std::vector<std::string> >& v)
+        void process(lib::ds::shared_ptr<const std::vector<std::string> >& v) override
         {
             ++m_StdCount;
         }
@@ -178,7 +180,7 @@ class VectorWithOffsetSubscriber
         VectorWithOffsetSubscriber() : m_LibCount(0) { }
         void process(
             lib::ds::shared_ptr<const lib::ds::VectorWithOffset<std::string> >& v
-        )
+        ) override
         {
             ++m_LibCount;
         }
@@ -200,13 +202,13 @@ class BothSubscriber
 
         void process(
             lib::ds::shared_ptr<const lib::ds::VectorWithOffset<std::string> >& v
-        )
+        ) override
         {
             ++m_LibCount;
         }
         void process(
             lib::ds::shared_ptr<const std::vector<std::string> >& v
-        )
+        ) override
         {
             ++m_StdCount;
         }

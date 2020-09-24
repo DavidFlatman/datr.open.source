@@ -27,6 +27,8 @@ namespace work {
 ///         stopTime = startTime + delta;                                       
 ///     @endcode                                                                
 ///                                                                             
+///@version 2020-09-24  JRS     updated with automated C++ 11 recommendations.  
+///                                                                             
 ///@version 2020-05-04  DHF     Open sourced                                    
 ///                                                                             
 ///@version 2017-03-20  DHF     Added operator+=, operator-=                    
@@ -44,8 +46,8 @@ namespace work {
 class DeltaTime : public lib::time::work::DateDeltaTimeBase
 {
     public:
-        DeltaTime() {}
-        DeltaTime(const DeltaTime& dt) : lib::time::work::DateDeltaTimeBase(dt) {}
+        DeltaTime() = default;
+        DeltaTime(const DeltaTime& dt) = default;
         explicit DeltaTime(const std::string& time);
         explicit DeltaTime(double sec) { setSeconds(sec); }
         operator double() const;

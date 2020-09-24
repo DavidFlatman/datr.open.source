@@ -10,6 +10,8 @@
 ///                                                                             
 ///@todo    Make use of lib_ds_enum.h                                           
 ///                                                                             
+///@version 2020-09-24  JRS     updated with automated C++ 11 recommendations.  
+///                                                                             
 ///@version 2020-05-04  DHF     Open sourced                                    
 ///                                                                             
 ///@version 2019-10-02  KJS/DHF Added MSG_INSUFFICIENT_DATA                     
@@ -128,7 +130,7 @@ enum level_t {
 
 };
 
-typedef uint32_t    messageid_t;
+using messageid_t = uint32_t;
 
 union MessageID {
     messageid_t     m_ID;

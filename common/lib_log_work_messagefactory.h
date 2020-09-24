@@ -45,7 +45,7 @@ namespace work {
 ///             }                                                               
 ///         @endcode                                                            
 ///                                                                             
-///@author  David H. Flatman        DHF     davidflatman@email.com              
+///@version 2020-09-24  JRS     updated with automated C++ 11 recommendations.  
 ///                                                                             
 ///@version 2020-05-04  DHF     Open sourced                                    
 ///                                                                             
@@ -64,12 +64,9 @@ class MessageFactory
 {
     public:
         MessageFactory(ds::class_t classid);
-        inline MessageFactory(const MessageFactory& that) 
-            : m_ClassID(that.m_ClassID)
-            { }
+        inline MessageFactory(const MessageFactory& that) = default;
         virtual ~MessageFactory();
-        MessageFactory& operator=(const MessageFactory& that)
-            { m_ClassID = that.m_ClassID; return *this; }
+        MessageFactory& operator=(const MessageFactory& that) = default;
 
         ConstMessagePtr fatal(
             ds::messageid_t id

@@ -5,6 +5,8 @@
 ///                                                                             
 ///@brief   Factory for generating Messages with defaults set.                  
 ///                                                                             
+///@version 2020-09-24  JRS     updated with automated C++ 11 recommendations.  
+///                                                                             
 ///@version 2020-05-04  DHF     Open sourced                                    
 ///                                                                             
 ///@version 2014-10-02  DHF     lib::DateTime moved to lib::time::work::DateTime
@@ -37,9 +39,7 @@ MessageFactory::MessageFactory(ds::class_t classid)
 ///@brief   Reclaim resources held by object.                                   
 //------------------------------------------------------------------------------
 MessageFactory::~MessageFactory()
-{
-
-} 
+= default; 
 
 //------------------------------------------------------------------------------
 ///@brief   Generate a FATAL message.                                           

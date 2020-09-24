@@ -15,6 +15,8 @@
 ///         deliberately avoiding using any lib_ files or routines.  We want    
 ///         the dev_test_work_test* to stand on its own.                        
 ///                                                                             
+///@version 2020-09-24  JRS     updated with automated C++ 11 recommendations.  
+///                                                                             
 ///@version 2020-05-04  DHF     Open sourced                                    
 ///                             Moved from namespace classes to work.           
 ///                                                                             
@@ -120,7 +122,7 @@ inline void checkOption(
 ///         int (holding the unique number and x.second which is the pointer to 
 ///         the Test object.                                                    
 //------------------------------------------------------------------------------
-typedef std::pair<int, Test*> RegisterIDTest;
+using RegisterIDTest = std::pair<int, Test*>;
 
 //------------------------------------------------------------------------------
 ///@brief Type for holding the results of a FilenameTestMap::find.              
@@ -137,13 +139,13 @@ typedef std::pair<int, Test*> RegisterIDTest;
 ///             @li e.second.first The unique number for the test object.       
 ///             @li e.second.second A pointer to a Test object.                 
 //------------------------------------------------------------------------------
-typedef std::pair<std::string, RegisterIDTest> FileNameTestMapElement;
+using FileNameTestMapElement = std::pair<std::string, RegisterIDTest>;
 
 //------------------------------------------------------------------------------
 ///@brief Type for holding a collection of root filenames (std::string) and     
 ///       associated RegisterIDTest objects.                                    
 //------------------------------------------------------------------------------
-typedef std::map<std::string, RegisterIDTest> FilenameTestMap;
+using FilenameTestMap = std::map<std::string, RegisterIDTest>;
 
 //------------------------------------------------------------------------------
 ///@brief A singleton test class for registered (TEST_REGISTER) classes.        
@@ -208,7 +210,7 @@ class Singleton
         //----------------------------------------------------------------------
         ///@brief Implementation of the pure virtual Test::runTest method.      
         //----------------------------------------------------------------------
-        void runTest();
+        void runTest() override;
 
     private:
         //----------------------------------------------------------------------
@@ -232,14 +234,14 @@ class Singleton
 
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
-Singleton* Singleton::pInstance = NULL;
+Singleton* Singleton::pInstance = nullptr;
 int Singleton::m_TestLevel(0);
 
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
 Singleton* Singleton::instance()
 {
-    if (pInstance == NULL) pInstance = new Singleton;
+    if (pInstance == nullptr) pInstance = new Singleton;
     return pInstance;
 }
 
@@ -247,9 +249,9 @@ Singleton* Singleton::instance()
 //------------------------------------------------------------------------------
 void Singleton::destroy()
 {
-    if (pInstance != NULL) {
+    if (pInstance != nullptr) {
         delete pInstance;
-        pInstance = NULL;
+        pInstance = nullptr;
     }
 }
 
@@ -263,8 +265,8 @@ Singleton::Singleton() : Test("registered classes")
 //------------------------------------------------------------------------------
 Singleton::~Singleton()
 {
-    for (iterator i=begin(); i != end(); ++i) {
-        delete i->second.second;
+    for (auto & i : *this) {
+        delete i.second.second;
     }
     erase(begin(), end());
 }
@@ -455,18 +457,18 @@ void Singleton::runTest()
     //  tests.                                                                  
     //--------------------------------------------------------------------------
     else {
-        for (iterator test=begin(); test != end(); ++test) {
-            if (test->second.first >= m_First && test->second.first < m_Last) {
+        for (auto & test : *this) {
+            if (test.second.first >= m_First && test.second.first < m_Last) {
                 try {
-                    test->second.second->run(
+                    test.second.second->run(
                         getVerbosity()
                       , m_OutputFunction
                       , indent
                       , m_TestLevel
                     );
-                    failAdd(test->second.second->getFailed());
-                    passAdd(test->second.second->getPassed());
-                    notImplementedAdd(test->second.second->getNotImplemented());
+                    failAdd(test.second.second->getFailed());
+                    passAdd(test.second.second->getPassed());
+                    notImplementedAdd(test.second.second->getNotImplemented());
                 } catch(const std::exception& err) {
                     display_error("std::exception", err.what());
                     #if 0
@@ -500,7 +502,7 @@ bool registerTestObject(
     p->insert(
         FileNameTestMapElement(root, RegisterIDTest(int(p->size()),testobject))
     );
-    return p != NULL && testobject != NULL;
+    return p != nullptr && testobject != nullptr;
 }
 
 //------------------------------------------------------------------------------

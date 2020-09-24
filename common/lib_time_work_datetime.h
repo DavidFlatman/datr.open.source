@@ -65,6 +65,8 @@ namespace work {
 ///         ;                                                                   
 ///     @endcode                                                                
 ///                                                                             
+///@version 2020-09-24  JRS     updated with automated C++ 11 recommendations.  
+///                                                                             
 ///@version 2020-05-04  DHF     Open sourced                                    
 ///                                                                             
 ///@version 2015-05-26  YBS     Added operator <<.                              
@@ -83,11 +85,11 @@ namespace work {
 class DateTime : public lib::time::work::DateDeltaTimeBase
 {
     public:
-        DateTime() {}
+        DateTime() = default;
         explicit DateTime(const std::string& str);
         explicit DateTime(double sec) { setSeconds(sec); }
         DateTime(const DateTime& t) { tv_sec = t.tv_sec; tv_nsec = t.tv_nsec;}
-        virtual ~DateTime() {}
+        virtual ~DateTime() = default;
 
         DateTime& operator=(const DateTime& that);
         DateTime& operator=(const std::string& that);

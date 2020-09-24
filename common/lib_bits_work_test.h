@@ -29,7 +29,7 @@ class Test : public dev::test::work::Test {
         Test& operator=(const Test& that);
 
     protected:
-        void runTest();
+        void runTest() override;
 
         void isBitSet();
         void getUnsigned();

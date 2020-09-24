@@ -6,6 +6,8 @@
 ///                                                                             
 ///@brief   Provide information about a thread.                                 
 ///                                                                             
+///@version 2020-09-24  JRS     updated with automated C++ 11 recommendations.  
+///                                                                             
 ///@version 2020-09-23  JRS     replace boost references with std references.   
 ///                                                                             
 ///@version 2020-05-04  DHF     Open sourced                                    
@@ -65,9 +67,7 @@ ThreadInfo::ThreadInfo(
 ///@brief   Reclaim resources held by object.                                   
 //------------------------------------------------------------------------------
 ThreadInfo::~ThreadInfo()
-{
-
-} // ThreadInfo::~ThreadInfo
+= default; // ThreadInfo::~ThreadInfo
 
 //------------------------------------------------------------------------------
 ///@brief   Return the name of this thread.                                     

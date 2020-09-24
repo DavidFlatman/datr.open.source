@@ -26,6 +26,8 @@ namespace ds {
 ///         The class doesn't do anything ... so it's not possible for multiple 
 ///         threads to step on each other's toes.                               
 ///                                                                             
+///@version 2020-09-24  JRS     updated with automated C++ 11 recommendations.  
+///                                                                             
 ///@version 2020-05-04  DHF     Open sourced                                    
 ///                                                                             
 ///@version 2016-11-01  DHF     Moved from lib::msg:: namespace to lib::ds::    
@@ -41,7 +43,7 @@ namespace ds {
 ///                                                                             
 //------------------------------------------------------------------------------
 
-struct NULL_BASE { virtual ~NULL_BASE() { } };
+struct NULL_BASE { virtual ~NULL_BASE() = default; };
 #define UNDEF_CONCAT(a,b) a ## b
 
 #define DEFINE_NULL(COUNT)                                                  \

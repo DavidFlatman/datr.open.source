@@ -33,6 +33,8 @@ namespace msg {
 ///         that we can declare the Publisher a friend of the Subscriber        
 ///         (indirectly).                                                       
 ///                                                                             
+///@version 2020-09-24  JRS     updated with automated C++ 11 recommendations.  
+///                                                                             
 ///@version 2020-05-04  DHF     Open sourced                                    
 ///                                                                             
 ///@version 2015-08-30  DHF     Broke out into file of it's own.                
@@ -49,11 +51,10 @@ class PublisherBase
 {
     public:
         inline virtual ~PublisherBase() 
-        {
-        }
+        = default;
 
     protected:
-        inline PublisherBase() {}
+        inline PublisherBase() = default;
 
         //----------------------------------------------------------------------
         ///@brief Increment the subscription count of the given SubscriptionBase

@@ -27,6 +27,8 @@ TEST_REGISTER(lib::msg::test::SubscriberTest);
 ///@author                                                                      
 ///         Make Test Utility           MTU         Utility by DHF              
 ///                                                                             
+///@version 2020-09-24  JRS     updated with automated C++ 11 recommendations.  
+///                                                                             
 ///@version 2020-05-04  DHF     Open sourced                                    
 ///                                                                             
 ///@version 2010-01-26  DHF     Changed outer namespace from tools to lib.      
@@ -39,12 +41,12 @@ TEST_REGISTER(lib::msg::test::SubscriberTest);
 //  Method:  SubscriberTest                                                     
 //------------------------------------------------------------------------------
 SubscriberTest::SubscriberTest() : Test("lib::msg::Subscriber") {}
-SubscriberTest::SubscriberTest(const SubscriberTest& that) : Test(that) {}
+SubscriberTest::SubscriberTest(const SubscriberTest& that) = default;
 
 //------------------------------------------------------------------------------
 //  Method:  ~SubscriberTest                                                    
 //------------------------------------------------------------------------------
-SubscriberTest::~SubscriberTest() {}
+SubscriberTest::~SubscriberTest() = default;
 
 //------------------------------------------------------------------------------
 //  Method:  operator=                                                          
@@ -68,7 +70,7 @@ class MySubscriberTest
         {
         }
 
-        void process(lib::ds::shared_ptr<const int>& i)
+        void process(lib::ds::shared_ptr<const int>& i) override
         {
             switch (m_CountInteger)
             {
@@ -88,7 +90,7 @@ class MySubscriberTest
             ++m_CountInteger;
         }
 
-        void process(lib::ds::shared_ptr<const double>& i)
+        void process(lib::ds::shared_ptr<const double>& i) override
         {
             switch (m_CountDouble)
             {
@@ -122,7 +124,7 @@ class MyPublisherTest
     , public lib::mp::work::Threadable
 {
     public:
-        void operator()()
+        void operator()() override
         {
             for (int i=0; i < 5; ++i)
             {

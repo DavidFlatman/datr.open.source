@@ -3,6 +3,8 @@
 ///                                                                             
 ///@par  Classification:  UNCLASSIFIED, OPEN SOURCE                             
 ///                                                                             
+///@version 2020-09-24  JRS     updated with automated C++ 11 recommendations.  
+///                                                                             
 ///@version 2020-08-27  DHF     File creation                                   
 ///                                                                             
 //------------------------------------------------------------------------------
@@ -33,8 +35,7 @@ Value::Value(ConstMetaDataPtr metaData) : m_MetaData(metaData)
 
 
 Value::~Value()
-{
-}
+= default;
 
 ConstMetaDataPtr Value::metaData() const { return m_MetaData; }
 

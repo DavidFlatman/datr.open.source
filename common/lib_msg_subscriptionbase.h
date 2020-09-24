@@ -32,6 +32,8 @@ class PublisherBase;
 ///         In this way we can have a std::queue<SubscriptionBase*> and still   
 ///         get to the derived object's process method.                         
 ///                                                                             
+///@version 2020-09-24  JRS     updated with automated C++ 11 recommendations.  
+///                                                                             
 ///@version 2020-05-04  DHF     Open sourced                                    
 ///                                                                             
 ///@version 2015-08-30  DHF     Moved to its own file.                          
@@ -43,8 +45,7 @@ class SubscriptionBase
 {
     public:
         virtual ~SubscriptionBase() 
-        {
-        }
+        = default;
         virtual void processQueueItem() = 0;
 
         virtual int publicationCount() const = 0;

@@ -8,6 +8,8 @@
 ///     @code                                                                   
 ///     @endcode                                                                
 ///                                                                             
+///@version 2020-09-24  JRS     updated with automated C++ 11 recommendations.  
+///                                                                             
 ///@version 2020-09-23  JRS     replace boost references with std references.   
 ///                                                                             
 ///@version 2020-05-04  DHF     Open sourced                                    
@@ -105,13 +107,12 @@ bool DeltaTime::operator< (const DeltaTime& that) const
     if (tv_sec > that.tv_sec) {
         return false;
 
-    } else if (tv_sec < that.tv_sec) {
+    }
+    if (tv_sec < that.tv_sec) {
         return true;
 
-    } else {
-        return tv_nsec < that.tv_nsec;
-
     }
+    return tv_nsec < that.tv_nsec;
 }
 
 //------------------------------------------------------------------------------
@@ -121,13 +122,12 @@ bool DeltaTime::operator<=(const DeltaTime& that) const
     if (tv_sec > that.tv_sec) {
         return false;
 
-    } else if (tv_sec < that.tv_sec) {
+    }
+    if (tv_sec < that.tv_sec) {
         return true;
 
-    } else {
-        return tv_nsec <= that.tv_nsec;
-
     }
+    return tv_nsec <= that.tv_nsec;
 }
 
 //------------------------------------------------------------------------------

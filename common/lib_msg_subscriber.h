@@ -162,6 +162,8 @@ namespace msg {
 ///         this is a bad assumption, the publicationEnding code (at least) will
 ///         have to be modified.                                                
 ///                                                                             
+///@version 2020-09-24  JRS     updated with automated C++ 11 recommendations.  
+///                                                                             
 ///@version 2020-05-06  DHF     Removed lib_atomic.h in favor of <atomic>.      
 ///                                                                             
 ///@version 2020-05-04  DHF     Open sourced                                    
@@ -302,9 +304,7 @@ class Subscriber
 
         //----------------------------------------------------------------------
         //----------------------------------------------------------------------
-        virtual ~Subscriber() 
-        {
-        }
+        virtual ~Subscriber() = default;
 
         //----------------------------------------------------------------------
         ///@brief Called when a Publisher has terminated publishing; used to    
@@ -325,7 +325,7 @@ class Subscriber
         ///       empty and publicationEnding (or stopProcessing returns true)  
         ///       has been called.                                              
         //----------------------------------------------------------------------
-        virtual void operator()() override
+        void operator()() override
         {
             try {
                 m_Stop = false;
@@ -353,7 +353,7 @@ class Subscriber
         //----------------------------------------------------------------------
         virtual void next()
         {
-            SubscriptionBase* item = NULL;
+            SubscriptionBase* item = nullptr;
             if (m_Queue.pop(item)) {
                 //beat();                                                       
                 item->processQueueItem();
@@ -489,7 +489,7 @@ class Subscriber
         ///@brief   Added item to the master queue for needing to be  executed  
         ///         next.                                                       
         //----------------------------------------------------------------------
-        virtual void addToParentQueue(SubscriptionBase* item) override
+        void addToParentQueue(SubscriptionBase* item) override
         {
             m_Queue.push(item);
         }

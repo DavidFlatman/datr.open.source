@@ -32,6 +32,8 @@ namespace work {
 ///         that represent status / debug information.  This can safely be      
 ///         ignored.                                                            
 ///                                                                             
+///@version 2020-09-24  JRS     updated with automated C++ 11 recommendations.  
+///                                                                             
 ///@version 2020-05-04  DHF     Open sourced                                    
 ///                                                                             
 ///@version 2020-02-11  KCG     Changed boost::shared_ptr to lib::ds::shared_ptr
@@ -74,11 +76,11 @@ class ThreadableCollection
 
             ThreadableCollection* p;
             lib::cast_dynamic(p, x);
-            if (p != NULL)
+            if (p != nullptr)
             {
-                for (iterator i = p->begin(); i != p->end(); ++i)
+                for (auto & i : *p)
                 {
-                    std::vector<ThreadablePtr>::push_back(*i);
+                    std::vector<ThreadablePtr>::push_back(i);
                 }
             }
             return x;
@@ -92,11 +94,11 @@ class ThreadableCollection
 
             ThreadableCollection* p;
             lib::cast_dynamic(p, x.get());
-            if (p != NULL)
+            if (p != nullptr)
             {
-                for (iterator i = p->begin(); i != p->end(); ++i)
+                for (auto & i : *p)
                 {
-                    std::vector<ThreadablePtr>::push_back(*i);
+                    std::vector<ThreadablePtr>::push_back(i);
                 }
             }
             return x;

@@ -62,6 +62,8 @@ namespace work {
 ///             };                                                              
 ///         @endcode                                                            
 ///                                                                             
+///@version 2020-09-24  JRS     updated with automated C++ 11 recommendations.  
+///                                                                             
 ///@version 2020-05-04  DHF     Open sourced                                    
 ///                                                                             
 ///@version 2020-02-11  KCG     Changed boost::shared_ptr to lib::ds::shared_ptr
@@ -79,9 +81,9 @@ namespace work {
 class Threadable : virtual public lib::work::NamedObject
 {
     public:
-        Threadable() { }
+        Threadable() = default;
         Threadable(const std::string& name) { setName(name);}
-        virtual ~Threadable() {}
+        virtual ~Threadable() = default;
 
         virtual void operator()() = 0;
 

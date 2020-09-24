@@ -4,6 +4,8 @@
 ///                                                                             
 ///@brief   Allow control (join, start) of multiple threads at one time.        
 ///                                                                             
+///@version 2020-09-24  JRS     updated with automated C++ 11 recommendations.  
+///                                                                             
 ///@version 2020-09-23  JRS     removed boost usage. debugJoinAll is not quite right.
 ///                                                                             
 ///@version 2020-05-04  DHF     Open sourced                                    
@@ -43,9 +45,7 @@ ThreadableCollection::ThreadableCollection()
 ///@brief   Reclaim resources held by object.                                   
 //------------------------------------------------------------------------------
 ThreadableCollection::~ThreadableCollection()
-{
-
-} // ThreadableCollection::~ThreadableCollection
+= default; // ThreadableCollection::~ThreadableCollection
 
 //------------------------------------------------------------------------------
 ///@brief                                                                       
@@ -104,16 +104,16 @@ void ThreadableCollection::startAll(bool checkAllIsWell)
 //------------------------------------------------------------------------------
 void ThreadableCollection::joinAll()
 {
-    for (iterator t = begin(); t != end(); ++t) {
-        if ((*t)->thread()->joinable()) {
-            (*t)->thread()->join();
+    for (auto & t : *this) {
+        if (t->thread()->joinable()) {
+            t->thread()->join();
             publish(
                 s_Message.debug(
                     MSG_THREAD_COMPLETED
-                  , "thread " + (*t)->name() + " stopped"
+                  , "thread " + t->name() + " stopped"
                 )
             );
-            (*t)->afterJoin();
+            t->afterJoin();
         }
     }
     publish(s_Message.debug(MSG_THREADS_COMPLETED, "threads completed"));

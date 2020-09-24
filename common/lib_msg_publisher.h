@@ -65,6 +65,8 @@ namespace msg {
 ///         If you don't want to sacrifice compile-time type checking then      
 ///         just inherit multiple times from Publication versus using Publisher.
 ///                                                                             
+///@version 2020-09-24  JRS     updated with automated C++ 11 recommendations.  
+///                                                                             
 ///@version 2020-05-04  DHF     Open sourced                                    
 ///                                                                             
 ///@version 2020-02-11  KCG     Changed boost::shared_ptr to lib::ds::shared_ptr
@@ -137,7 +139,7 @@ class Publisher
         using ConnectionError = std::logic_error;
 
         Publisher() : m_EndPublicationCalled(false) {  }
-        virtual ~Publisher() {}
+        virtual ~Publisher() = default;
 
         template <typename TYPE>
         void publish(lib::ds::shared_ptr<const TYPE>  item) {

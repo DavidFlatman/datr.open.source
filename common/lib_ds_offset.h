@@ -21,6 +21,8 @@ namespace ds {
 ///                                                                             
 ///@par Thread Safety:  unknown none class object                               
 ///                                                                             
+///@version 2020-09-24  JRS     updated with automated C++ 11 recommendations.  
+///                                                                             
 ///@version 2020-05-04  DHF     Open sourced                                    
 ///                             Removed boost::scoped_ptr                       
 ///                                                                             
@@ -34,7 +36,7 @@ namespace ds {
 struct Offset
 {
     Offset(uint64_t offset = 0) : m_FileOffset(offset) { }
-    Offset(const Offset& o) : m_FileOffset(o.m_FileOffset) { }
+    Offset(const Offset& o) = default;
     uint64_t    m_FileOffset;
 
 }; // class Offset //

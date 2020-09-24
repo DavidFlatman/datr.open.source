@@ -34,6 +34,8 @@ namespace work {
 ///                                                                             
 ///@par Thread Safety:  object                                                  
 ///                                                                             
+///@version 2020-09-24  JRS     updated with automated C++ 11 recommendations.  
+///                                                                             
 ///@version 2020-09-23  JRS     replace boost references with std references.   
 ///                                                                             
 ///@version 2020-05-04  DHF     Open sourced                                    
@@ -76,7 +78,7 @@ class Queue
 
         //----------------------------------------------------------------------
         //----------------------------------------------------------------------
-        virtual ~Queue() {}
+        virtual ~Queue() = default;
 
         //----------------------------------------------------------------------
         ///@brief   Add an item to the queue.                                   

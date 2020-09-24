@@ -10,7 +10,7 @@
 ///         deliberately avoiding using any lib_ files or routines.  We want    
 ///         the dev_test_work_test* to stand on its own.                        
 ///                                                                             
-///@author  David H. Flatman    DHF     davidflatman@email.com                  
+///@version 2020-09-24  JRS     updated with automated C++ 11 recommendations.  
 ///                                                                             
 ///@version 2020-09-08  DHF     Removed dependency on ftime.                    
 ///                                                                             
@@ -118,7 +118,7 @@ const Test::verbosity_t Test::vStatistics(vHeader | vSummary | vTimeStamp);
 Test::Test (
     const std::string& className
 ) 
-  : m_OutputFunction(NULL)
+  : m_OutputFunction(nullptr)
   , m_OutputIndentation("")
   , m_TestClass(this)
   , m_ClassName(className)
@@ -176,9 +176,7 @@ Test& Test::operator=(const Test& that)
 ///@par  Purpose:                                                               
 ///                                                                             
 ///-----------------------------------------------------------------------------
-Test::~Test() {
-    
-}
+Test::~Test() = default;
 
 ///-----------------------------------------------------------------------------
 ///@par  Method:  string className                                              
@@ -476,7 +474,7 @@ void Test::notImplementedAdd(int count)
 ///-----------------------------------------------------------------------------
 void Test::output(verbosity_t level, const std::string& message)  
 {
-    if (level & m_Verbosity && m_OutputFunction != NULL) {
+    if (level & m_Verbosity && m_OutputFunction != nullptr) {
         char buffer[25];
         if (m_Verbosity & vTimeStamp) {
 //------------------------------------------------------------------------------

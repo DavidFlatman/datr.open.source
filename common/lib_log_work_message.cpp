@@ -6,6 +6,8 @@
 ///                                                                             
 ///@brief   Object representing a single log message.                           
 ///                                                                             
+///@version 2020-09-24  JRS     updated with automated C++ 11 recommendations.  
+///                                                                             
 ///@version 2020-09-23  JRS     Removed boost string operation                  
 ///                                                                             
 ///@version 2020-09-22  JRS     Removed some compiler warnings                  
@@ -73,17 +75,7 @@ Message::Message()
 ///@note    Refactor away if Microsoft ever figures out that "= default" is     
 ///         supposed to mean.                                                   
 //------------------------------------------------------------------------------
-Message::Message(const Message& that)
-  : m_TimeStamp(that.m_TimeStamp)
-  , m_ApplicationMnemonic(that.m_ApplicationMnemonic)
-  , m_ClassID(that.m_ClassID)
-  , m_SeverityLevel(that.m_SeverityLevel)
-  , m_MessageID(that.m_MessageID)
-  , m_Message(that.m_Message)
-  , m_PID(that.m_PID)
-
-{
-}
+Message::Message(const Message& that) = default;
 
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
@@ -102,7 +94,7 @@ Message::Message(
   , lib::time::work::DateTime   time_stamp  
   , const std::string&          appMnemonic 
 ) : m_TimeStamp(time_stamp)
-  , m_ApplicationMnemonic(appMnemonic != "" ? appMnemonic : s_ApplicationMnemonic)
+  , m_ApplicationMnemonic(!appMnemonic.empty() ? appMnemonic : s_ApplicationMnemonic)
   , m_ClassID(classID)
   , m_SeverityLevel(severity)
   , m_MessageID(message_id)
@@ -123,7 +115,7 @@ Message::Message(
   , lib::time::work::DateTime   time_stamp  
   , const std::string&          appMnemonic 
 ) : m_TimeStamp(time_stamp)
-  , m_ApplicationMnemonic(appMnemonic != "" ? appMnemonic : s_ApplicationMnemonic)
+  , m_ApplicationMnemonic(!appMnemonic.empty() ? appMnemonic : s_ApplicationMnemonic)
   , m_ClassID(classID)
   , m_MessageID(message_id)
   , m_Message(message)
@@ -138,9 +130,7 @@ Message::Message(
 ///@brief   Reclaim resources held by object.                                   
 //------------------------------------------------------------------------------
 Message::~Message()
-{
-
-} // Message::~Message
+= default; // Message::~Message
 
 //------------------------------------------------------------------------------
 ///@brief                                                                       
@@ -340,18 +330,7 @@ std::string Message::toString(PARTS part) const
 ///         supposed to mean.                                                   
 //------------------------------------------------------------------------------
 Message& Message::operator=(const Message& that)
-{
-    m_TimeStamp             = that.m_TimeStamp;
-    m_ApplicationMnemonic   = that.m_ApplicationMnemonic;
-    m_SeverityLevel         = that.m_SeverityLevel;
-    m_ClassID               = that.m_ClassID;
-    m_MessageID             = that.m_MessageID;
-    m_Message               = that.m_Message;
-    m_PID                   = that.m_PID;
-
-    return *this;
-
-}
+= default;
 
 //------------------------------------------------------------------------------
 //  str.substr(0,26)            time string                                     
@@ -448,11 +427,7 @@ Messages::Messages()
 ///@note    Refactor away if Microsoft ever figures out that "= default" is     
 ///         supposed to mean.                                                   
 //------------------------------------------------------------------------------
-Messages::Messages(const Messages& msgs)
-    : std::vector<ConstMessagePtr>(msgs)
-    , m_HighestSeverityLevel(msgs.m_HighestSeverityLevel)
-{
-}
+Messages::Messages(const Messages& msgs) = default;
 
 //------------------------------------------------------------------------------
 ///@brief                                                                       
@@ -478,8 +453,8 @@ void Messages::push_back(ConstMessagePtr msg)
 //------------------------------------------------------------------------------
 void Messages::push_back(const Messages& msg)
 {
-    for (Messages::const_iterator m = msg.begin(); m != msg.end(); ++m) {
-        push_back(*m);
+    for (const auto & m : msg) {
+        push_back(m);
     }
 }
 

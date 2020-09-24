@@ -3,6 +3,8 @@
 ///@brief   Hold the non-class code for the lib::log facility.                  
 ///@par Classification:  UNCLASSIFIED, OPEN SOURCE                              
 ///                                                                             
+///@version 2020-09-24  JRS     updated with automated C++ 11 recommendations.  
+///                                                                             
 ///@version 2020-05-04  DHF     Open sourced                                    
 ///                                                                             
 ///@version 2011-05-18  DHF     File creation basd on old lib::Log class.       
@@ -45,7 +47,7 @@ std::string toString(ds::level_t level, bool full)
 //------------------------------------------------------------------------------
 ds::level_t fromString(const std::string& str)
 {
-    assert(str.size() > 0);
+    assert(!str.empty());
 
     switch(str[0]) 
     {

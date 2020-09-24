@@ -12,6 +12,8 @@
 ///                                                                             
 ///@par Thread Safety:  class                                                   
 ///                                                                             
+///@version 2020-09-24  JRS     updated with automated C++ 11 recommendations.  
+///                                                                             
 ///@version 2020-09-23  JRS     replace boost references with std references.   
 ///                                                                             
 ///@version 2020-09-22  JRS     Switched from OS-specific times to std::chrono  
@@ -255,7 +257,7 @@ bool DateTime::fromString(const std::string& str, bool strict)
     //--------------------------------------------------------------------------
     //  If the string specified a string month, translate it to a number.       
     //--------------------------------------------------------------------------
-    if (m != "") {
+    if (!m.empty()) {
         static const std::string months("janfebmaraprmayjunjulaugsepoctnovdec");
         size_t offset = months.find(lib::toLower(m));
         if (offset == std::string::npos) {
@@ -374,13 +376,12 @@ bool DateTime::operator<(const DateTime& right) const
     if (tv_sec < right.tv_sec) {
         return true;
 
-    } else if (tv_sec == right.tv_sec) {
+    }
+    if (tv_sec == right.tv_sec) {
         return tv_nsec < right.tv_nsec;
 
-    } else {
-        return false;
-
     }
+    return false;
 }
 
 //------------------------------------------------------------------------------
