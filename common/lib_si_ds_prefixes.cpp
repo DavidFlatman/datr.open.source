@@ -3,7 +3,7 @@
 //------------------------------------------------------------------------------
 ///@file lib_si_ds_prefixes.cpp                                                 
 ///                                                                             
-///@par Classification:  UNCLASSFIIED, OPEN SOURCE                              
+///@par Classification:  UNCLASSIFIED, OPEN SOURCE                              
 ///                                                                             
 ///@version 2020-05-04  DHF     Open sourced.                                   
 //------------------------------------------------------------------------------

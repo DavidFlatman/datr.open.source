@@ -76,7 +76,7 @@ class PublisherBase
           , boost::signals2::signal<void ()>& signal
         ) {
             connection = signal.connect(
-                boost::bind(&SubscriptionBase::publicationEnding, &sub)
+                std::bind(&SubscriptionBase::publicationEnding, &sub)
             );
         }
 

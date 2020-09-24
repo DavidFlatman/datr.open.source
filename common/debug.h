@@ -1,9 +1,9 @@
 //------------------------------------------------------------------------------
 ///@file debug.h                                                                
 ///                                                                             
-///@par Classification:  UNCLASSFIIED, OPEN SOURCE                              
+///@par Classification:  UNCLASSIFIED, OPEN SOURCE                              
 ///                                                                             
-///@brief Holds some useful^W primative debugging tools.                        
+///@brief Holds some useful^W primitive debugging tools.                        
 ///                                                                             
 ///@par Expected Usage                                                          
 ///     @code                                                                   

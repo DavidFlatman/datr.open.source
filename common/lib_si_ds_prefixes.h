@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-///@par Classification:  UNCLASSFIIED, OPEN SOURCE                              
+///@par Classification:  UNCLASSIFIED, OPEN SOURCE                              
 ///                                                                             
 ///@version 2020-05-04  DHF     Open sourced.                                   
 //------------------------------------------------------------------------------

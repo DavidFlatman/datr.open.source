@@ -1,7 +1,9 @@
 //------------------------------------------------------------------------------
 ///@file debug.cpp                                                              
 ///                                                                             
-///@par Classification:  UNCLASSFIIED, OPEN SOURCE                              
+///@par Classification:  UNCLASSIFIED, OPEN SOURCE                              
+///                                                                             
+///@version 2020-05-04  DHF     Open sourced.                                   
 ///                                                                             
 ///@version 2020-05-04  DHF     Open sourced.                                   
 //------------------------------------------------------------------------------
@@ -19,7 +21,7 @@ void debug_hexdump(const void* memory, size_t bytes)
     {
         if ((i % 16) == 0)
         {
-            printf("\n%5ld.  ", i);
+            printf("\n%5zd.  ", i);
         } else {
             printf(",  ");
         }
@@ -52,7 +54,7 @@ void debug_diff(const std::string& left, const std::string& right)
         if (left[i] != right[i])
         {
             diff = true;
-            printf("%ld,  ", i);
+            printf("%zd,  ", i);
         }
     }
 

@@ -124,10 +124,10 @@ class Publication
             if (same || derived) {
                 boost::signals2::connection connection1(
                     m_PublishSignal.connect(
-                        boost::bind(
+                        std::bind(
                             &Subscription<SUB_TYPE>::inbox
                           , &sub
-                          , boost::placeholders::_1
+                          , std::placeholders::_1
                         )
                     )
                 );
@@ -158,10 +158,10 @@ class Publication
         {
             boost::signals2::connection connection1(
                 m_PublishSignal.connect(
-                    boost::bind(
+                    std::bind(
                         &Subscription<TYPE>::inbox
                       , &sub
-                      , boost::placeholders::_1
+                      , std::placeholders::_1
                     )
                 )
             );

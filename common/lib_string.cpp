@@ -608,6 +608,13 @@ std::string toLower(const std::string& source)
         ans[i] = tolower(ans[i]);
     }
     return ans;
+/*
+    // if you prefer std::algorithm to loops:
+    std::string s(input);
+    // explicit cast needed to resolve ambiguity
+    std::transform(s.begin(), s.end(), s.begin(), (int(*)(int)) std::tolower);
+    return s;
+*/
 }
 
 //------------------------------------------------------------------------------
@@ -622,6 +629,13 @@ std::string toUpper(const std::string& source)
         ans[i] = toupper(ans[i]);
     }
     return ans;
+/*
+    // if you prefer std::algorithm to loops:
+    std::string s(input);
+    // explicit cast needed to resolve ambiguity
+    std::transform(s.begin(), s.end(), s.begin(), (int(*)(int)) std::toupper);
+    return s;
+*/
 }
 #endif
 
@@ -630,22 +644,28 @@ std::string toUpper(const std::string& source)
 ///         than max_replace times. case sensitive search and replace.
 ///         max_replace is to prevent an infinite loop in the case where
 ///         the caller puts search in format.
+/// @return the number of replacements made
 //------------------------------------------------------------------------------
-void replace_all(std::string& str, const std::string& search,
+int replace_all(std::string& str, const std::string& search,
     const std::string& format, int max_replace)
 {
+    int replaced = 0;
     if (!search.empty())
     {
         size_t search_len = search.length();
-        size_t pos = str.find(search);
-        for (int i = 0; i < max_replace && pos != std::string::npos; ++i)
+        for (; replaced < max_replace; ++replaced)
         {
+            size_t pos = str.find(search);
+            if (pos == std::string::npos)
+            {
+                break;
+            }
             // yes, it would be more efficient to use a string formatter than
             // add three std::string subexpressions and assign it to the result.
             str = str.substr(0, pos) + format + str.substr(pos + search_len);
-            pos = str.find(search);
         }
     }
+    return replaced;
 }
 
 

@@ -202,7 +202,7 @@ std::string trimRight(const std::string& str, const std::string& white = " \t\n\
 std::string toLower(const std::string& str);
 std::string toUpper(const std::string& str);
 
-void replace_all(std::string& str, const std::string& search,
+int replace_all(std::string& str, const std::string& search,
     const std::string& format, int max_replace = 100000);
 
 //------------------------------------------------------------------------------
