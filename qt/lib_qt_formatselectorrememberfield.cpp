@@ -24,18 +24,12 @@ FormatSelectorRememberField::FormatSelectorRememberField(
 ) : RememberField(field_name)
   , QComboBox(parent)
 {
-    setPlaceholderText("Select a format");
-    addItem("TextDate", "ddd MMM d yyyy hh:mm:ss t");
-    addItem("ISODate", "yyyy-MM-ddTHH:mm:sst");
-    addItem("RFC2822Date", "dd MMM yyyy HH:mm:ss ±z");
+    addItem("TextDate", "ddd MMM d yyyy hh:mm:ss");
+    addItem("ISODate", "yyyy-MM-ddTHH:mm:ss");
+    addItem("RFC2822Date", "dd MMM yyyy HH:mm:ss zzz");
     addItem("DATR", "yyyy-MM-dd HH:mm:ss");
-    if(rememberedValue().isEmpty())
+    if(!rememberedValue().isEmpty())
     {
-//------------------------------------------------------------------------------
-// Set FormatSelector to placeholder text.
-//------------------------------------------------------------------------------
-        setCurrentIndex(-1);
-    } else {
         setValue(rememberedValue());
     }
 } // // FormatSelectorRememberField::FormatSelectorRememberField() //
@@ -51,9 +45,9 @@ FormatSelectorRememberField::FormatSelectorRememberField(
 ) : RememberField(field_name)
   , QComboBox(parent)
 {
-    addItem("TextDate", "ddd MMM d yyyy hh:mm:ss t");
-    addItem("ISODate", "yyyy-MM-ddTHH:mm:sst");
-    addItem("RFC2822Date", "dd MMM yyyy HH:mm:ss ±z");
+    addItem("TextDate", "ddd MMM d yyyy hh:mm:ss");
+    addItem("ISODate", "yyyy-MM-ddTHH:mm:ss");
+    addItem("RFC2822Date", "dd MMM yyyy HH:mm:ss zzz");
     addItem("DATR", "yyyy-MM-dd HH:mm:ss");
     addFormat(field_name, field_value);
 }
@@ -111,11 +105,7 @@ void FormatSelectorRememberField::removeFormat(int const& row)
 //------------------------------------------------------------------------------
 QString FormatSelectorRememberField::value() const
 {
-    if(currentIndex() == -1)
-    {
-        return itemData(0, Qt::UserRole).toString();
-    }
-    return currentData(Qt::UserRole).toString();
+    return itemData(currentIndex(), Qt::UserRole).toString();
 } // FormatSelectorRememberField::value() //
 
 //------------------------------------------------------------------------------
