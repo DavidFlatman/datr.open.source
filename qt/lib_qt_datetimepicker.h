@@ -115,7 +115,7 @@ public:
     void showPicker();
     void hidePicker();
     void addFormat(QString const& text, QString const& format);
-    void removeFormat(int const& row);
+    void removeFormat(QString const& text);
     QDate date() const;
     QTime time() const;
 

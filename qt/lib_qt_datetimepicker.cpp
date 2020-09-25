@@ -262,9 +262,9 @@ void DateTimePicker::addFormat(QString const& text, QString const& format)
 ///@brief Remove a format from the format selector.
 ///@param row    Int containing the row of the format to be removed.
 //------------------------------------------------------------------------------
-void DateTimePicker::removeFormat(int const& row)
+void DateTimePicker::removeFormat(QString const& text)
 {
-    m_Data->m_FormatSelector->removeFormat(row);
+    m_Data->m_FormatSelector->removeFormat(text);
 } // DateTimePicker::removeFormat() //
 
 //------------------------------------------------------------------------------

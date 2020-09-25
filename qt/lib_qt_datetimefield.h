@@ -86,7 +86,7 @@ public:
     void setMinimumTime(QTime const& new_time);
     void setMaximumTime(QTime const& new_time);
     void addFormat(QString const& text, QString const& format);
-    void removeFormat(int const& row);
+    void removeFormat(QString const& text);
 
     virtual QString value() const override;
     virtual void setValue(QString const& new_value) override;

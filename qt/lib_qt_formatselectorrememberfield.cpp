@@ -2,6 +2,8 @@
 ///@file lib_qt_formatselectorrememberfield.cpp
 ///@par  Classification:  UNCLASSIFIED, OPEN SOURCE
 ///
+///@version 2020-08-25  PN     Updated to work with Qt4.8.7.
+///                            Removed currentData() and setPlaceholder().
 ///@version 2020-08-21  PN     File creation. Implemented constructor
 ///                            , destructor, addFormat(), removeFormat()
 ///                            , value(), and setValue().
@@ -47,7 +49,7 @@ FormatSelectorRememberField::FormatSelectorRememberField(
 {
     addItem("TextDate", "ddd MMM d yyyy hh:mm:ss");
     addItem("ISODate", "yyyy-MM-ddTHH:mm:ss");
-    addItem("RFC2822Date", "dd MMM yyyy HH:mm:ss zzz");
+    addItem("RFC2822Date", "dd MMM yyyy HH:mm:ss");
     addItem("DATR", "yyyy-MM-dd HH:mm:ss");
     addFormat(field_name, field_value);
 }
@@ -85,16 +87,18 @@ void FormatSelectorRememberField::addFormat(
 } // FormatSelectorRememberField::addFormat() //
 
 //------------------------------------------------------------------------------
-///@brief Remove a format from the format selector.
-///@param row    Int containing the row of the format to be removed.
+///@brief Remove a format from the format selector based on displayed text.
+///@param text    QString containing the displayed text of the format to be
+///               removed.
 //------------------------------------------------------------------------------
-void FormatSelectorRememberField::removeFormat(int const& row)
+void FormatSelectorRememberField::removeFormat(QString const& text)
 {
-    if(row < count() && row >= 0)
+    int row = findText(text, Qt::MatchExactly);
+    if(row == -1)
     {
-        removeItem(row);
+        std::cout << "removeFormat(): Format not in the selector" << std::endl;
     } else {
-        std::cout << "Warning: removeFormat() out of range" << std::endl;
+        removeItem(row);
     }
 } // FormatSelectorRememberField::removeFormat() //
 

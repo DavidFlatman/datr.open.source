@@ -7,3 +7,6 @@
 
     The build procedures search ../qt for source code.
 
+    Compatibility: Required to be using QT framework version 
+    4.8.7 (QT-4.8) or newer. This application does not use
+    any features from QT framework version 5.15.1 (QT-5).

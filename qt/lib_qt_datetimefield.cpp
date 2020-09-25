@@ -133,9 +133,9 @@ void DateTimeField::addFormat(QString const& text, QString const& format)
 ///@brief Remove a format from the format selector.
 ///@param row    Int containing the row of the format to be removed.
 //------------------------------------------------------------------------------
-void DateTimeField::removeFormat(int const& row)
+void DateTimeField::removeFormat(QString const& text)
 {
-    m_Data->m_DateTimePicker->removeFormat(row);
+    m_Data->m_DateTimePicker->removeFormat(text);
 } // DateTimePicker::removeFormat() //
 
 //------------------------------------------------------------------------------

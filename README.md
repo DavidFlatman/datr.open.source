@@ -116,6 +116,7 @@
 
        
 #   WARNINGS
+        Compatibility: Required to be using QT framework version 4.8.7 (QT-4.8) or newer.
 
 ##  Boost
         The existing code base is overly dependent on Boost.  Given the choice,
