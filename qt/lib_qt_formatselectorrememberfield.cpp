@@ -12,6 +12,7 @@
 #include "lib_qt_formatselectorrememberfield.h"
 
 #include <iostream>
+#include <QDebug>
 
 namespace lib {
 namespace qt {
@@ -28,13 +29,13 @@ FormatSelectorRememberField::FormatSelectorRememberField(
 {
     addItem("TextDate", "ddd MMM d yyyy hh:mm:ss");
     addItem("ISODate", "yyyy-MM-ddTHH:mm:ss");
-    addItem("RFC2822Date", "dd MMM yyyy HH:mm:ss zzz");
+    addItem("RFC2822Date", "dd MMM yyyy HH:mm:ss");
     addItem("DATR", "yyyy-MM-dd HH:mm:ss");
     if(!rememberedValue().isEmpty())
     {
         setValue(rememberedValue());
     }
-} // // FormatSelectorRememberField::FormatSelectorRememberField() //
+} // FormatSelectorRememberField::FormatSelectorRememberField() //
 
 //------------------------------------------------------------------------------
 ///@brief Initialize inherited classes and populate the QComboBox with default
@@ -74,15 +75,14 @@ void FormatSelectorRememberField::addFormat(
 {
     if(text.isEmpty() || format.isEmpty())
     {
-        std::cout << "Warning: addFormat() inputs cannot be empty" << std::endl;
+        qDebug() << "Warning: addFormat() arguments cannot be empty";
         return;
-    }
-    if(findData(QVariant(format), Qt::UserRole, Qt::MatchExactly) == -1)
-    {
+    } else if(findData(QVariant(format), Qt::UserRole, Qt::MatchExactly) == -1){
         addItem(text, format);
         setCurrentIndex(count()-1);
     } else {
-        std::cout << "Warning: Format already in selector!" << std::endl;
+        qDebug() << "Warning: addFormat() format already in selector!"
+                 << format;
     }
 } // FormatSelectorRememberField::addFormat() //
 
@@ -96,7 +96,8 @@ void FormatSelectorRememberField::removeFormat(QString const& text)
     int row = findText(text, Qt::MatchExactly);
     if(row == -1)
     {
-        std::cout << "removeFormat(): Format not in the selector" << std::endl;
+        qDebug() << "Warning: removeFormat() format not in the selector"
+                 << text;
     } else {
         removeItem(row);
     }
@@ -113,8 +114,8 @@ QString FormatSelectorRememberField::value() const
 } // FormatSelectorRememberField::value() //
 
 //------------------------------------------------------------------------------
-///@brief Set a new format to be added to the format selector. Will not add a
-///       format that is already in the list.
+///@brief Set the remembered format to be added to the format selector. Will not
+///       add a format that is already in the list.
 ///@param new_value    QString containing the new format to be added.
 //------------------------------------------------------------------------------
 void FormatSelectorRememberField::setValue(QString const& new_value)

@@ -24,6 +24,7 @@
 #include <iostream>
 #include <QApplication>
 #include <QDir>
+#include <QDebug>
 #include <QFileDialog>
 #include <QFileInfo>
 #include <QHBoxLayout>
@@ -111,12 +112,12 @@ void PathField::openDialog()
                 , m_Data->m_Directory
                 , m_Data->m_Type
                );
-    std::cout << filePath.toStdString() << std::endl;
     if(!filePath.isEmpty() && !filePath.isNull())
     {
         m_Data->m_Directory = QFileInfo(filePath).dir().path();
-        std::cout << "File Selected: " << filePath.toStdString() << std::endl;
         m_Data->m_Path->setText(filePath);
+    } else {
+        qDebug() << "Warning: openDialog() file not selected";
     }
 } // void PathField::openDialog() //
 
@@ -153,24 +154,25 @@ bool PathField::verifyCriteria() const
 {
     if(m_Data->m_Path->text() == "")
     {
-        std::cout << "ERROR: No File selected!" << std::endl;
+        qDebug() << "Warning: verifyCriteria() file not selected!";
         return false;
     }
     if(m_Data->m_MustExist)
     {
         if(!QFile(m_Data->m_Path->text()).exists())
         {
-            std::cout << "ERROR: File does not exist!" << std::endl;
+            qDebug() << "Warning: verifyCriteria() file does not exist!"
+                     << m_Data->m_Path->text();
             return false;
         }
     } else if(m_Data->m_WarnIfExists)
     {
         if(QFile(m_Data->m_Path->text()).exists())
         {
-            std::cout << "WARNING: file exists!" << std::endl;
+            qDebug() << "Warning: verifyCriteria() file exists!"
+                     << m_Data->m_Path->text();
         }
     }
-    std::cout << "Path is valid!" << std::endl;
     m_Data->m_ValidFilePath = true;
     return true;
 } // PathField::isValidPath() //

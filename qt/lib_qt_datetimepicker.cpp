@@ -42,6 +42,7 @@
 #include <iostream>
 #include <QCalendarWidget>
 #include <QDateTime>
+#include <QDebug>
 #include <QGridLayout>
 #include <QHeaderView>
 #include <QLabel>
@@ -198,7 +199,7 @@ void DateTimePicker::setMinimumTime(QTime const& new_time)
             item->setHidden(true);
         }
     } else {
-        std::cout << "Warning: setMinimumTime() Invalid Input" << std::endl;
+        qDebug() << "Warning: setMinimumTime() Invalid Input" << new_time;
     }
 } // DateTimePicker::setMinimumTime //
 
@@ -227,7 +228,7 @@ void DateTimePicker::setMaximumTime(QTime const& new_time)
             }
         }
     } else {
-        std::cout << "Warning: setMaximumTime() Invalid Input" << std::endl;
+        qDebug() << "Warning: setMaximumTime() Invalid Input" << new_time;
     }
 } // DateTimePicker::setMaximumTime //
 
