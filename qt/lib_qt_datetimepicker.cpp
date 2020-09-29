@@ -39,7 +39,6 @@
 #include "lib_qt_datetimepicker.h"
 #include "lib_qt_formatselectorrememberfield.h"
 
-#include <iostream>
 #include <QCalendarWidget>
 #include <QDateTime>
 #include <QDebug>

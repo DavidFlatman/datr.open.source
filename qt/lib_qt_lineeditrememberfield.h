@@ -9,8 +9,6 @@
 #include "lib_qt_rememberfield.h"
 
 #include <QLineEdit>
-#include <QWidget>
-#include <QString>
 
 namespace lib {
 namespace qt {
@@ -60,12 +58,12 @@ class LineEditRememberField
 {
     public:
         explicit LineEditRememberField(
-              QString const& fieldName
+              QString const& field_name
             , QWidget* parent = nullptr
           );
         LineEditRememberField(
-              QString const& fieldName
-            , QString const& fieldValue
+              QString const& field_name
+            , QString const& field_value
             , QWidget* parent = nullptr
           );
         virtual ~LineEditRememberField();

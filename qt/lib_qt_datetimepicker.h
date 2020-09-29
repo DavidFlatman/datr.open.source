@@ -10,11 +10,9 @@
 #include "lib_qt_rememberfield.h"
 
 #include <memory>
-#include <QAbstractButton>
-#include <QCalendarWidget>
+#include <QDate>
 #include <QGroupBox>
-#include <QStringList>
-#include <QTreeWidgetItem>
+#include <QTime>
 
 namespace lib {
 namespace qt {
@@ -73,25 +71,25 @@ namespace qt {
 ///     @endcode
 ///
 ///@version 2020-09-21  PN     Added addFormat() and removeFormat().
-///@version 2020-09-15  PN     Added setLineEdit(), todayButtonPressed()
-///                            , nowButtonPressed(), onDateChange()
-///                            , onTimeChange(), populateList()
-///                            , updateLineEdit(), findItemInTree().
-///@version 2020-09-14  PN     Added setMinimumDate(), setMaximumDate()
-///                            , setMinimumTime(), setMaximumTime, setDate()
-///                            , setTime(), showPicker(), hidePicker()
-///                            , date(), and time().
+///@version 2020-09-15  PN     Added setLineEdit(), todayButtonPressed(),
+///                            nowButtonPressed(), onDateChange(),
+///                            onTimeChange(), populateList(),
+///                            updateLineEdit(), findItemInTree().
+///@version 2020-09-14  PN     Added setMinimumDate(), setMaximumDate(),
+///                            setMinimumTime(), setMaximumTime, setDate(),
+///                            setTime(), showPicker(), hidePicker(),
+///                            date(), and time().
 ///@version 2020-09-11  PN     Moved all functions to DateTimeField class.
 ///                            Updated DateTimePicker to be a dialog container
 ///                            for handling user selection of date and time.
 ///@version 2020-09-10  PN     Removed isValidDate(). Added cancel().
-///@version 2020-09-03  PN     File creation. Detailed design. Added constructor
-///                            , destructor, setMinimumDate(), setMaximumDate()
-///                            , openDialog(), isValidDate(), name(), setName()
-///                            , value(), and setValue().
-///
+///@version 2020-09-03  PN     File creation. Detailed design. Added
+///                            constructor, destructor, setMinimumDate(),
+///                            setMaximumDate(), openDialog(), isValidDate(),
+///                            name(), setName(), value(), and setValue().
 //------------------------------------------------------------------------------
-class DateTimePicker : public QGroupBox
+class DateTimePicker
+    : public QGroupBox
 {
     Q_OBJECT
 

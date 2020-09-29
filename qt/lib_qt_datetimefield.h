@@ -59,8 +59,8 @@ namespace qt {
 ///     @endcode
 ///
 ///@version 2020-09-21  PN     Added addFormat() and removeFormat().
-///@version 2020-09-14  PN     Add setMaximumDate(), setMinimumDate
-///                            , setMaximumTime() and setMinimumTime().
+///@version 2020-09-14  PN     Add setMaximumDate(), setMinimumDate,
+///                            setMaximumTime(), and setMinimumTime().
 ///@version 2020-09-11  PN     File creation. Moved all previous functions from
 ///                            DateTimePicker class to DateTimeField.
 //------------------------------------------------------------------------------

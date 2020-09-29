@@ -8,8 +8,6 @@
 
 #include "lib_qt_field.h"
 
-#include <QSettings>
-
 namespace lib {
 namespace qt {
 
@@ -95,7 +93,9 @@ namespace qt {
 ///@version 2020-08-11  PN     File creation
 //------------------------------------------------------------------------------
 
-class RememberField : public Field {
+class RememberField
+    : public Field
+{
     public:
         explicit RememberField(QString const& fieldName);
         RememberField(

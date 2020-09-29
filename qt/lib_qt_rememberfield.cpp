@@ -13,7 +13,6 @@
 
 #include "lib_qt_rememberfield.h"
 
-#include <iostream>
 #include <QSettings>
 #include <QString>
 

@@ -19,9 +19,8 @@
 //------------------------------------------------------------------------------
 
 #include "lib_qt_pathfield.h"
-#include "lib_qt_lineeditrememberfield.h"
+#include "lib_qt_pathrememberfield.h"
 
-#include <iostream>
 #include <QApplication>
 #include <QDir>
 #include <QDebug>
@@ -41,7 +40,7 @@ namespace qt {
 struct PathField::Data
 {
     QHBoxLayout*                m_Layout;
-    LineEditRememberField*      m_Path;
+    PathRememberField*          m_Path;
     QPushButton*                m_ThreeDots;
     QString                     m_Title;
     QString                     m_Directory;
@@ -52,7 +51,7 @@ struct PathField::Data
 
     Data(QString const& field_name)
         : m_Layout(new QHBoxLayout)
-        , m_Path(new LineEditRememberField(field_name, nullptr))
+        , m_Path(new PathRememberField(field_name, nullptr))
         , m_ThreeDots(new QPushButton("..."))
         , m_Title(field_name)
         , m_MustExist(false)

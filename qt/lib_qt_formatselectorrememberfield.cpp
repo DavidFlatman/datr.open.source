@@ -4,14 +4,13 @@
 ///
 ///@version 2020-08-25  PN     Updated to work with Qt4.8.7.
 ///                            Removed currentData() and setPlaceholder().
-///@version 2020-08-21  PN     File creation. Implemented constructor
-///                            , destructor, addFormat(), removeFormat()
-///                            , value(), and setValue().
+///@version 2020-08-21  PN     File creation. Implemented constructor,
+///                            destructor, addFormat(), removeFormat(), value(),
+///                            and setValue().
 //------------------------------------------------------------------------------
 
 #include "lib_qt_formatselectorrememberfield.h"
 
-#include <iostream>
 #include <QDebug>
 
 namespace lib {

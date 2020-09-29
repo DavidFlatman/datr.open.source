@@ -4,8 +4,8 @@
 ///
 ///@version 2020-09-21  PN     Add addFormat() and removeFormat().
 ///@version 2020-09-14  PN     Update connect() to handle DateTimePicker
-///                            acceptChanges() signal. Add setMaximumDate()
-///                            , setMinimumDate, setMaximumTime() and
+///                            acceptChanges() signal. Add setMaximumDate(),
+///                            setMinimumDate, setMaximumTime() and
 ///                            setMinimumTime().
 ///@version 2020-09-11  PN     File creation.
 //------------------------------------------------------------------------------
@@ -14,7 +14,6 @@
 #include "lib_qt_lineeditrememberfield.h"
 #include "lib_qt_datetimepicker.h"
 
-#include <iostream>
 #include <QCalendarWidget>
 #include <QDateTime>
 #include <QDialogButtonBox>

@@ -12,9 +12,6 @@
 
 #include "lib_qt_lineeditrememberfield.h"
 
-#include <iostream>
-#include <QEvent>
-
 namespace lib {
 namespace qt {
 

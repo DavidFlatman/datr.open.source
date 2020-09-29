@@ -10,11 +10,6 @@
 
 #include <memory>
 #include <QWidget>
-#include <QString>
-#include <QHBoxLayout>
-#include <QLineEdit>
-#include <QPushButton>
-#include <QLabel>
 
 namespace lib {
 namespace qt {

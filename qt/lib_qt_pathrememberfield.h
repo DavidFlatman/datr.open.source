@@ -43,42 +43,35 @@ namespace qt {
 ///         }
 ///     @endcode
 ///
-///@version 2020-09-29  PN     Added QList<QString> filesList(), QString
-///                            currentDirectory, and
-///                            getFilesInCurrentDirectory().
-///@version 2020-09-28  PN     File creation. Added constructors, destructor
-///                            , keyPressHandler(), onPathChange(), and
-///                            , eventFilter().
+///@version 2020-09-29  PN     Added QList<QString> filesList() and
+///                            updateFilesList(). Removed onPathChange().
+///@version 2020-09-28  PN     File creation. Added constructors, destructor,
+///                            autoCompletePath(), onPathChange(), and
+///                            eventFilter().
 //------------------------------------------------------------------------------
 class PathRememberField
     : public LineEditRememberField
 {
-    Q_OBJECT
-
     public:
         explicit PathRememberField(
-              QString const& fieldName
+              QString const& field_name
             , QWidget* parent = nullptr
           );
         PathRememberField(
-              QString const& fieldName
-            , QString const& fieldValue
+              QString const& field_name
+            , QString const& field_value
             , QWidget* parent = nullptr
           );
         ~PathRememberField();
 
-        QList<QString> getFilesInCurrentDirectory();
-        void keyPressHandler();
-
-    public slots:
-        void onPathChange();
+        void autoCompletePath();
+        void updateFilesList();
 
     protected:
         bool eventFilter(QObject* obj, QEvent *event) override;
 
     private:
         QList<QString> filesList();
-        QString currentDirectory();
 }; // class PathRememberField //
 } // namespace lib //
 } // namespace qt //

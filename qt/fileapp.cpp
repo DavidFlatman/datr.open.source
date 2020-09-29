@@ -12,13 +12,13 @@
 #include "lib_qt_pathfield.h"
 #include "lib_qt_datetimefield.h"
 
-#include <iostream>
 #include <QApplication>
 #include <QCoreApplication>
+#include <QDebug>
 
 int main(int argc, char* argv[])
 {
-    std::cout << "Starting Appliction" << std::endl << std::endl;
+    qDebug() << "Starting Appliction";
     QApplication app(argc, argv);
 
 //------------------------------------------------------------------------------
@@ -28,10 +28,8 @@ int main(int argc, char* argv[])
     QCoreApplication::setOrganizationDomain("navy.mil");
     QCoreApplication::setApplicationName("FileApp");
 
-    lib::qt::DateTimeField date_field("DateTime", nullptr);
-    date_field.show();
-//    lib::qt::PathField path_field("file", nullptr);
-//    path_field.show();
+    lib::qt::PathField path_field("File", nullptr);
+    path_field.show();
 
     return app.exec();
 }
