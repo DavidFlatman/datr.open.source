@@ -19,7 +19,7 @@
 #                                                                               
 #@author    makemake    MM      Utility by DHF, last modified 2017-02-02        
 #                                                                               
-#@version   2020-09-08  MM      File creation                                   
+#@version   2020-09-21  MM      File creation                                   
 #                                                                               
 #===============================================================================
 
@@ -87,7 +87,9 @@ TESTOBJ =   \
   $(OBJDIR)/lib_ieee_ts754_work_floattest$(OBJEXT)  \
   $(OBJDIR)/lib_msg_conversionlabtest$(OBJEXT)  \
   $(OBJDIR)/lib_msg_publishertest$(OBJEXT)  \
-  $(OBJDIR)/lib_msg_subscribertest$(OBJEXT)
+  $(OBJDIR)/lib_msg_subscribertest$(OBJEXT)  \
+  $(OBJDIR)/lib_work_filetest$(OBJEXT)  \
+  $(OBJDIR)/lib_work_vectorwithoffsetcollectiontest$(OBJEXT)
 
 .PHONY: all
 all:    \
@@ -119,201 +121,45 @@ $(BINDIR)/dev_test_main$(BINEXT): $(OBJDIR)/dev_test_main$(OBJEXT) \
 
 
 #-------------------------------------------------------------------------------
-#  file:  ../common/lib_string.cpp                                              
+#  file:  ../common/lib_work_filetest.cpp                                       
 #-------------------------------------------------------------------------------
-$(OBJDIR)/lib_string.o: ../common/lib_string.cpp ../common/lib_compiler_info.h  \
- ../common/lib_string.h
-	@ echo $@
-	@$(CXX) -c $(CXXFLAGS) $(INCPATH) -o "$@" "$<"
-	@forbidden -s $@
-
-
-#-------------------------------------------------------------------------------
-#  file:  ../common/lib_log_ds.cpp                                              
-#-------------------------------------------------------------------------------
-$(OBJDIR)/lib_log_ds.o: ../common/lib_log_ds.cpp ../common/lib_log_ds.h  \
- ../common/lib_time_work_datetime.h  \
- ../common/lib_time_work_datedeltatimebase.h  \
- ../common/lib_time_work_deltatime.h
-	@ echo $@
-	@$(CXX) -c $(CXXFLAGS) $(INCPATH) -o "$@" "$<"
-	@forbidden -s $@
-
-
-#-------------------------------------------------------------------------------
-#  file:  ../common/lib_time_work_datedeltatimebase.cpp                         
-#-------------------------------------------------------------------------------
-$(OBJDIR)/lib_time_work_datedeltatimebase.o:  \
- ../common/lib_time_work_datedeltatimebase.cpp  \
- ../common/lib_time_work_datedeltatimebase.h  \
- ../common/lib_si_ds_prefixes.h
-	@ echo $@
-	@$(CXX) -c $(CXXFLAGS) $(INCPATH) -o "$@" "$<"
-	@forbidden -s $@
-
-
-#-------------------------------------------------------------------------------
-#  file:  ../common/lib_time_work_deltatime.cpp                                 
-#-------------------------------------------------------------------------------
-$(OBJDIR)/lib_time_work_deltatime.o: ../common/lib_time_work_deltatime.cpp  \
- ../common/lib_time_work_deltatime.h  \
- ../common/lib_time_work_datedeltatimebase.h  \
- ../common/lib_time_work_datetime.h ../common/lib_si_ds_prefixes.h  \
- ../common/lib_string.h ../common/lib_time_ds.h ../common/debug.h
-	@ echo $@
-	@$(CXX) -c $(CXXFLAGS) $(INCPATH) -o "$@" "$<"
-	@forbidden -s $@
-
-
-#-------------------------------------------------------------------------------
-#  file:  ../common/dev_debug.cpp                                               
-#-------------------------------------------------------------------------------
-$(OBJDIR)/dev_debug.o: ../common/dev_debug.cpp ../common/dev_debug.h  \
- ../common/lib_compiler_info.h ../common/lib_time_work_datetime.h  \
- ../common/lib_time_work_datedeltatimebase.h  \
- ../common/lib_time_work_deltatime.h ../common/lib_string.h  \
- ../common/debug.h
-	@ echo $@
-	@$(CXX) -c $(CXXFLAGS) $(INCPATH) -o "$@" "$<"
-	@forbidden -s $@
-
-
-#-------------------------------------------------------------------------------
-#  file:  ../common/dev_test_work_test.cpp                                      
-#-------------------------------------------------------------------------------
-$(OBJDIR)/dev_test_work_test.o: ../common/dev_test_work_test.cpp  \
- ../common/dev_test_work_test.h ../common/lib_ds_shared_ptr.h  \
- ../common/lib_compiler_info.h ../common/lib_string.h ../common/debug.h  \
- src/lib_time_work_walltime.h ../common/lib_time_work_datetime.h  \
- ../common/lib_time_work_datedeltatimebase.h  \
- ../common/lib_time_work_deltatime.h
-	@ echo $@
-	@$(CXX) -c $(CXXFLAGS) $(INCPATH) -o "$@" "$<"
-	@forbidden -s $@
-
-
-#-------------------------------------------------------------------------------
-#  file:  ../common/debug.cpp                                                   
-#-------------------------------------------------------------------------------
-$(OBJDIR)/debug.o: ../common/debug.cpp ../common/debug.h
-	@ echo $@
-	@$(CXX) -c $(CXXFLAGS) $(INCPATH) -o "$@" "$<"
-	@forbidden -s $@
-
-
-#-------------------------------------------------------------------------------
-#  file:  ../common/lib_log_work_message.cpp                                    
-#-------------------------------------------------------------------------------
-$(OBJDIR)/lib_log_work_message.o: ../common/lib_log_work_message.cpp  \
- ../common/lib_log_work_message.h ../common/lib_ds_shared_ptr.h  \
- ../common/lib_time_work_datetime.h  \
- ../common/lib_time_work_datedeltatimebase.h  \
- ../common/lib_time_work_deltatime.h ../common/lib_ds_flags.h  \
- ../common/lib_log_ds.h ../common/lib_log_work.h  \
- ../common/lib_si_ds_prefixes.h ../common/lib_string.h ../common/debug.h
-	@ echo $@
-	@$(CXX) -c $(CXXFLAGS) $(INCPATH) -o "$@" "$<"
-	@forbidden -s $@
-
-
-#-------------------------------------------------------------------------------
-#  file:  ../common/lib_bits_work.cpp                                           
-#-------------------------------------------------------------------------------
-$(OBJDIR)/lib_bits_work.o: ../common/lib_bits_work.cpp ../common/lib_bits_work.h  \
- ../common/debug.h
-	@ echo $@
-	@$(CXX) -c $(CXXFLAGS) $(INCPATH) -o "$@" "$<"
-	@forbidden -s $@
-
-
-#-------------------------------------------------------------------------------
-#  file:  ../common/lib_config_work_filepaths.cpp                               
-#-------------------------------------------------------------------------------
-$(OBJDIR)/lib_config_work_filepaths.o: ../common/lib_config_work_filepaths.cpp  \
- ../common/lib_config_work_filepaths.h
-	@ echo $@
-	@$(CXX) -c $(CXXFLAGS) $(INCPATH) -o "$@" "$<"
-	@forbidden -s $@
-
-
-#-------------------------------------------------------------------------------
-#  file:  ../common/lib_mp_work_thread.cpp                                      
-#-------------------------------------------------------------------------------
-$(OBJDIR)/lib_mp_work_thread.o: ../common/lib_mp_work_thread.cpp  \
- ../common/lib_mp_work_thread.h  \
- ../common/lib_ds_shared_ptr.h ../common/lib_mp_work_threadinfo.h  \
+$(OBJDIR)/lib_work_filetest.o: ../common/lib_work_filetest.cpp  \
+ ../common/lib_work_filetest.h ../common/dev_test_work_test.h  \
+ ../common/lib_ds_shared_ptr.h ../common/dev_test_work.h  \
+ ../common/lib_config_work_filepaths.h ../common/lib_compiler_info.h  \
+ ../common/lib_file_work_info.h ../common/lib_log_work_exception.h  \
  ../common/lib_log_work_message.h ../common/lib_time_work_datetime.h  \
  ../common/lib_time_work_datedeltatimebase.h  \
  ../common/lib_time_work_deltatime.h ../common/lib_ds_flags.h  \
- ../common/lib_log_ds.h ../common/lib_work_namedobject.h
+ ../common/lib_log_ds.h ../common/lib_macro.h ../common/lib_string.h  \
+ ../common/lib_work_file.h ../common/debug.h
 	@ echo $@
 	@$(CXX) -c $(CXXFLAGS) $(INCPATH) -o "$@" "$<"
 	@forbidden -s $@
 
 
 #-------------------------------------------------------------------------------
-#  file:  ../common/lib_si_ds_prefixes.cpp                                      
+#  file:  ../common/lib_bits_work_test.cpp                                      
 #-------------------------------------------------------------------------------
-$(OBJDIR)/lib_si_ds_prefixes.o: ../common/lib_si_ds_prefixes.cpp  \
- ../common/lib_si_ds_prefixes.h
-	@ echo $@
-	@$(CXX) -c $(CXXFLAGS) $(INCPATH) -o "$@" "$<"
-	@forbidden -s $@
-
-
-#-------------------------------------------------------------------------------
-#  file:  ../common/lib_eu_work_metadatatest.cpp                                
-#-------------------------------------------------------------------------------
-$(OBJDIR)/lib_eu_work_metadatatest.o: ../common/lib_eu_work_metadatatest.cpp  \
- ../common/lib_eu_work_metadatatest.h ../common/dev_test_work_test.h  \
+$(OBJDIR)/lib_bits_work_test.o: ../common/lib_bits_work_test.cpp  \
+ ../common/lib_bits_work_test.h ../common/dev_test_work_test.h  \
  ../common/lib_ds_shared_ptr.h ../common/dev_test_work.h  \
- ../common/lib_config_work_filepaths.h ../common/lib_eu_work_metadata.h  \
- ../common/lib_eu_work_datatype.h ../common/lib_ds_enum.h  \
- ../common/lib_work_executebeforemain.h ../common/lib_compiler_info.h  \
- ../common/lib_string.h
+ ../common/lib_config_work_filepaths.h ../common/lib_bits_work.h  \
+ ../common/debug.h
 	@ echo $@
 	@$(CXX) -c $(CXXFLAGS) $(INCPATH) -o "$@" "$<"
 	@forbidden -s $@
 
 
 #-------------------------------------------------------------------------------
-#  file:  ../common/lib_eu_work_valuetest.cpp                                   
+#  file:  ../common/lib_eu_work_value.cpp                                       
 #-------------------------------------------------------------------------------
-$(OBJDIR)/lib_eu_work_valuetest.o: ../common/lib_eu_work_valuetest.cpp  \
- ../common/lib_eu_work_valuetest.h ../common/dev_test_work_test.h  \
- ../common/lib_ds_shared_ptr.h ../common/dev_test_work.h  \
- ../common/lib_config_work_filepaths.h ../common/lib_eu_work_value.h  \
+$(OBJDIR)/lib_eu_work_value.o: ../common/lib_eu_work_value.cpp  \
+ ../common/lib_eu_work_value.h ../common/lib_ds_shared_ptr.h  \
  ../common/lib_eu_work_metadata.h ../common/lib_eu_work_datatype.h  \
  ../common/lib_ds_enum.h ../common/lib_work_executebeforemain.h  \
- ../common/lib_compiler_info.h ../common/lib_string.h ../common/debug.h
-	@ echo $@
-	@$(CXX) -c $(CXXFLAGS) $(INCPATH) -o "$@" "$<"
-	@forbidden -s $@
-
-
-#-------------------------------------------------------------------------------
-#  file:  ../common/lib_log_work_messagefactory.cpp                             
-#-------------------------------------------------------------------------------
-$(OBJDIR)/lib_log_work_messagefactory.o: ../common/lib_log_work_messagefactory.cpp  \
- ../common/lib_log_work_messagefactory.h  \
- ../common/lib_time_work_datetime.h  \
- ../common/lib_time_work_datedeltatimebase.h  \
- ../common/lib_time_work_deltatime.h ../common/lib_log_ds.h  \
- ../common/lib_log_work_message.h ../common/lib_ds_shared_ptr.h  \
- ../common/lib_ds_flags.h ../common/lib_string.h  \
- ../common/lib_work_version.h
-	@ echo $@
-	@$(CXX) -c $(CXXFLAGS) $(INCPATH) -o "$@" "$<"
-	@forbidden -s $@
-
-
-#-------------------------------------------------------------------------------
-#  file:  ../common/lib_eu_work_metadata.cpp                                    
-#-------------------------------------------------------------------------------
-$(OBJDIR)/lib_eu_work_metadata.o: ../common/lib_eu_work_metadata.cpp  \
- ../common/lib_eu_work_metadata.h ../common/lib_eu_work_datatype.h  \
- ../common/lib_ds_enum.h ../common/lib_work_executebeforemain.h  \
- ../common/lib_compiler_info.h ../common/lib_string.h
+ ../common/lib_compiler_info.h ../common/lib_string.h  \
+ ../common/lib_bits_work.h ../common/debug.h
 	@ echo $@
 	@$(CXX) -c $(CXXFLAGS) $(INCPATH) -o "$@" "$<"
 	@forbidden -s $@
@@ -335,38 +181,54 @@ $(OBJDIR)/lib_mp_work_threadinfo.o: ../common/lib_mp_work_threadinfo.cpp  \
 
 
 #-------------------------------------------------------------------------------
-#  file:  src/lib_time_work_walltime.cpp                                        
+#  file:  ../common/lib_eu_work_metadata.cpp                                    
 #-------------------------------------------------------------------------------
-$(OBJDIR)/lib_time_work_walltime.o: src/lib_time_work_walltime.cpp  \
- src/lib_time_work_walltime.h ../common/lib_time_work_datetime.h  \
- ../common/lib_time_work_datedeltatimebase.h  \
- ../common/lib_time_work_deltatime.h ../common/lib_time_work_deltatime.h
+$(OBJDIR)/lib_eu_work_metadata.o: ../common/lib_eu_work_metadata.cpp  \
+ ../common/lib_eu_work_metadata.h ../common/lib_eu_work_datatype.h  \
+ ../common/lib_ds_enum.h ../common/lib_work_executebeforemain.h  \
+ ../common/lib_compiler_info.h ../common/lib_string.h
 	@ echo $@
 	@$(CXX) -c $(CXXFLAGS) $(INCPATH) -o "$@" "$<"
 	@forbidden -s $@
 
 
 #-------------------------------------------------------------------------------
-#  file:  ../common/lib_mp_work_threadablecollection.cpp                        
+#  file:  ../common/lib_ieee_ts754_work_float.cpp                               
 #-------------------------------------------------------------------------------
-$(OBJDIR)/lib_mp_work_threadablecollection.o:  \
- ../common/lib_mp_work_threadablecollection.cpp  \
- ../common/lib_mp_work_threadablecollection.h ../common/lib_cast.h  \
- ../common/lib_ds_shared_ptr.h ../common/lib_log_work_message.h  \
+$(OBJDIR)/lib_ieee_ts754_work_float.o: ../common/lib_ieee_ts754_work_float.cpp  \
+ ../common/lib_ieee_ts754_work_float.h ../common/debug.h  \
+ ../common/lib_bits_work.h
+	@ echo $@
+	@$(CXX) -c $(CXXFLAGS) $(INCPATH) -o "$@" "$<"
+	@forbidden -s $@
+
+
+#-------------------------------------------------------------------------------
+#  file:  ../common/lib_log_work_message.cpp                                    
+#-------------------------------------------------------------------------------
+$(OBJDIR)/lib_log_work_message.o: ../common/lib_log_work_message.cpp  \
+ ../common/lib_log_work_message.h ../common/lib_ds_shared_ptr.h  \
  ../common/lib_time_work_datetime.h  \
  ../common/lib_time_work_datedeltatimebase.h  \
  ../common/lib_time_work_deltatime.h ../common/lib_ds_flags.h  \
- ../common/lib_log_ds.h ../common/lib_mp_work_threadable.h  \
- ../common/lib_mp_work_thread.h  \
- ../common/lib_mp_work_threadinfo.h ../common/lib_work_namedobject.h  \
- ../common/lib_msg_publisher.h ../common/lib_ds_null.h  \
- ../common/lib_msg_subscriber.h ../common/lib_mp_work_queue.h  \
- ../common/lib_msg_publishersubscriberbase.h  \
- ../common/lib_msg_subscription.h ../common/lib_msg_subscriptionbase.h  \
- ../common/lib_msg_publication.h ../common/lib_msg_publisherbase.h  \
- ../common/lib_msg_publisherhelper.h  \
- ../common/lib_msg_publisherconnectionhelper.h  \
- ../common/lib_msg_actualconnection.h ../common/lib_string.h  \
+ ../common/lib_log_ds.h ../common/lib_log_work.h  \
+ ../common/lib_si_ds_prefixes.h ../common/lib_string.h ../common/debug.h
+	@ echo $@
+	@$(CXX) -c $(CXXFLAGS) $(INCPATH) -o "$@" "$<"
+	@forbidden -s $@
+
+
+#-------------------------------------------------------------------------------
+#  file:  ../common/lib_work_file.cpp                                           
+#-------------------------------------------------------------------------------
+$(OBJDIR)/lib_work_file.o: ../common/lib_work_file.cpp ../common/lib_work_file.h  \
+ ../common/lib_log_work_message.h ../common/lib_ds_shared_ptr.h  \
+ ../common/lib_time_work_datetime.h  \
+ ../common/lib_time_work_datedeltatimebase.h  \
+ ../common/lib_time_work_deltatime.h ../common/lib_ds_flags.h  \
+ ../common/lib_log_ds.h ../common/lib_log_work_exception.h  \
+ ../common/lib_macro.h ../common/lib_string.h  \
+ ../common/lib_compiler_info.h ../common/lib_file_work_info.h  \
  ../common/lib_log_work_messagefactory.h
 	@ echo $@
 	@$(CXX) -c $(CXXFLAGS) $(INCPATH) -o "$@" "$<"
@@ -374,12 +236,44 @@ $(OBJDIR)/lib_mp_work_threadablecollection.o:  \
 
 
 #-------------------------------------------------------------------------------
-#  file:  ../common/lib_log_work.cpp                                            
+#  file:  ../common/lib_config_work_filepaths.cpp                               
 #-------------------------------------------------------------------------------
-$(OBJDIR)/lib_log_work.o: ../common/lib_log_work.cpp ../common/lib_log_work.h  \
- ../common/lib_log_ds.h ../common/lib_time_work_datetime.h  \
+$(OBJDIR)/lib_config_work_filepaths.o: ../common/lib_config_work_filepaths.cpp  \
+ ../common/lib_config_work_filepaths.h
+	@ echo $@
+	@$(CXX) -c $(CXXFLAGS) $(INCPATH) -o "$@" "$<"
+	@forbidden -s $@
+
+
+#-------------------------------------------------------------------------------
+#  file:  ../common/lib_log_ds.cpp                                              
+#-------------------------------------------------------------------------------
+$(OBJDIR)/lib_log_ds.o: ../common/lib_log_ds.cpp ../common/lib_log_ds.h  \
+ ../common/lib_time_work_datetime.h  \
  ../common/lib_time_work_datedeltatimebase.h  \
  ../common/lib_time_work_deltatime.h
+	@ echo $@
+	@$(CXX) -c $(CXXFLAGS) $(INCPATH) -o "$@" "$<"
+	@forbidden -s $@
+
+
+#-------------------------------------------------------------------------------
+#  file:  ../common/lib_work_version.cpp                                        
+#-------------------------------------------------------------------------------
+$(OBJDIR)/lib_work_version.o: ../common/lib_work_version.cpp  \
+ ../common/lib_work_version.h ../common/lib_string.h
+	@ echo $@
+	@$(CXX) -c $(CXXFLAGS) $(INCPATH) -o "$@" "$<"
+	@forbidden -s $@
+
+
+#-------------------------------------------------------------------------------
+#  file:  ../common/lib_ds_standardunits.cpp                                    
+#-------------------------------------------------------------------------------
+$(OBJDIR)/lib_ds_standardunits.o: ../common/lib_ds_standardunits.cpp  \
+ ../common/lib_ds_standardunits.h ../common/lib_ds_enum.h  \
+ ../common/lib_work_executebeforemain.h ../common/lib_compiler_info.h  \
+ ../common/lib_string.h
 	@ echo $@
 	@$(CXX) -c $(CXXFLAGS) $(INCPATH) -o "$@" "$<"
 	@forbidden -s $@
@@ -394,6 +288,17 @@ $(OBJDIR)/lib_ieee_ts754_work_floattest.o:  \
  ../common/lib_ds_shared_ptr.h ../common/dev_test_work.h  \
  ../common/lib_config_work_filepaths.h  \
  ../common/lib_ieee_ts754_work_float.h ../common/debug.h
+	@ echo $@
+	@$(CXX) -c $(CXXFLAGS) $(INCPATH) -o "$@" "$<"
+	@forbidden -s $@
+
+
+#-------------------------------------------------------------------------------
+#  file:  ../common/dev_test_work.cpp                                           
+#-------------------------------------------------------------------------------
+$(OBJDIR)/dev_test_work.o: ../common/dev_test_work.cpp ../common/dev_test_work.h  \
+ ../common/dev_test_work_test.h ../common/lib_ds_shared_ptr.h  \
+ ../common/lib_config_work_filepaths.h
 	@ echo $@
 	@$(CXX) -c $(CXXFLAGS) $(INCPATH) -o "$@" "$<"
 	@forbidden -s $@
@@ -429,39 +334,63 @@ $(OBJDIR)/lib_msg_conversionlabtest.o: ../common/lib_msg_conversionlabtest.cpp  
 
 
 #-------------------------------------------------------------------------------
-#  file:  ../common/lib_msg_subscribertest.cpp                                  
+#  file:  ../common/lib_mp_work_threadablecollection.cpp                        
 #-------------------------------------------------------------------------------
-$(OBJDIR)/lib_msg_subscribertest.o: ../common/lib_msg_subscribertest.cpp  \
- ../common/lib_msg_subscribertest.h ../common/dev_test_work_test.h  \
- ../common/lib_ds_shared_ptr.h ../common/dev_test_work.h  \
- ../common/lib_config_work_filepaths.h ../common/lib_msg_subscriber.h  \
- ../common/lib_ds_null.h ../common/lib_mp_work_queue.h  \
- ../common/lib_mp_work_threadable.h ../common/lib_mp_work_thread.h  \
- ../common/lib_mp_work_threadinfo.h ../common/lib_log_work_message.h  \
+$(OBJDIR)/lib_mp_work_threadablecollection.o:  \
+ ../common/lib_mp_work_threadablecollection.cpp  \
+ ../common/lib_mp_work_threadablecollection.h ../common/lib_cast.h  \
+ ../common/lib_ds_shared_ptr.h ../common/lib_log_work_message.h  \
  ../common/lib_time_work_datetime.h  \
  ../common/lib_time_work_datedeltatimebase.h  \
  ../common/lib_time_work_deltatime.h ../common/lib_ds_flags.h  \
- ../common/lib_log_ds.h ../common/lib_work_namedobject.h  \
+ ../common/lib_log_ds.h ../common/lib_mp_work_threadable.h  \
+ ../common/lib_mp_work_thread.h  \
+ ../common/lib_mp_work_threadinfo.h ../common/lib_work_namedobject.h  \
+ ../common/lib_msg_publisher.h ../common/lib_ds_null.h  \
+ ../common/lib_msg_subscriber.h ../common/lib_mp_work_queue.h  \
  ../common/lib_msg_publishersubscriberbase.h  \
  ../common/lib_msg_subscription.h ../common/lib_msg_subscriptionbase.h  \
- ../common/lib_msg_publisher.h ../common/lib_cast.h  \
  ../common/lib_msg_publication.h ../common/lib_msg_publisherbase.h  \
  ../common/lib_msg_publisherhelper.h  \
  ../common/lib_msg_publisherconnectionhelper.h  \
  ../common/lib_msg_actualconnection.h ../common/lib_string.h  \
- ../common/lib_mp_work_threadablecollection.h ../common/debug.h
+ ../common/lib_log_work_messagefactory.h
 	@ echo $@
 	@$(CXX) -c $(CXXFLAGS) $(INCPATH) -o "$@" "$<"
 	@forbidden -s $@
 
 
 #-------------------------------------------------------------------------------
-#  file:  ../common/lib_bits_work_test.cpp                                      
+#  file:  ../common/lib_string.cpp                                              
 #-------------------------------------------------------------------------------
-$(OBJDIR)/lib_bits_work_test.o: ../common/lib_bits_work_test.cpp  \
- ../common/lib_bits_work_test.h ../common/dev_test_work_test.h  \
- ../common/lib_ds_shared_ptr.h ../common/dev_test_work.h  \
- ../common/lib_config_work_filepaths.h ../common/lib_bits_work.h  \
+$(OBJDIR)/lib_string.o: ../common/lib_string.cpp ../common/lib_compiler_info.h  \
+ ../common/lib_string.h
+	@ echo $@
+	@$(CXX) -c $(CXXFLAGS) $(INCPATH) -o "$@" "$<"
+	@forbidden -s $@
+
+
+#-------------------------------------------------------------------------------
+#  file:  ../common/lib_log_work_exception.cpp                                  
+#-------------------------------------------------------------------------------
+$(OBJDIR)/lib_log_work_exception.o: ../common/lib_log_work_exception.cpp  \
+ ../common/lib_log_work_exception.h ../common/lib_log_work_message.h  \
+ ../common/lib_ds_shared_ptr.h ../common/lib_time_work_datetime.h  \
+ ../common/lib_time_work_datedeltatimebase.h  \
+ ../common/lib_time_work_deltatime.h ../common/lib_ds_flags.h  \
+ ../common/lib_log_ds.h ../common/lib_macro.h ../common/lib_string.h
+	@ echo $@
+	@$(CXX) -c $(CXXFLAGS) $(INCPATH) -o "$@" "$<"
+	@forbidden -s $@
+
+
+#-------------------------------------------------------------------------------
+#  file:  ../common/dev_debug.cpp                                               
+#-------------------------------------------------------------------------------
+$(OBJDIR)/dev_debug.o: ../common/dev_debug.cpp ../common/dev_debug.h  \
+ ../common/lib_compiler_info.h ../common/lib_time_work_datetime.h  \
+ ../common/lib_time_work_datedeltatimebase.h  \
+ ../common/lib_time_work_deltatime.h ../common/lib_string.h  \
  ../common/debug.h
 	@ echo $@
 	@$(CXX) -c $(CXXFLAGS) $(INCPATH) -o "$@" "$<"
@@ -469,24 +398,73 @@ $(OBJDIR)/lib_bits_work_test.o: ../common/lib_bits_work_test.cpp  \
 
 
 #-------------------------------------------------------------------------------
-#  file:  ../common/lib_eu_work_value.cpp                                       
+#  file:  ../common/lib_time_work_datedeltatimebase.cpp                         
 #-------------------------------------------------------------------------------
-$(OBJDIR)/lib_eu_work_value.o: ../common/lib_eu_work_value.cpp  \
- ../common/lib_eu_work_value.h ../common/lib_ds_shared_ptr.h  \
- ../common/lib_eu_work_metadata.h ../common/lib_eu_work_datatype.h  \
- ../common/lib_ds_enum.h ../common/lib_work_executebeforemain.h  \
- ../common/lib_compiler_info.h ../common/lib_string.h  \
- ../common/lib_bits_work.h ../common/debug.h
+$(OBJDIR)/lib_time_work_datedeltatimebase.o:  \
+ ../common/lib_time_work_datedeltatimebase.cpp  \
+ ../common/lib_time_work_datedeltatimebase.h  \
+ ../common/lib_si_ds_prefixes.h
 	@ echo $@
 	@$(CXX) -c $(CXXFLAGS) $(INCPATH) -o "$@" "$<"
 	@forbidden -s $@
 
 
 #-------------------------------------------------------------------------------
-#  file:  ../common/lib_work_version.cpp                                        
+#  file:  ../common/lib_eu_work_valuetest.cpp                                   
 #-------------------------------------------------------------------------------
-$(OBJDIR)/lib_work_version.o: ../common/lib_work_version.cpp  \
- ../common/lib_work_version.h ../common/lib_string.h
+$(OBJDIR)/lib_eu_work_valuetest.o: ../common/lib_eu_work_valuetest.cpp  \
+ ../common/lib_eu_work_valuetest.h ../common/dev_test_work_test.h  \
+ ../common/lib_ds_shared_ptr.h ../common/dev_test_work.h  \
+ ../common/lib_config_work_filepaths.h ../common/lib_eu_work_value.h  \
+ ../common/lib_eu_work_metadata.h ../common/lib_eu_work_datatype.h  \
+ ../common/lib_ds_enum.h ../common/lib_work_executebeforemain.h  \
+ ../common/lib_compiler_info.h ../common/lib_string.h ../common/debug.h
+	@ echo $@
+	@$(CXX) -c $(CXXFLAGS) $(INCPATH) -o "$@" "$<"
+	@forbidden -s $@
+
+
+#-------------------------------------------------------------------------------
+#  file:  ../common/lib_eu_work_metadatatest.cpp                                
+#-------------------------------------------------------------------------------
+$(OBJDIR)/lib_eu_work_metadatatest.o: ../common/lib_eu_work_metadatatest.cpp  \
+ ../common/lib_eu_work_metadatatest.h ../common/dev_test_work_test.h  \
+ ../common/lib_ds_shared_ptr.h ../common/dev_test_work.h  \
+ ../common/lib_config_work_filepaths.h ../common/lib_eu_work_metadata.h  \
+ ../common/lib_eu_work_datatype.h ../common/lib_ds_enum.h  \
+ ../common/lib_work_executebeforemain.h ../common/lib_compiler_info.h  \
+ ../common/lib_string.h
+	@ echo $@
+	@$(CXX) -c $(CXXFLAGS) $(INCPATH) -o "$@" "$<"
+	@forbidden -s $@
+
+
+#-------------------------------------------------------------------------------
+#  file:  src/lib_time_work_walltime.cpp                                        
+#-------------------------------------------------------------------------------
+$(OBJDIR)/lib_time_work_walltime.o: src/lib_time_work_walltime.cpp  \
+ src/lib_time_work_walltime.h ../common/lib_time_work_datetime.h  \
+ ../common/lib_time_work_datedeltatimebase.h  \
+ ../common/lib_time_work_deltatime.h ../common/lib_time_work_deltatime.h
+	@ echo $@
+	@$(CXX) -c $(CXXFLAGS) $(INCPATH) -o "$@" "$<"
+	@forbidden -s $@
+
+
+#-------------------------------------------------------------------------------
+#  file:  ../common/lib_bits_work.cpp                                           
+#-------------------------------------------------------------------------------
+$(OBJDIR)/lib_bits_work.o: ../common/lib_bits_work.cpp ../common/lib_bits_work.h  \
+ ../common/debug.h
+	@ echo $@
+	@$(CXX) -c $(CXXFLAGS) $(INCPATH) -o "$@" "$<"
+	@forbidden -s $@
+
+
+#-------------------------------------------------------------------------------
+#  file:  ../common/debug.cpp                                                   
+#-------------------------------------------------------------------------------
+$(OBJDIR)/debug.o: ../common/debug.cpp ../common/debug.h
 	@ echo $@
 	@$(CXX) -c $(CXXFLAGS) $(INCPATH) -o "$@" "$<"
 	@forbidden -s $@
@@ -500,6 +478,68 @@ $(OBJDIR)/lib_time_work_datetime.o: ../common/lib_time_work_datetime.cpp  \
  ../common/lib_time_work_datedeltatimebase.h  \
  ../common/lib_time_work_deltatime.h ../common/lib_si_ds_prefixes.h  \
  ../common/lib_string.h ../common/lib_time_ds.h
+	@ echo $@
+	@$(CXX) -c $(CXXFLAGS) $(INCPATH) -o "$@" "$<"
+	@forbidden -s $@
+
+
+#-------------------------------------------------------------------------------
+#  file:  ../common/lib_work_vectorwithoffsetcollectiontest.cpp                 
+#-------------------------------------------------------------------------------
+$(OBJDIR)/lib_work_vectorwithoffsetcollectiontest.o:  \
+ ../common/lib_work_vectorwithoffsetcollectiontest.cpp  \
+ ../common/lib_work_vectorwithoffsetcollectiontest.h  \
+ ../common/dev_test_work_test.h ../common/lib_ds_shared_ptr.h  \
+ ../common/dev_test_work.h ../common/lib_config_work_filepaths.h  \
+ ../common/lib_pod_work_vectorwithoffsetfilereader.h  \
+ ../common/lib_work_file.h ../common/lib_log_work_message.h  \
+ ../common/lib_time_work_datetime.h  \
+ ../common/lib_time_work_datedeltatimebase.h  \
+ ../common/lib_time_work_deltatime.h ../common/lib_ds_flags.h  \
+ ../common/lib_log_ds.h ../common/lib_log_work_exception.h  \
+ ../common/lib_macro.h ../common/lib_string.h  \
+ ../common/lib_ds_vectorwithoffset.h ../common/lib_ds_offset.h  \
+ ../common/lib_work_vectorwithoffsetcollection.h  \
+ ../common/lib_work_vectorwithoffsetcollection.tpp
+	@ echo $@
+	@$(CXX) -c $(CXXFLAGS) $(INCPATH) -o "$@" "$<"
+	@forbidden -s $@
+
+
+#-------------------------------------------------------------------------------
+#  file:  ../common/lib_file_work_info.cpp                                      
+#-------------------------------------------------------------------------------
+$(OBJDIR)/lib_file_work_info.o: ../common/lib_file_work_info.cpp  \
+ ../common/lib_file_work_info.h
+	@ echo $@
+	@$(CXX) -c $(CXXFLAGS) $(INCPATH) -o "$@" "$<"
+	@forbidden -s $@
+
+
+#-------------------------------------------------------------------------------
+#  file:  ../common/dev_test_work_test.cpp                                      
+#-------------------------------------------------------------------------------
+$(OBJDIR)/dev_test_work_test.o: ../common/dev_test_work_test.cpp  \
+ ../common/dev_test_work_test.h ../common/lib_ds_shared_ptr.h  \
+ ../common/lib_compiler_info.h ../common/lib_string.h ../common/debug.h  \
+ src/lib_time_work_walltime.h ../common/lib_time_work_datetime.h  \
+ ../common/lib_time_work_datedeltatimebase.h  \
+ ../common/lib_time_work_deltatime.h
+	@ echo $@
+	@$(CXX) -c $(CXXFLAGS) $(INCPATH) -o "$@" "$<"
+	@forbidden -s $@
+
+
+#-------------------------------------------------------------------------------
+#  file:  ../common/lib_mp_work_thread.cpp                                      
+#-------------------------------------------------------------------------------
+$(OBJDIR)/lib_mp_work_thread.o: ../common/lib_mp_work_thread.cpp  \
+ ../common/lib_mp_work_thread.h  \
+ ../common/lib_ds_shared_ptr.h ../common/lib_mp_work_threadinfo.h  \
+ ../common/lib_log_work_message.h ../common/lib_time_work_datetime.h  \
+ ../common/lib_time_work_datedeltatimebase.h  \
+ ../common/lib_time_work_deltatime.h ../common/lib_ds_flags.h  \
+ ../common/lib_log_ds.h ../common/lib_work_namedobject.h
 	@ echo $@
 	@$(CXX) -c $(CXXFLAGS) $(INCPATH) -o "$@" "$<"
 	@forbidden -s $@
@@ -534,22 +574,78 @@ $(OBJDIR)/lib_msg_publishertest.o: ../common/lib_msg_publishertest.cpp  \
 
 
 #-------------------------------------------------------------------------------
-#  file:  ../common/dev_test_work.cpp                                           
+#  file:  ../common/lib_log_work_messagefactory.cpp                             
 #-------------------------------------------------------------------------------
-$(OBJDIR)/dev_test_work.o: ../common/dev_test_work.cpp ../common/dev_test_work.h  \
- ../common/dev_test_work_test.h ../common/lib_ds_shared_ptr.h  \
- ../common/lib_config_work_filepaths.h
+$(OBJDIR)/lib_log_work_messagefactory.o: ../common/lib_log_work_messagefactory.cpp  \
+ ../common/lib_log_work_messagefactory.h  \
+ ../common/lib_time_work_datetime.h  \
+ ../common/lib_time_work_datedeltatimebase.h  \
+ ../common/lib_time_work_deltatime.h ../common/lib_log_ds.h  \
+ ../common/lib_log_work_message.h ../common/lib_ds_shared_ptr.h  \
+ ../common/lib_ds_flags.h ../common/lib_string.h  \
+ ../common/lib_work_version.h
 	@ echo $@
 	@$(CXX) -c $(CXXFLAGS) $(INCPATH) -o "$@" "$<"
 	@forbidden -s $@
 
 
 #-------------------------------------------------------------------------------
-#  file:  ../common/lib_ieee_ts754_work_float.cpp                               
+#  file:  ../common/lib_log_work.cpp                                            
 #-------------------------------------------------------------------------------
-$(OBJDIR)/lib_ieee_ts754_work_float.o: ../common/lib_ieee_ts754_work_float.cpp  \
- ../common/lib_ieee_ts754_work_float.h ../common/debug.h  \
- ../common/lib_bits_work.h
+$(OBJDIR)/lib_log_work.o: ../common/lib_log_work.cpp ../common/lib_log_work.h  \
+ ../common/lib_log_ds.h ../common/lib_time_work_datetime.h  \
+ ../common/lib_time_work_datedeltatimebase.h  \
+ ../common/lib_time_work_deltatime.h
+	@ echo $@
+	@$(CXX) -c $(CXXFLAGS) $(INCPATH) -o "$@" "$<"
+	@forbidden -s $@
+
+
+#-------------------------------------------------------------------------------
+#  file:  ../common/lib_time_work_deltatime.cpp                                 
+#-------------------------------------------------------------------------------
+$(OBJDIR)/lib_time_work_deltatime.o: ../common/lib_time_work_deltatime.cpp  \
+ ../common/lib_time_work_deltatime.h  \
+ ../common/lib_time_work_datedeltatimebase.h  \
+ ../common/lib_time_work_datetime.h ../common/lib_si_ds_prefixes.h  \
+ ../common/lib_string.h ../common/lib_time_ds.h ../common/debug.h
+	@ echo $@
+	@$(CXX) -c $(CXXFLAGS) $(INCPATH) -o "$@" "$<"
+	@forbidden -s $@
+
+
+#-------------------------------------------------------------------------------
+#  file:  ../common/lib_si_ds_prefixes.cpp                                      
+#-------------------------------------------------------------------------------
+$(OBJDIR)/lib_si_ds_prefixes.o: ../common/lib_si_ds_prefixes.cpp  \
+ ../common/lib_si_ds_prefixes.h
+	@ echo $@
+	@$(CXX) -c $(CXXFLAGS) $(INCPATH) -o "$@" "$<"
+	@forbidden -s $@
+
+
+#-------------------------------------------------------------------------------
+#  file:  ../common/lib_msg_subscribertest.cpp                                  
+#-------------------------------------------------------------------------------
+$(OBJDIR)/lib_msg_subscribertest.o: ../common/lib_msg_subscribertest.cpp  \
+ ../common/lib_msg_subscribertest.h ../common/dev_test_work_test.h  \
+ ../common/lib_ds_shared_ptr.h ../common/dev_test_work.h  \
+ ../common/lib_config_work_filepaths.h ../common/lib_msg_subscriber.h  \
+ ../common/lib_ds_null.h ../common/lib_mp_work_queue.h  \
+ ../common/lib_mp_work_threadable.h ../common/lib_mp_work_thread.h  \
+ ../common/lib_mp_work_threadinfo.h ../common/lib_log_work_message.h  \
+ ../common/lib_time_work_datetime.h  \
+ ../common/lib_time_work_datedeltatimebase.h  \
+ ../common/lib_time_work_deltatime.h ../common/lib_ds_flags.h  \
+ ../common/lib_log_ds.h ../common/lib_work_namedobject.h  \
+ ../common/lib_msg_publishersubscriberbase.h  \
+ ../common/lib_msg_subscription.h ../common/lib_msg_subscriptionbase.h  \
+ ../common/lib_msg_publisher.h ../common/lib_cast.h  \
+ ../common/lib_msg_publication.h ../common/lib_msg_publisherbase.h  \
+ ../common/lib_msg_publisherhelper.h  \
+ ../common/lib_msg_publisherconnectionhelper.h  \
+ ../common/lib_msg_actualconnection.h ../common/lib_string.h  \
+ ../common/lib_mp_work_threadablecollection.h ../common/debug.h
 	@ echo $@
 	@$(CXX) -c $(CXXFLAGS) $(INCPATH) -o "$@" "$<"
 	@forbidden -s $@
@@ -568,14 +664,17 @@ $(OBJDIR)/libdatr.open.source.a: \
   $(OBJDIR)/lib_bits_work$(OBJEXT)  \
   $(OBJDIR)/lib_bits_work_test$(OBJEXT)  \
   $(OBJDIR)/lib_config_work_filepaths$(OBJEXT)  \
+  $(OBJDIR)/lib_ds_standardunits$(OBJEXT)  \
   $(OBJDIR)/lib_eu_work_metadata$(OBJEXT)  \
   $(OBJDIR)/lib_eu_work_metadatatest$(OBJEXT)  \
   $(OBJDIR)/lib_eu_work_value$(OBJEXT)  \
   $(OBJDIR)/lib_eu_work_valuetest$(OBJEXT)  \
+  $(OBJDIR)/lib_file_work_info$(OBJEXT)  \
   $(OBJDIR)/lib_ieee_ts754_work_float$(OBJEXT)  \
   $(OBJDIR)/lib_ieee_ts754_work_floattest$(OBJEXT)  \
   $(OBJDIR)/lib_log_ds$(OBJEXT)  \
   $(OBJDIR)/lib_log_work$(OBJEXT)  \
+  $(OBJDIR)/lib_log_work_exception$(OBJEXT)  \
   $(OBJDIR)/lib_log_work_message$(OBJEXT)  \
   $(OBJDIR)/lib_log_work_messagefactory$(OBJEXT)  \
   $(OBJDIR)/lib_mp_work_thread$(OBJEXT)  \
@@ -590,6 +689,9 @@ $(OBJDIR)/libdatr.open.source.a: \
   $(OBJDIR)/lib_time_work_datetime$(OBJEXT)  \
   $(OBJDIR)/lib_time_work_deltatime$(OBJEXT)  \
   $(OBJDIR)/lib_time_work_walltime$(OBJEXT)  \
+  $(OBJDIR)/lib_work_file$(OBJEXT)  \
+  $(OBJDIR)/lib_work_filetest$(OBJEXT)  \
+  $(OBJDIR)/lib_work_vectorwithoffsetcollectiontest$(OBJEXT)  \
   $(OBJDIR)/lib_work_version$(OBJEXT)  
 	@ $(AR) ru $@ $?
 	@ $(RANLIB) $@

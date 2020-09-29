@@ -10,8 +10,6 @@
 ///         deliberately avoiding using any lib_ files or routines.  We want    
 ///         the dev_test_work_test* to stand on its own.                        
 ///                                                                             
-///@author  David H. Flatman    DHF     davidflatman@email.com                  
-///                                                                             
 ///@version 2020-09-08  DHF     Removed dependency on ftime.                    
 ///                                                                             
 ///@version 2020-05-04  DHF     Open sourced                                    

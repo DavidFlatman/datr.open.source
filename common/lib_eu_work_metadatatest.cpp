@@ -1,9 +1,11 @@
 //------------------------------------------------------------------------------
 ///@file lib_eu_work_metadatatest.cpp                                           
 ///                                                                             
+///@par Classification: UNCLASSIFIED, OPEN SOURCE                               
+///                                                                             
 ///@author  Make Test Utility       MTU     Utility by DHF                      
 ///                                                                             
-///@version 2020-08-27  flatman     File creation via Make Test Utility         
+///@version 2020-08-27  DHF     File creation.                                  
 //------------------------------------------------------------------------------
 #include "lib_eu_work_metadatatest.h"
 #include "dev_test_work.h"

@@ -716,7 +716,7 @@ inline bool CLOSE(double l, double r) {return CLOSE(l, r, 0.00001L);}
             false                                                           \
           , #constructor " failed to throw " #exception, __FILE__, __LINE__ \
         );                                                                  \
-    } catch(exception)                                                      \
+    } catch(exception&)                                                      \
     {                                                                       \
         m_TestClass->conditionalTest(                                       \
             true                                                            \
@@ -795,7 +795,7 @@ inline bool CLOSE(double l, double r) {return CLOSE(l, r, 0.00001L);}
     try {                                                                   \
         cond;                                                               \
         FAIL(#cond ": exception not thrown");                               \
-    } catch(exceptionType) {                                                \
+    } catch(exceptionType&) {                                               \
         PASS(#cond ": exception thrown");                                   \
     } catch(...) {                                                          \
         FAIL(#cond ": wrong exception thrown");                             \

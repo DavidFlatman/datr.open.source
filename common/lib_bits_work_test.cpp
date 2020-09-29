@@ -1,9 +1,12 @@
 //------------------------------------------------------------------------------
-///@file lib_eu_work_test.cpp                                              
+///@file lib_eu_work_test.cpp                                                   
+///                                                                             
+///@par Classification: UNCLASSIFIED, OPEN SOURCE                               
 ///                                                                             
 ///@author  Make Test Utility       MTU     Utility by DHF                      
 ///                                                                             
-///@version 2020-09-01  flatman     File creation via Make Test Utility         
+///@version 2020-09-21  DHF     Made open source.                               
+///                                                                             
 //------------------------------------------------------------------------------
 #include "lib_bits_work_test.h"
 #include "dev_test_work_test.h"

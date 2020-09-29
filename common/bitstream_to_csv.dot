@@ -1,0 +1,112 @@
+//------------------------------------------------------------------------------
+///@brief   Preliminary design for bitstream_to_csv v1.0.0                      
+///                                                                             
+///@version 2020-09-15  DHF     File creation                                   
+//------------------------------------------------------------------------------
+
+
+digraph G {
+    rankdir="TB";
+    label="bitstream_to_csv v1.0.0 Preliminary Design";
+
+    node    [shape=component, color="#0000FF", style="rounded"]
+
+    publisher [label="lib::pod::msg::VectorWithOffsetFilePublisher", xlabel="--input", color="#000000"]
+    toRecord  
+      [
+        label= <
+          <table border="0" cellspacing="0">
+            <tr><td colspan="2">lib::vendor::boeing::missioncard::msg::VectorWithOffsetToRecordConversionLab</td></tr>
+            <tr><td></td><td align="left"><sup><i>
+              lib::vendor::boeing::missiongcard::work::VectorWithOffsetToRecordConversionLab
+            </i></sup></td></tr>
+            <tr><td></td><td align="left"><sup><i>
+              lib::vendor::boeing::missioncard::ds::Record
+            </i></sup></td></tr>
+          </table>
+        >
+      ]
+        
+
+    toEU      
+      [
+        xlabel="--dictionary"
+        label= <
+          <table border="0" cellspacing="0">
+            <tr><td colspan="2">lib::vendor::boeing::missioncard::msg::RecordToEngineeringUnitsConversionLab</td></tr>
+            <tr><td></td><td align="left"><sup><i>
+                lib::vendor::boeing::missioncard::work::RecordToEngineeringUnitsConversionLab
+            </i></sup></td></tr>
+
+            <tr><td></td><td align="left"><sup><i>
+                lib::dd::work::DataDictionary
+            </i></sup></td></tr>
+            <tr><td></td><td align="left"><sup><i>
+                lib::vendor::boeing::missioncard::work::DataDictionary
+            </i></sup></td></tr>
+
+            <tr><td></td><td align="left"><sup><i>
+                lib::xml::work::Document (existing)
+            </i></sup></td></tr>
+
+            <tr><td></td><td align="left"><sup><i>
+                lib::eu::ds::EngineeringUnitsCollection
+            </i></sup></td></tr>
+
+            <tr><td></td><td align="left"><sup><i>
+            </i></sup></td></tr>
+
+            <tr><td></td><td align="left"><sup><i>
+            </i></sup></td></tr>
+          </table>
+        >
+      ]
+    toCSV     [label="lib::eu::msg::EngineeringUnitsToCSVConversionLab"]
+    writer    [label="lib::nopod::msg::LineLimitedWihtHeaderFileWriter", xlabel="--output", color="#000000"]
+
+    publisher -> toRecord edge[color="#000000", label="lib::ds::VectorWithOffset"]
+
+    toRecord -> toEU edge[color="#0000FF", label="lib::vendor::boeing::missioncard::ds::Record"]
+
+
+    toEU -> toCSV
+    edge[color="#0000FF", label="lib::eu::ds::EngineeringUnitsCollection"]
+
+    toCSV -> writer
+    edge[color="#000000", label="lib::nonpod::ds::StringVectorWithOffset"]
+
+/*
+    subgraph class_id {
+        style="filled";
+        color="#f0f0f0";
+        rank ="sink";
+        node [shape=plaintext];
+
+        my_description [
+            labeljust="L"
+            label=
+            <<table border="0" cellborder="0">
+              <tr>
+                <td valign="top">VectorWithOffsetToRecordConversionLab\l</td>
+                <td>
+                  *   lib::vendor::boeing::missiongcard::work::VectorWithOffsetToRecordConversionLab\l
+                  *   lib::vendor::boeing::missioncard::ds::Record\l
+                </td>
+              </tr><tr>
+                <td>RecordToEngineeringUnits\l</td>
+                <td>
+                  *   lib::vendor::boeing::missioncard::work::RecordToEngineeringUnits\l
+                  *   lib::vendor::boeing::missioncard::ds::Record\l
+                  *   lib::vendor::boeing::missioncard::work::DataDictionary\l
+                  *   lib::eu::ds::EngineeringUnitsCollection\l
+                </td>
+              </tr>
+            </table>>
+        ]
+
+    } // class_id
+*/
+
+}   //digraph G
+
+

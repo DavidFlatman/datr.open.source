@@ -89,8 +89,8 @@
 ///                     -   Test that the file exists before using it:          
 ///                                                                             
 ///                         @code                                               
-///                             TEST(lib::file::Info::exists(path));            
-///                             if (lib::file::Info::exists(path)) {            
+///                             TEST(lib::file::work::Info::exists(path));      
+///                             if (lib::file::work::Info::exists(path)) {      
 ///                                 // tests with file                          
 ///                             }                                               
 ///                         @endcode                                            

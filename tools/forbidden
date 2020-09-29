@@ -48,7 +48,8 @@
 
 local $font_red    = sprintf("%c[1;31m", 27);
 #local $font_green  = sprintf("%c[1;32m", 27);
-local $font_yellow = sprintf("%c[1;33m", 27);
+#local $font_yellow = sprintf("%c[1;33m", 27);
+local $font_yellow = sprintf("%c[38;2;128;80;0m", 27);
 local $font_blue   = sprintf("%c[1;34m", 27);
 local $font_magenta= sprintf("%c[1;35m", 27);
 local $font_cyan   = sprintf("%c[1;36m", 27);

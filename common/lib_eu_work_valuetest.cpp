@@ -3,7 +3,7 @@
 ///                                                                             
 ///@author  Make Test Utility       MTU     Utility by DHF                      
 ///                                                                             
-///@version 2020-09-01  flatman     File creation via Make Test Utility         
+///@version 2020-09-01  DHF     File creation via Make Test Utility         
 //------------------------------------------------------------------------------
 #include "lib_eu_work_valuetest.h"
 #include "dev_test_work_test.h"

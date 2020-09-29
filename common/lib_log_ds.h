@@ -81,6 +81,8 @@ using class_t = uint16_t;
 static const class_t MAIN                                              = 0x0001;
 static const class_t LIB_MP_THREADABLE_COLLECTION                      = 0x0002;
 static const class_t LIB_MP_THREADINFO                                 = 0x0003;
+static const class_t LIB_LOG_WORK_EXCEPTION                            = 0x0004;
+static const class_t LIB_WORK_FILE                                     = 0x0005;
 static const class_t CLASS_UNKNOWN                                     = 0xFFFF;
 
 

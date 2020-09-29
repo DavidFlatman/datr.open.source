@@ -2,9 +2,9 @@
 ///                                                                             
 ///@file lib_work_executebeforemain.h                                           
 ///                                                                             
-///@par  Classification:  UNCLASSIFIED                                          
+///@par Classification: UNCLASSIFIED, OPEN SOURCE                               
 ///                                                                             
-///@author  David H. Flatman    DHF     david.flatman.ctr@navy.mil              
+///@version 2020-09-21  DHF     Made open source.                               
 ///                                                                             
 ///@version 2019-08-15  DHF     Modified class EMBI_ to declare the variable    
 ///                             static to avoid linker errors.                  
@@ -16,9 +16,7 @@
 #ifndef LIB_WORK_EXECUTEBEFOREMAIN_H_FILE_GUARD
 #define LIB_WORK_EXECUTEBEFOREMAIN_H_FILE_GUARD
 
-#ifndef CONCAT4
-#define CONCAT4(a, b, c, d) a ## b ## c ## d
-#endif
+#include "lib_macro.h"
 
 //------------------------------------------------------------------------------
 ///@brief   Execute code before and after int main(int argc, char* argv[])      

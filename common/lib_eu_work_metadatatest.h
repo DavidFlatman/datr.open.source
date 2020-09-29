@@ -21,7 +21,7 @@ namespace test {
 ///                                                                             
 ///@author  Make Test Utility       MTU     Utility by DHF                      
 ///                                                                             
-///@version 2020-08-27  flatman     File creation via Make Test Utility         
+///@version 2020-08-27  DHF     File creation via Make Test Utility             
 ///                                                                             
 //------------------------------------------------------------------------------
 class MetaDataTest : public dev::test::work::Test {

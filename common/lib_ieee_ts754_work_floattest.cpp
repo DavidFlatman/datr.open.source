@@ -1,9 +1,11 @@
 //------------------------------------------------------------------------------
 ///@file lib_ieee_work_floattest.cpp                                            
 ///                                                                             
+///@par Classification: UNCLASSIFIED, OPEN SOURCE                               
+///                                                                             
 ///@author  Make Test Utility       MTU     Utility by DHF                      
 ///                                                                             
-///@version 2020-09-01  flatman     File creation via Make Test Utility         
+///@version 2020-09-01  DHF         File creation via Make Test Utility         
 //------------------------------------------------------------------------------
 #include "lib_ieee_ts754_work_floattest.h"
 #include "dev_test_work_test.h"
@@ -57,7 +59,7 @@ Test::~Test()
 //------------------------------------------------------------------------------
 Test& Test::operator=(const Test& that)
 {
-    Test::operator=(that);
+    dev::test::work::Test::operator=(that);
     return *this;
 } // Test::operator=(const Test& that) //                                       
 

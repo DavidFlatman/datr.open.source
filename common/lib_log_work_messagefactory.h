@@ -45,8 +45,6 @@ namespace work {
 ///             }                                                               
 ///         @endcode                                                            
 ///                                                                             
-///@author  David H. Flatman        DHF     davidflatman@email.com              
-///                                                                             
 ///@version 2020-05-04  DHF     Open sourced                                    
 ///                                                                             
 ///@version 2014-10-02  DHF     lib::DateTime moved to lib::time::work::DateTime

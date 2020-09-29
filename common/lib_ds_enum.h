@@ -1,6 +1,6 @@
 //------------------------------------------------------------------------------
 ///@file lib_ds_enum.h                                                          
-///@par  Classification:  UNCLASSIFIED                                          
+///@par Classification: UNCLASSIFIED, OPEN SOURCE                               
 //------------------------------------------------------------------------------
 
 #ifndef LIB_DS_ENUM_H_FILE_GUARD
@@ -162,9 +162,8 @@
 ///                                                                             
 ///         The DATR locationalization will make all of the strings "red".      
 ///                                                                             
-///@author  David H. Flatman        DHF     davidflatman@email.comments         
 ///                                                                             
-///@author  Magnus N. Tafvelin      MNT     magnus.tafvelin@navy.mil            
+///@version 2020-09-21  DHF     Made open source.                               
 ///                                                                             
 ///@version 2020-02-24  DHF     Visual Studio has thread local issues.          
 ///                                                                             

@@ -6,8 +6,6 @@
 ///                                                                             
 ///@brief   Hold the data structures and constants for lib::time:: namesapce.   
 ///                                                                             
-///@author  David H. Flatman    DHF     davidflatman@email.com                  
-///                                                                             
 ///@version 2020-05-04  DHF     Open sourced                                    
 ///                                                                             
 ///@version 2014-10-02  DHF     File creation.                                  

@@ -1,0 +1,25 @@
+/*!
+                                                                                
+@note   When something is converted from datr to datr.open.source, it must      
+        remove:                                                                 
+            -   All references to customer test items                           
+            -   All full names of developers (leaving initials is okay)         
+            -   Remove all boost-isms                                           
+                    -   boost::shared_ptr becomes lib::ds::shared_ptr           
+                                                                                
+                                                                                
+@par Modules:                                                                   
+    -   lib::msg::FilePublisher<lib::ds::VectorWithOffset<uint8_t>>             
+            Converted from datr/common to open source.                          
+                                                                                
+            -   lib_pod_work_vectorwithoffsetfilereader.h                       
+                    Converted from datr/common to open source                   
+                                                                                
+    -   lib::msg::BitStreamToPacketConversionLab                                
+            -   lib::work::BitStreamToPacketConversionLab                       
+            -   lib::work::VectorWithOffsetCollection                           
+                    Convert from datr/common to open source                     
+                                                                                
+                                                                                
+                                                                                
+*/                                                                              

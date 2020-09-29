@@ -5,8 +5,6 @@
 ///                                                                             
 ///@par Classification:  UNCLASSIFIED, OPEN SOURCE                              
 ///                                                                             
-///@author  David H. Flatman    DHF         davidflatman@email.com              
-///                                                                             
 //------------------------------------------------------------------------------
 #ifndef LIB_MSG_PUBLISHER_H
 #define LIB_MSG_PUBLISHER_H
