@@ -43,8 +43,12 @@ namespace qt {
 ///         }
 ///     @endcode
 ///
-///@version 2020-09-28  PN     File creation. Added constructors, destructor,
-///                            getListOfFiles()
+///@version 2020-09-29  PN     Added QList<QString> filesList(), QString
+///                            currentDirectory, and
+///                            getFilesInCurrentDirectory().
+///@version 2020-09-28  PN     File creation. Added constructors, destructor
+///                            , keyPressHandler(), onPathChange(), and
+///                            , eventFilter().
 //------------------------------------------------------------------------------
 class PathRememberField
     : public LineEditRememberField
