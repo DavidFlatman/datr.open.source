@@ -33,7 +33,7 @@ FormatSelectorRememberField::FormatSelectorRememberField(
     addItem("DATR", "yyyy-MM-dd HH:mm:ss");
     if(!rememberedValue().isEmpty())
     {
-        setValue(rememberedValue());
+        addItem("Remembered Format", rememberedValue());
     }
 } // FormatSelectorRememberField::FormatSelectorRememberField() //
 
@@ -114,13 +114,12 @@ QString FormatSelectorRememberField::value() const
 } // FormatSelectorRememberField::value() //
 
 //------------------------------------------------------------------------------
-///@brief Set the remembered format to be added to the format selector. Will not
-///       add a format that is already in the list.
+///@brief Set the current selected format to a new format.
 ///@param new_value    QString containing the new format to be added.
 //------------------------------------------------------------------------------
 void FormatSelectorRememberField::setValue(QString const& new_value)
 {
-    addFormat("Remembered Format", new_value);
+    setItemData(currentIndex(), new_value);
 } // FormatSelectorRememberField::setValue()
 } // namespace qt //
 } // namespace lib //

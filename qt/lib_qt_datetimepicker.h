@@ -95,45 +95,45 @@ class DateTimePicker : public QGroupBox
 {
     Q_OBJECT
 
-public:
-    explicit DateTimePicker(
-          QString const& title
-        , QWidget* parent = nullptr
-    );
-    ~DateTimePicker();
+    public:
+        explicit DateTimePicker(
+              QString const& title
+            , QWidget* parent = nullptr
+        );
+        ~DateTimePicker();
 
 //------------------------------------------------------------------------------
 // Each QCalenderWidget and QTimeEdit will have a min and max.
 //------------------------------------------------------------------------------
-    void setMinimumDate(QDate const& new_date);
-    void setMaximumDate(QDate const& new_date);
-    void setMinimumTime(QTime const& new_time);
-    void setMaximumTime(QTime const& new_time);
-    void setDate(QDate const& new_date);
-    void setTime(QTime const& new_time);
-    void setLineEdit(QString const& new_date_time);
-    void showPicker();
-    void hidePicker();
-    void addFormat(QString const& text, QString const& format);
-    void removeFormat(QString const& text);
-    QDate date() const;
-    QTime time() const;
+        void setMinimumDate(QDate const& new_date);
+        void setMaximumDate(QDate const& new_date);
+        void setMinimumTime(QTime const& new_time);
+        void setMaximumTime(QTime const& new_time);
+        void setDate(QDate const& new_date);
+        void setTime(QTime const& new_time);
+        void setLineEdit(QString const& new_date_time);
+        void showPicker();
+        void hidePicker();
+        void addFormat(QString const& text, QString const& format);
+        void removeFormat(QString const& text);
+        QDate date() const;
+        QTime time() const;
 
-public slots:
-    void todayButtonPressed();
-    void nowButtonPressed();
-    void okButtonPressed();
-    void onDateChange();
-    void onTimeChange();
-    void updateLineEdit();
+    public slots:
+        void todayButtonPressed();
+        void nowButtonPressed();
+        void okButtonPressed();
+        void onDateChange();
+        void onTimeChange();
+        void updateLineEdit();
 
-signals:
-    void acceptChanges();
+    signals:
+        void acceptChanges();
 
-private:
-    struct Data;
-    std::unique_ptr<Data> m_Data;
-    void populateList();
+    private:
+        struct Data;
+        std::unique_ptr<Data> m_Data;
+        void populateList();
 }; // class DateTimePicker //
 } // namespace qt //
 } // namespace lib //

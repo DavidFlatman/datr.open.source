@@ -36,11 +36,15 @@ namespace qt {
 ///                                                                             
 ///@par Expected Usage:                                                         
 ///     @code
-///         LineEditRememberField(QString);
-///         LineEditRememberField(QString, QString);
-///         ~LineEditRememberField();
-///         QString value()
-///         setValue(QString)
+///         struct MyField::Data
+///         {
+///              QHBoxLayout*                m_Layout;
+///              LineEditRememberField*      m_Path;
+///
+///             MyField() {
+///                 m_Layout->addWidget(m_Path);
+///             }
+///         }
 ///     @endcode
 ///
 ///@version 2020-08-25  PN     Update documentation to DATR standards.
