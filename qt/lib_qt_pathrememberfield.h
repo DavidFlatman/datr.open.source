@@ -8,8 +8,6 @@
 
 #include "lib_qt_lineeditrememberfield.h"
 
-#include <QList>
-
 namespace lib {
 namespace qt {
 
@@ -24,11 +22,11 @@ namespace qt {
 ///
 ///@par Class Knowledge
 ///         -   This class knows about:
-///             -   LineEditRememberField
+///             -   LineEditRememberField class.
 ///         -   This class hides:
+///             -   The autocomplete mechanism.
 ///         -   This class is agnostic about:
-///             -   The underlying handler for <DOWN-ARROW> and <UP-ARROW> key
-///                 press.
+///             -   How the <DOWN-ARROW> and <UP-ARROW> key press is detected.
 ///
 ///@par Expected Usage:
 ///     @code
@@ -43,6 +41,7 @@ namespace qt {
 ///         }
 ///     @endcode
 ///
+///@version 2020-09-30  PN     Moved updateFilesList() to private.
 ///@version 2020-09-29  PN     Added QList<QString> filesList() and
 ///                            updateFilesList(). Removed onPathChange().
 ///@version 2020-09-28  PN     File creation. Added constructors, destructor,
@@ -64,14 +63,14 @@ class PathRememberField
           );
         ~PathRememberField();
 
-        void autoCompletePath();
-        void updateFilesList();
-
     protected:
-        bool eventFilter(QObject* obj, QEvent *event) override;
+        virtual void keyPressEvent(QKeyEvent *event) override;
 
     private:
-        QList<QString> filesList();
+        QStringList filesList;
+        int index;
+        void updateFilesList();
+        void autoCompletePath();
 }; // class PathRememberField //
 } // namespace lib //
 } // namespace qt //

@@ -2,6 +2,8 @@
 ///@file lib_qt_pathfield.cpp                                                   
 ///@par  Classification:  UNCLASSIFIED, OPEN SOURCE                             
 ///
+///@version 2020-08-30  PN     Update setIfWarnExists() and setMustExist() for
+///                            error handling.
 ///@version 2020-08-25  PN     Update documentation to DATR standards.
 ///@version 2020-08-20  PN     Remove QLineEdit from Data struct. Added
 ///                            lineEditRememberField to Data struct.
@@ -64,7 +66,7 @@ struct PathField::Data
 //------------------------------------------------------------------------------
 // Load previously opened directory for QFileDialog to open from.
 //------------------------------------------------------------------------------
-        m_Directory = QFileInfo(m_Path->text()).dir().path();
+        m_Directory = QFileInfo(m_Path->value()).dir().path();
     }
 }; // struct PathField::Data //
 
@@ -114,7 +116,7 @@ void PathField::openDialog()
     if(!filePath.isEmpty() && !filePath.isNull())
     {
         m_Data->m_Directory = QFileInfo(filePath).dir().path();
-        m_Data->m_Path->setText(filePath);
+        m_Data->m_Path->setValue(filePath);
     } else {
         qDebug() << "Warning: openDialog() file not selected";
     }
@@ -126,12 +128,12 @@ void PathField::openDialog()
 //------------------------------------------------------------------------------
 void PathField::onPathChange()
 {
-    if(!m_Data->m_Path->text().isEmpty() && !m_Data->m_Path->text().isNull())
+    if(!m_Data->m_Path->value().isEmpty() && !m_Data->m_Path->value().isNull())
     {
         if(isRelativePath())
         {
             m_Data->m_Path->setValue(
-                        QFileInfo(m_Data->m_Path->text())
+                        QFileInfo(m_Data->m_Path->value())
                         .absoluteFilePath()
                         );
         }
@@ -143,7 +145,7 @@ void PathField::onPathChange()
 //------------------------------------------------------------------------------
 bool PathField::isRelativePath() const
 {
-    return QFileInfo(m_Data->m_Path->text()).isRelative();
+    return QFileInfo(m_Data->m_Path->value()).isRelative();
 } // PathField::isRelativePath() //
 
 //------------------------------------------------------------------------------
@@ -151,25 +153,25 @@ bool PathField::isRelativePath() const
 //------------------------------------------------------------------------------
 bool PathField::verifyCriteria() const
 {
-    if(m_Data->m_Path->text() == "")
+    if(m_Data->m_Path->value().isEmpty())
     {
         qDebug() << "Warning: verifyCriteria() file not selected!";
         return false;
     }
     if(m_Data->m_MustExist)
     {
-        if(!QFile(m_Data->m_Path->text()).exists())
+        if(!QFile(m_Data->m_Path->value()).exists())
         {
             qDebug() << "Warning: verifyCriteria() file does not exist!"
-                     << m_Data->m_Path->text();
+                     << m_Data->m_Path->value();
             return false;
         }
     } else if(m_Data->m_WarnIfExists)
     {
-        if(QFile(m_Data->m_Path->text()).exists())
+        if(QFile(m_Data->m_Path->value()).exists())
         {
             qDebug() << "Warning: verifyCriteria() file exists!"
-                     << m_Data->m_Path->text();
+                     << m_Data->m_Path->value();
         }
     }
     m_Data->m_ValidFilePath = true;
@@ -200,7 +202,13 @@ void PathField::setTitle(QString const& new_title)
 //------------------------------------------------------------------------------
 void PathField::setMustExist(bool state)
 {
-    m_Data->m_MustExist = state;
+    if(state && m_Data->m_WarnIfExists)
+    {
+        qDebug() << "Warning: setWarnIfExists() can't have both mustExist and "
+                    "warnIfExists set to true";
+    } else {
+        m_Data->m_MustExist = state;
+    }
 } // PathField::setMustExist() //
 
 //------------------------------------------------------------------------------
@@ -210,7 +218,13 @@ void PathField::setMustExist(bool state)
 //------------------------------------------------------------------------------
 void PathField::setWarnIfExists(bool state)
 {
-    m_Data->m_WarnIfExists = state;
+    if(state && m_Data->m_MustExist)
+    {
+        qDebug() << "Warning: setWarnIfExists() can't have both mustExist and "
+                    "warnIfExists set to true";
+    } else {
+        m_Data->m_WarnIfExists = state;
+    }
 } // PathField::setWarnIfExists() //
 
 //------------------------------------------------------------------------------

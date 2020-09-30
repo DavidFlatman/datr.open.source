@@ -12,6 +12,8 @@
 
 #include "lib_qt_lineeditrememberfield.h"
 
+#include <QDir>
+
 namespace lib {
 namespace qt {
 
@@ -62,7 +64,7 @@ QString LineEditRememberField::value() const
 //------------------------------------------------------------------------------
 void LineEditRememberField::setValue(QString const& new_value)
 {
-    QLineEdit::setText(new_value);
+    QLineEdit::setText(QDir::toNativeSeparators(new_value));
 } // LineEditRememberField::setValue() //
 } // namespace qt //
 } // namespace lib //
