@@ -2,6 +2,8 @@
 ///@file lib_qt_pathfield.cpp                                                   
 ///@par  Classification:  UNCLASSIFIED, OPEN SOURCE                             
 ///
+///@version 2020-10-05  PN     Removed verifyCritera() and updated
+///                            onPathChange().
 ///@version 2020-08-30  PN     Update setIfWarnExists() and setMustExist() for
 ///                            error handling.
 ///@version 2020-08-25  PN     Update documentation to DATR standards.
@@ -54,7 +56,7 @@ struct PathField::Data
         , m_Path(new PathRememberField(field_name, nullptr))
         , m_ThreeDots(new QPushButton("..."))
         , m_Title(field_name)
-        , m_MustExist(false)
+        , m_MustExist(true)
         , m_WarnIfExists(false)
         , m_ValidFilePath(false)
     {
@@ -116,26 +118,30 @@ void PathField::openDialog()
         m_Data->m_Directory = QFileInfo(filePath).dir().path();
         m_Data->m_Path->setValue(filePath);
     } else {
-        qDebug() << "Warning: openDialog() file not selected";
+        qDebug() << "openDialog() No file was selected";
     }
 } // void PathField::openDialog() //
 
 //------------------------------------------------------------------------------
-///@brief Update m_Path to contain abosulute path and call to verifyCriteria().
+///@brief When QLineEdit is changed, verify if value fulfills criteria for
+///       m_MustExist.
 ///@pre QLineEdit must be initialized and connected to this slot.
 //------------------------------------------------------------------------------
 void PathField::onPathChange()
 {
     if(!m_Data->m_Path->value().isEmpty() && !m_Data->m_Path->value().isNull())
     {
-        if(isRelativePath())
+        if(m_Data->m_MustExist && !QFile(m_Data->m_Path->value()).exists())
         {
-            m_Data->m_Path->setValue(
-                        QFileInfo(m_Data->m_Path->value())
-                        .absoluteFilePath()
-                        );
+            qDebug() << "Warning: verifyCriteria() file does not exist!"
+                     << m_Data->m_Path->value();
         }
-        verifyCriteria();
+        if(m_Data->m_WarnIfExists && QFile(m_Data->m_Path->value()).exists())
+        {
+            qDebug() << "Warning: verifyCriteria() file exists!"
+                     << m_Data->m_Path->value();
+        }
+        m_Data->m_ValidFilePath = true;
     }
 } // void PathField::onPathChange() //
 //------------------------------------------------------------------------------
@@ -145,36 +151,6 @@ bool PathField::isRelativePath() const
 {
     return QFileInfo(m_Data->m_Path->value()).isRelative();
 } // PathField::isRelativePath() //
-
-//------------------------------------------------------------------------------
-///@brief Checks whether m_Path is valid given field criteria; mustExist.
-//------------------------------------------------------------------------------
-bool PathField::verifyCriteria() const
-{
-    if(m_Data->m_Path->value().isEmpty())
-    {
-        qDebug() << "Warning: verifyCriteria() file not selected!";
-        return false;
-    }
-    if(m_Data->m_MustExist)
-    {
-        if(!QFile(m_Data->m_Path->value()).exists())
-        {
-            qDebug() << "Warning: verifyCriteria() file does not exist!"
-                     << m_Data->m_Path->value();
-            return false;
-        }
-    } else if(m_Data->m_WarnIfExists)
-    {
-        if(QFile(m_Data->m_Path->value()).exists())
-        {
-            qDebug() << "Warning: verifyCriteria() file exists!"
-                     << m_Data->m_Path->value();
-        }
-    }
-    m_Data->m_ValidFilePath = true;
-    return true;
-} // PathField::isValidPath() //
 
 //------------------------------------------------------------------------------
 ///@brief Set m_Type in m_Data.

@@ -75,6 +75,7 @@ namespace qt {
 ///         };
 ///     @endcode
 ///
+///@version 2020-10-05  PN     Removed verifyCritera().
 ///@version 2020-08-25  PN     Update documentation to DATR standards.
 ///@version 2020-08-18  PN     Removed openDialogHelper(), and close(). Changed
 ///                            isAbsolutePath() to isRelativePath() and
@@ -134,7 +135,6 @@ class PathField
         struct Data;
         std::unique_ptr<Data> m_Data;
         bool isRelativePath() const;
-        bool verifyCriteria() const;
 
 }; // class PathField //
 } // namespace qt //
