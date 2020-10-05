@@ -77,8 +77,8 @@ DateTimeField::~DateTimeField()
 } // DateTimeField::~DateTimeField() //
 
 //------------------------------------------------------------------------------
-///@brief Set the minimum available date for user selection in m_DateTimePicker.
-///@param new_date    QDate containing the minimum date avaialble for user
+///@brief Set the minimum date available for user selection in m_DateTimePicker.
+///@param new_date    QDate containing the minimum date available for user
 ///                   selection.
 //------------------------------------------------------------------------------
 void DateTimeField::setMinimumDate(QDate const& new_date)
@@ -87,8 +87,8 @@ void DateTimeField::setMinimumDate(QDate const& new_date)
 } // DateTimeField::setMinimumDateTime() //
 
 //------------------------------------------------------------------------------
-///@brief Set the maximum available date for user selection in m_DateTimePicker.
-///@param new_date    QDate containing the maximum date avaialble for user
+///@brief Set the maximum date available for user selection in m_DateTimePicker.
+///@param new_date    QDate containing the maximum date available for user
 ///                   selection.
 //------------------------------------------------------------------------------
 void DateTimeField::setMaximumDate(QDate const& new_date)
@@ -97,9 +97,10 @@ void DateTimeField::setMaximumDate(QDate const& new_date)
 } // DateTimeField::setMaximumDateTime() //
 
 //------------------------------------------------------------------------------
-///@brief Set the minimum available time for user selection in m_DateTimePicker.
-///@param new_date    QDate containing the minimum time avaialble for user
-///                   selection.
+///@brief Set the minimum time available for user selection in m_DateTimePicker.
+///@param new_time    QTime containing the minimum time available for user
+///                   selection. Only QTime.minute = 0 or QTime.minute = 30 is
+///                   allowed.
 //------------------------------------------------------------------------------
 void DateTimeField::setMinimumTime(QTime const& new_time)
 {
@@ -107,8 +108,8 @@ void DateTimeField::setMinimumTime(QTime const& new_time)
 } // DateTimeField::setMinimumDateTime() //
 
 //------------------------------------------------------------------------------
-///@brief Set the maximum available time for user selection in m_DateTimePicker.
-///@param new_date    QDate containing the maximum time avaialble for user
+///@brief Set the maximum time available for user selection in m_DateTimePicker.
+///@param new_time    QTime containing the maximum time available for user
 ///                   selection. Only QTime.minute = 0 or QTime.minute = 30 is
 ///                   allowed.
 //------------------------------------------------------------------------------
@@ -121,7 +122,7 @@ void DateTimeField::setMaximumTime(QTime const& new_time)
 ///@brief Add a new format to the format selector.
 ///@param text    QString containing the text to be displayed on format
 ///               selector.
-///       format    QString containing the format.
+///       format  QString containing the QDateTime format.
 //------------------------------------------------------------------------------
 void DateTimeField::addFormat(QString const& text, QString const& format)
 {
@@ -130,7 +131,8 @@ void DateTimeField::addFormat(QString const& text, QString const& format)
 
 //------------------------------------------------------------------------------
 ///@brief Remove a format from the format selector.
-///@param row    Int containing the row of the format to be removed.
+///@param text   QString containing the displayed text in the selector of the
+///              format to be removed.
 //------------------------------------------------------------------------------
 void DateTimeField::removeFormat(QString const& text)
 {

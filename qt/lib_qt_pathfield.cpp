@@ -24,12 +24,10 @@
 #include "lib_qt_pathrememberfield.h"
 
 #include <QApplication>
-#include <QDir>
 #include <QDebug>
 #include <QFileDialog>
 #include <QFileInfo>
 #include <QHBoxLayout>
-#include <QLineEdit>
 #include <QPushButton>
 #include <QString>
 

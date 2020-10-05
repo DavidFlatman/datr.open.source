@@ -104,6 +104,7 @@ class RememberField
         );
         virtual ~RememberField();
 
+    protected:
         virtual QString rememberedValue() const;
         virtual void setRememberedValue(QString const& value);
 

@@ -13,7 +13,6 @@
 
 #include <QDebug>
 #include <QDir>
-#include <QEvent>
 #include <QKeyEvent>
 
 namespace lib {

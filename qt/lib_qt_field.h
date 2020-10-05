@@ -56,13 +56,13 @@ class Field
 {
     public:
         virtual QString name() const;
-        virtual QString value() const = 0;
-        virtual void setValue(QString const& new_value) = 0;
         virtual void setName(QString const& new_name);
 
     protected:
         explicit Field(QString const& name = "field");
         virtual ~Field();
+        virtual QString value() const = 0;
+        virtual void setValue(QString const& new_value) = 0;
 
     private:
         QString m_Name;

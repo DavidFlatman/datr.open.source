@@ -2,6 +2,7 @@
 ///@file lib_qt_datetimepicker.cpp
 ///@par  Classification:  UNCLASSIFIED, OPEN SOURCE
 ///
+///@version 2020-09-30  ON     Replaced std::cout warninings with qDebug().
 ///@version 2020-09-21  PN     Added addFormat() and removeFormat(). Replaced
 ///                            QComboBox with FormatSelectorRememberField.
 ///@version 2020-09-18  PN     Replaced QTreeWidget with QListWidget and added a
@@ -33,7 +34,6 @@
 ///                            , setValue(), name(), setName(), openDialog()
 ///                            , onDateChange(), and isValidDate().
 ///@version 2020-09-03  PN     File creation.
-///
 //------------------------------------------------------------------------------
 
 #include "lib_qt_datetimepicker.h"
