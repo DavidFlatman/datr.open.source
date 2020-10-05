@@ -2,8 +2,8 @@
 ///@file lib_qt_pathfield.cpp                                                   
 ///@par  Classification:  UNCLASSIFIED, OPEN SOURCE                             
 ///
-///@version 2020-10-05  PN     Removed verifyCritera() and updated
-///                            onPathChange().
+///@version 2020-10-05  PN     Removed verifyCritera(), isRelativePath() and
+///                            updated onPathChange().
 ///@version 2020-08-30  PN     Update setIfWarnExists() and setMustExist() for
 ///                            error handling.
 ///@version 2020-08-25  PN     Update documentation to DATR standards.
@@ -56,7 +56,7 @@ struct PathField::Data
         , m_Path(new PathRememberField(field_name, nullptr))
         , m_ThreeDots(new QPushButton("..."))
         , m_Title(field_name)
-        , m_MustExist(true)
+        , m_MustExist(false)
         , m_WarnIfExists(false)
         , m_ValidFilePath(false)
     {
@@ -144,13 +144,6 @@ void PathField::onPathChange()
         m_Data->m_ValidFilePath = true;
     }
 } // void PathField::onPathChange() //
-//------------------------------------------------------------------------------
-///@brief Checks whether the m_Paths is the relative file path.
-//------------------------------------------------------------------------------
-bool PathField::isRelativePath() const
-{
-    return QFileInfo(m_Data->m_Path->value()).isRelative();
-} // PathField::isRelativePath() //
 
 //------------------------------------------------------------------------------
 ///@brief Set m_Type in m_Data.

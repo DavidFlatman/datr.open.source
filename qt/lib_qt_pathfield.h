@@ -134,7 +134,6 @@ class PathField
     private:
         struct Data;
         std::unique_ptr<Data> m_Data;
-        bool isRelativePath() const;
 
 }; // class PathField //
 } // namespace qt //
