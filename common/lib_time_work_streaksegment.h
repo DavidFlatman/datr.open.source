@@ -14,10 +14,10 @@
 #include "lib_log_ds.h"
 #include "lib_log_message.h"
 //#include "lib_log_work_exception.h"
-#include "lib_time_ds_commonstreakparams.h"
+//#include "lib_time_ds_commonstreakparams.h"
 #include "lib_time_work_deltatime.h"
 #include "lib_time_work_instrumentationtime.h"
-#include "lib_time_work_streakanalysisconfig.h"
+//#include "lib_time_work_streakanalysisconfig.h"
 
 namespace lib {
 namespace time {

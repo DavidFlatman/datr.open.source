@@ -6,7 +6,7 @@
 #define LIB_TIME_WORK_H_FILE_GUARD
 
 #include "lib_time_work_range.h"
-#include "lib_commandline.h"
+//#include "lib_commandline.h"
 #include "lib_log_messagefactory.h"
 #include "lib_log_work_messagegenerator.h"
 
