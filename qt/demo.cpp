@@ -1,22 +1,15 @@
-//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------                                                                         
+///@file demo.cpp
+///@par  Classification:  UNCLASSIFIED, OPEN SOURCE
+///@brief   Demonstrate a prototype for Qt Mdi window.
 ///                                                                             
-///@file demo.cpp                                                               
-///                                                                             
-///@brief   Demonstrate that the Qt build is working along with linking         
-///         against the datr.open.source code.                                  
-///                                                                             
-///@version 2020-09-08  DHF     File creation.                                  
-///                                                                             
+///@version 2020-10-07  PN     File creation.
 //------------------------------------------------------------------------------
 
-//------------------------------------------------------------------------------
-//  Pull in any of the datr.open.source code files.                             
-//------------------------------------------------------------------------------
-#include "lib_bits_work.h"
+#include "lib_qt_mainwindow.h"
 
 #include <QApplication>
-#include <QLabel>
-#include <QString>
+#include <QCoreApplication>
 
 int main(int argc, char* argv[])
 {
@@ -24,26 +17,12 @@ int main(int argc, char* argv[])
     //  Initialize the Qt application.                                          
     //--------------------------------------------------------------------------
     QApplication app(argc, argv);
+    QCoreApplication::setOrganizationName("DATR");
+    QCoreApplication::setOrganizationDomain("navy.mil");
+    QCoreApplication::setApplicationName("MdiWindowPrototype");
 
-    //--------------------------------------------------------------------------
-    //  Call some datr.open.source code.                                        
-    //--------------------------------------------------------------------------
-    char memory[] { 0x55, 0xAA};
-
-    QString message("Bit pattern: ");
-
-    for (int i=0; i < sizeof(memory) * 8; ++i)
-    {
-        message += (lib::bits::work::isBitSet(&memory[0], i)) ? "1" : "0";
-    }
-
-
-    //--------------------------------------------------------------------------
-    //  Create a Qt widget, display it, and execute the Qt application.         
-    //--------------------------------------------------------------------------
-    QLabel  label(message);
-
-    label.show();
+    lib::qt::MainWindow main_window(nullptr);
+    main_window.show();
 
     return app.exec();
 }

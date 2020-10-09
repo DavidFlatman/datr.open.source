@@ -26,14 +26,22 @@ INCLUDEPATH     += ../qt
 INCLUDEPATH     += ../qt/images
 INCLUDEPATH     += ../common
 
-LIBS            += ../linux/obj/libdatr.open.source.a
-
 DESTDIR         =   bin
 OBJECTS_DIR     =   obj
 MOC_DIR         =   moc
 
 
 
-SOURCES         += ../qt/demo.cpp
+SOURCES         += ../qt/demo.cpp \
+    ../qt/lib_qt_childwindow.cpp \
+    ../qt/lib_qt_mainwindow.cpp \
+    ../qt/lib_qt_parameter.cpp \
+    ../qt/lib_qt_record.cpp
+
+HEADERS += \
+    ../qt/lib_qt_childwindow.h \
+    ../qt/lib_qt_mainwindow.h \
+    ../qt/lib_qt_parameter.h \
+    ../qt/lib_qt_record.h
 
 
