@@ -28,10 +28,12 @@
 #   -qpath          qrc resource file                                           
 #   -TDpath         Path to target dependency                                   
 #                                                                               
-#   version 2020-03-05  DHF     Added -qt option                                
-#                                                                               
 #   version 2012-01-26  DHF     Added -TD                                       
 #                               Add comment header to output                    
+#
+#   version 2020-03-05  DHF     Added -qt option                                
+#                                                                               
+#   version 2020-09-23  MNT     Made the X11 flag OS dependant
 #-------------------------------------------------------------------------------
 
 use POSIX qw{strftime};
@@ -96,10 +98,13 @@ for my $a (@ARGV)
 
 $config{"qt"} = 1;
 $config{"thread"} = 1;
-$config{"x11"} = 1;
 $config{"stl"} = 1;
 $config{"largefile"} = 1;
 $config{"warn_off"} = 1;
+
+if($^O ne 'darwin') {
+    $config{"x11"} = 1;
+}
 
 open(QRC, ">${qrc_file}") or die "unable to open ${qrc_file}\n$!\n";
 close(QRC);

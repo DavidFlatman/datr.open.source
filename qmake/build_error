@@ -1,0 +1,10 @@
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang++ -c -pipe -stdlib=libc++ -std=c++11 -O2 -std=gnu++11  -arch x86_64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.15.sdk -mmacosx-version-min=10.13 -w -fPIC -DQT_NO_DEBUG -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB -D_LARGEFILE64_SOURCE -D_LARGEFILE_SOURCE -I. -I../qt -I../qt/images -I../common -I../../../Qt/5.15.1/clang_64/lib/QtWidgets.framework/Headers -I../../../Qt/5.15.1/clang_64/lib/QtGui.framework/Headers -I../../../Qt/5.15.1/clang_64/lib/QtCore.framework/Headers -Imoc -I/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.15.sdk/System/Library/Frameworks/OpenGL.framework/Headers -I/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.15.sdk/System/Library/Frameworks/AGL.framework/Headers -I../../../Qt/5.15.1/clang_64/mkspecs/macx-clang -F/Users/magnus/Qt/5.15.1/clang_64/lib -o obj/demo.o ../qt/demo.cpp
+../qt/demo.cpp:31:27: error: constant expression evaluates to 170 which cannot be narrowed to type 'char' [-Wc++11-narrowing]
+    char memory[] { 0x55, 0xAA};
+                              ^~~~
+                              ../qt/demo.cpp:31:27: note: insert an explicit cast to silence this issue
+                                  char memory[] { 0x55, 0xAA};
+                                                            ^~~~
+                                                                                      static_cast<char>( )
+                                                                                      1 error generated.
+                                                                                      
