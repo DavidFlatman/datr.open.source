@@ -34,7 +34,7 @@ MOC_DIR         =   moc
 
 
 
-SOURCES         += ../qt/demo.cpp
+SOURCES         += ../qt/demo2.cpp
 
 
 

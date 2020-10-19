@@ -26,8 +26,10 @@
 #   -Lpath          Pass qualifier to linker.                                   
 #   -mpath/file     Path to main source file.                                   
 #   -qpath          qrc resource file                                           
-#   -TDpath         Path to target dependency                                   
-#                                                                               
+#   -TDpath         Path to target dependency 
+#   --threads=      Number of threads available to use.                                  
+#   
+#   version 2020-10-15  PN      Added --threads= and multi-threading.                                                                            
 #   version 2012-01-26  DHF     Added -TD                                       
 #                               Add comment header to output                    
 #
@@ -37,6 +39,9 @@
 #-------------------------------------------------------------------------------
 
 use POSIX qw{strftime};
+use threads;
+use threads::shared;
+use Thread::Queue;
 
 local @inc_pathes;
 local @src_pathes;
@@ -58,6 +63,16 @@ local @targetdeps;
 
 local $main;
 
+local $file_queue  = Thread::Queue->new();
+local $thread_count = `nproc`;
+
+share(@main_files);
+share(@src_pathes);
+share(@inc_pathes);
+share(@hdr_files);
+share(@src_files);
+share(@library);
+
 for my $a (@ARGV)
 {
     if ($a =~ /^-c(.*)/) {
@@ -65,6 +80,7 @@ for my $a (@ARGV)
     } elsif ($a =~ /^-d(.*)/) {
         push(@src_pathes, $1);
         push(@inc_pathes, $1);
+        &directory($1);
 
     } elsif ($a =~ /^-D/) {
         push(@macros, $a);
@@ -93,7 +109,16 @@ for my $a (@ARGV)
     } elsif ($a =~ /^-TD(.*)/) {
         push(@targetdeps, $1);
 
+    } elsif ($a =~ /^--threads=(.*)/) {
+        $thread_count = $1;
+
     }
+}
+
+for (my $i = 0; $i < $thread_count; ++$i)
+{
+    $file_queue->enqueue(undef);
+    $threads[$t] = threads->create(\&process_src_path, $i);
 }
 
 $config{"qt"} = 1;
@@ -109,9 +134,9 @@ if($^O ne 'darwin') {
 open(QRC, ">${qrc_file}") or die "unable to open ${qrc_file}\n$!\n";
 close(QRC);
 
-foreach my $path (@src_pathes) {
-    &process_src_path($path);
-}
+# foreach my $path (@src_pathes) {
+#     &process_src_path($path);
+# }
 
 open(QRC, ">${qrc_file}") or die "unable to open ${qrc_file}\n$!\n";
 print QRC "<!DOCTYPE RCC><RCC version=\"1.0\">\n";
@@ -198,54 +223,17 @@ print "\n";
 #-------------------------------------------------------------------------------
 sub process_src_path
 {
-    my ($dir) = @_;
 
-    opendir(DIR, $dir) or die "unable to open directory ${dir}\n$!\n";
-    my @files = readdir(DIR);
-    closedir(DIR);
-
-    foreach my $f (@files) {
-        my $d = $dir . "/" . $f;
-
-        if ($f eq "." or $f eq "..") {
-            #-------------------------------------------------------------------
-            # skip this and parent directory.                                   
-            #-------------------------------------------------------------------
-
-        } elsif ($f =~ /\.c$/i or $f =~ /\.cpp$/i or $f =~ /\.cc/i) {
-            my $test = system("grep --silent \"int main\" \"${d}\"");
-            if ($test == 0) {
-                push(@main_files, $d);
-            } else {
-                push(@src_files, $d);
-            }
+        #  elsif ($f =~ /\.c$/i or $f =~ /\.cpp$/i or $f =~ /\.cc/i) 
+        #     my $test = system("grep --silent \"int main\" \"${d}\"");
+        #     if ($test == 0) {
+        #         push(@main_files, $d);
+        #      else 
+        #         push(@src_files, $d);
+        #     
 
             &search_file($d);
 
-        } elsif ($f =~ /\.h$/i or $f =~ /\.hpp$/i or $f =~ /\.hh/i) {
-            push(@hdr_files, $d);
-
-            &search_file($d);
-
-        } elsif ($f =~ /\.qrc$/) {
-            push(@qrc_files, $d);
-
-        } elsif (
-            $f =~ /\.gif$/
-         or $f =~ /.png$/ 
-         or $f =~ /.jpg$/ 
-         or $f =~ /.ico$/
-         or $f =~ /.svg$/
-         or $f =~ /.svgz$/
-         or $f =~ /.tgz$/
-         or $f =~ /.css$/
-         or $f =~ /.js$/
-         or $f =~ /.htm$/
-         or $f =~ /.html$/
-        ) {
-            push(@img_files, $d);
-        }
-    }
 
 
 } # sub process_src_path #
@@ -279,5 +267,77 @@ sub qt_search
         if ($test == 0) {
             $qt{$module} = 1;
         }
+    }
+}
+
+#-------------------------------------------------------------------------------
+#@brief  Search through given directory for files to parse. Function pulled from
+#        depends script and adapted for makepro.                   
+#-------------------------------------------------------------------------------
+sub directory
+{
+    my ($dir) = @_;
+
+    opendir(DIR, $dir) or die "Unable to open directory ${dir}\n$!\n";
+    my @files = readdir(DIR);
+    closedir(DIR);
+
+    foreach my $f (@files)
+    {
+        my $full = $dir . "/" . $f;
+        if ($f eq "." or $f eq ".." or defined($skip{$f})) {
+            #-------------------------------------------------------------------
+            #   Ignore this and parent directory and -s<directories>            
+            #-------------------------------------------------------------------
+
+        } elsif ($f =~ /\.c$/i or $f =~ /\.cpp$/i or $f =~ /\.cc/i) {
+
+            push(@src_files, $full);
+            &queue($full);
+
+        } elsif ($f =~ /\.h$/i or $f =~ /\.hpp$/i or $f =~ /\.hh/i) {
+
+            push(@hdr_files, $full);
+            &queue($full);
+
+        } elsif ($f =~ /\.qrc$/) {
+            push(@qrc_files, $full);
+
+        } elsif (
+            $f =~ /\.gif$/
+         or $f =~ /.png$/ 
+         or $f =~ /.jpg$/ 
+         or $f =~ /.ico$/
+         or $f =~ /.svg$/
+         or $f =~ /.svgz$/
+         or $f =~ /.tgz$/
+         or $f =~ /.css$/
+         or $f =~ /.js$/
+         or $f =~ /.htm$/
+         or $f =~ /.html$/
+        ) {
+
+            push(@img_files, $full);
+
+        } else {
+            #-------------------------------------------------------------------
+            #   Ignore non-header and non-source files such as README.md.            
+            #-------------------------------------------------------------------
+        }
+    }
+}
+
+#-------------------------------------------------------------------------------
+#@brief Add the given file to the file-queue if it hasn't already been added.
+#       Function pulled from depends script and adapted for makepro.
+#-------------------------------------------------------------------------------
+sub queue
+{
+    my ($file) = @_;
+
+    lock(%include);
+    if (!defined($include{$file})) {
+        $include{$file} = "";
+        $file_queue->enqueue($file);
     }
 }

@@ -4,8 +4,8 @@
 #                                                                               
 #   Name: makeconfig                                                            
 #                                                                               
-#   Purpose:    Create the configure.sh file which will create the .pro files   
-#               and Makefiles.                                                  
+#   Purpose:    Create the .pro and Makefile files for the known main       
+#               programs.                                                   
 #                                                                               
 #               This script should be executed everytime that a new main.cpp is 
 #               created.                                                        
@@ -23,7 +23,10 @@
 #   @version    unknown     unknown Major overhaul                              
 #                                                                               
 #   @version    2020-09-30  MNT     Added QMAKE                                 
-#                                                                               
+# 
+#   @version    2020-10-19  PN      Combined makeconfig and configure.sh
+#                                   Renamed makeconfig to configure.sh
+#                                                                            
 #-------------------------------------------------------------------------------
 
 OUTPUT_DIR=../../../datr-non-cm/linux/
@@ -52,6 +55,5 @@ fi
     --qmake=$QMAKE                                          \
     -f-std=c++11
 
-
-chmod u+x build configure.sh
+chmod u+x build
 

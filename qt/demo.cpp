@@ -28,7 +28,7 @@ int main(int argc, char* argv[])
     //  Create a Qt widget, display it, and execute the Qt application.         
     //--------------------------------------------------------------------------
     QLabel  label("Test");
-
+    label.resize(1000,1000);
     label.show();
 
     return app.exec();

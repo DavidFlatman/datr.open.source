@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 use strict;
 use warnings;
-# Print hello world
+use threads;
 
 # $ scalar
 # @ list
@@ -40,3 +40,25 @@ foreach my $a (@list)
 print "list: @list\n";
 print "list size: " . scalar @list . "\n";
 print "list max index: " . $#list . "\n";
+
+my %hash;
+$hash{"test"} = 1;
+print $hash{"test"} . "\n";
+
+sub routine {
+    my @list = @_;
+    my $size = scalar(@_);
+
+    print "parameter size: $size\n";
+    foreach my $item(@_)
+    {
+        print $item . "\n";
+    }
+    print "List: @list\n";
+}
+
+routine(10,20,30);
+
+my $testingSpecialCharacter = `pwd`;
+chomp($testingSpecialCharacter);
+print $testingSpecialCharacter . "\n";
