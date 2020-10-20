@@ -15,5 +15,4 @@
 #-------------------------------------------------------------------------------
 
 clear && clear                                                              && \
- make -j8 -f Makefile-demo                                             && \
- make -j8 -f Makefile-demo2                                            
+ make -j8 -f Makefile-demo                                             

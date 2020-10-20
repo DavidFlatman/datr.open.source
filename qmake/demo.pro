@@ -9,7 +9,7 @@
         #   -I../common                                                           
         #   -q../qt/datr                                                          
         #   -qtwidgets                                                            
-        #   --qmake=qmake                                                         
+        #   --qmake=qmake-qt4                                                     
         #   -f-std=c++11                                                          
 
         ########################################################################   
@@ -19,6 +19,7 @@ CONFIG          += qt
 CONFIG          += stl
 CONFIG          += thread
 CONFIG          += warn_off
+CONFIG          += x11
 
 QT              += widgets
 

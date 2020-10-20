@@ -1,14 +1,3 @@
-# DO NOT MERGE THIS FILE WITH DEVELOP OR MASTER
-# THIS .gitignore FILE IS UNIQUE TO THIS FEATURE BRANCH
-
-# Visual Studio Code Specific
-.vscode/
-# Unit test files
-test/
-
-# QtCreator Specific
-*.pro.user
-
 # Prerequisites
 *.d
 
