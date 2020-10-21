@@ -75,7 +75,7 @@
 #include "debug.h"
 
 #ifdef IS_LINUX
-    #include "lib_time_walltime.h"
+    #include "lib_time_work_walltime.h"
     #define  FONT_RED       "\x1B[1;31m"
     #define  FONT_ORANGE    "\x1B[38;2;196;128;1m"
     #define  FONT_NORMAL    "\x1B[0m"
@@ -214,7 +214,7 @@ void Test::run(
     outputIndent();
 
 #ifdef IS_LINUX
-    lib::time::WallTime wallTime;
+    lib::time::work::WallTime wallTime;
 
     std::string red(lib::format("%c[38;2;255;1;1m",27));
     std::string normal(lib::format("%c[0m",27));
@@ -228,7 +228,7 @@ void Test::run(
               , LEVEL                                                       \
             );                                                              \
             if (testLevel >= LEVEL) {                                       \
-                lib::time::WallTime wallTime;                               \
+                lib::time::work::WallTime wallTime;                               \
                 RUN_TEST();                                                 \
                 double seconds = wallTime.seconds();                        \
                 verbosity_t verbosity(vRunLevelTime);                       \
